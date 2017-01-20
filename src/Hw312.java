@@ -14,21 +14,39 @@ public class Hw312 {
 		
 		
 		
-//		String[] arr = {"1","2","3","4","5","6"};
-//		List<String> r = new ArrayList<String>();
-//		combinations2(arr, 3, 0, new String[3], r);
-//        System.out.println(r);
-//        System.out.println(r.size());
-//        
-//        int count = 0;
-//        for(int i = 0; i < r.size(); i++) {
-//        	if(r.get(i).contains("1") && r.get(i).contains("2")) {
-//        		count++;
-//        		System.out.println(r.get(i));
-//        	}
-//        }
-//        System.out.println(count);
-//		
+		String[] arr = {"1","2","3","4","5","6"};
+		List<String> r = new ArrayList<String>();
+		combinations2(arr, 3, 0, new String[3], r);
+        System.out.println(r);
+        System.out.println(r.size());
+		
+        
+        
+        String[] arr2 = {"1","2","3","4","5","6","7","8"};
+		List<String> r2 = new ArrayList<String>();
+		combinations2(arr2, 3, 0, new String[3], r2);
+        System.out.println(r2);
+        System.out.println(r2.size());
+        
+        int q=0;
+        int count = 0;
+        for(int i = 0; i < r.size(); i++) {
+        	for(int j = 0; j < r2.size(); j++) {
+        		if(r.get(i).contains("1") && r2.get(j).contains("1")) {
+            		count++;
+            		System.out.println(r.get(i)+"\t"+r2.get(j));
+            	}
+        		q++;
+        	}
+        }
+        System.out.println(q);
+        System.out.println(count);
+		
+        
+        
+        
+        
+        
 
 		
 		//1680
@@ -37,9 +55,9 @@ public class Hw312 {
 //		System.out.println(r.size());
 		
 		
-		int n = 4;
-		int k = 4;
-		System.out.println(nChooseR(n,k));
+		int n = 8;
+		int k = 3;
+		//System.out.println(nChooseR(n,k));
 //		
 //		
 ////		for(int i = 0; i <40; i++) {
@@ -58,9 +76,10 @@ public class Hw312 {
 //		System.out.println(l);
 //		System.out.println(l % 13);
 		
-		hw2q8();
+		//hw2q8();
 	}
 	
+	// hashing/birthdays problem
 	private static void hw2q8() {
 		int b = 10000;
 		
@@ -68,8 +87,9 @@ public class Hw312 {
 			double d = 1.0;
 			for(int i = b; i >= b-n+1; i--) {
 				d *= (double)i;
+				d /= b;
 			}
-			System.out.println(d / Math.pow(10000, n));
+			System.out.println(n + ":\t" + d);
 		}
 	}
 	
