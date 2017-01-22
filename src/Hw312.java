@@ -4,49 +4,29 @@ import java.util.*;
 public class Hw312 {
 
 	public static void main(String[] args) {
-//		List<String> r = permutation("12345678");
-//		HashSet<String> set = new HashSet<String>();
-//		for(String s : r) {
-//			set.add(s.substring(0, 4));
-//		}
-//		System.out.println(set);
-//		System.out.println(set.size());
+		List<String> r = permutation("0123456789ABCDEFGHIJ");
+		HashSet<String> set = new HashSet<String>();
+		for(String s : r) {
+			set.add(s.substring(0, 4));
+		}
+		System.out.println(set);
+		System.out.println(set.size());
 		
 		
 		
-		String[] arr = {"1","2","3","4","5","6"};
-		List<String> r = new ArrayList<String>();
-		combinations2(arr, 3, 0, new String[3], r);
-        System.out.println(r);
-        System.out.println(r.size());
-		
-        
-        
-        String[] arr2 = {"1","2","3","4","5","6","7","8"};
-		List<String> r2 = new ArrayList<String>();
-		combinations2(arr2, 3, 0, new String[3], r2);
-        System.out.println(r2);
-        System.out.println(r2.size());
-        
-        int q=0;
-        int count = 0;
-        for(int i = 0; i < r.size(); i++) {
-        	for(int j = 0; j < r2.size(); j++) {
-        		if(r.get(i).contains("1") && r2.get(j).contains("1")) {
-            		count++;
-            		System.out.println(r.get(i)+"\t"+r2.get(j));
-            	}
-        		q++;
-        	}
-        }
-        System.out.println(q);
-        System.out.println(count);
-		
-        
-        
-        
-        
-        
+//		String[] arr = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"};
+//		List<String[]> r = combinations(arr, 2);
+//        System.out.println(r);
+//        System.out.println(r.size());
+//        for(int i = 0; i < r.size(); i++) {
+//        	String[] comb = r.get(i);
+//        	for(int j = 0; j < comb.length; j++) {
+//        		if(comb[j].equals("1")) {
+//        			System.out.println(Arrays.toString(comb));
+//        		}
+//        	}
+//        }
+//		
 
 		
 		//1680
@@ -139,13 +119,22 @@ public class Hw312 {
 //		}
 //	}
 	
-	static void combinations2(String[] arr, int len, int startPosition, String[] result, List<String> l){
+	// Returns all distinct results of choosing the given number of items from the given array. Order does not matter.
+	// example of input: combinations(new String[]{"1","2","3","4"}, 2);
+	// example of output: [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+	public static List<String[]> combinations(String[] array, int choose) {
+		if(choose > array.length || choose < 0) throw new IllegalArgumentException();
+		List<String[]> list = new ArrayList<String[]>();
+		combinations(array, choose, 0, new String[choose], list);
+		return list;
+	}	
+	private static void combinations(String[] arr, int len, int startPosition, String[] result, List<String[]> resultList){
         if (len == 0){
-            l.add(Arrays.toString(result));
+        	resultList.add(Arrays.copyOf(result, result.length));
         } else {
         	for (int i = startPosition; i <= arr.length-len; i++){
                 result[result.length - len] = arr[i];
-                combinations2(arr, len-1, i+1, result, l);
+                combinations(arr, len-1, i+1, result, resultList);
             }
         }
     }  
