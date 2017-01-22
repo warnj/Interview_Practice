@@ -8,31 +8,58 @@ import java.util.Stack;
 
 public class StacksAndQueues {
 	
-	public static class MinStack {
-		public int min;
-		public int[] arr;
-		public int size;
+	public static class MinStack<E extends Comparable<E>> {
+		private Node<E> front;
+		private int size;
 		
-		public MinStack() {
-			arr = new int[10];
-			min = Integer.MAX_VALUE;
+		public MinStack() {}
+		
+		public void push(E data) {
+			if(front == null) {
+				front = new Node<E>(data, data, null);
+			} else {
+				front = new Node<E>(data, min(front.min, data), front);
+			}
+			size++;
 		}
 		
-		public void push(int n) {
-			if(size >= arr.length) resize();
-			arr[size++] = n;
-			if(min > n) min = n;
+		public E pop() {
+			if(front == null) throw new EmptyStackException();
+			size--;
+			E result = front.data;
+			front = front.next;
+			return result;
 		}
 		
-		public int pop() {
+		public E peek() {
+			if(front == null) throw new EmptyStackException();
+			return front.data;
+		}
+		
+		public E getMin() {
+			if(front == null) throw new EmptyStackException();
+			return front.min;
+		}
+		
+		public boolean isEmpty() {return size == 0;}
+		public int size() {return size;}
+		
+		private E min(E one, E two) {
+			if(one.compareTo(two) < 0)
+				return one;
+			else
+				return two;
+		}
+		
+		private static class Node<E extends Comparable<E>> {
+			E data;
+			E min;
+			Node<E> next;
 			
-		}
-		
-		private void resize() {
-			int[] old = arr;
-			arr = new int[old.length * 2];
-			for(int i = 0; i < old.length; i++) {
-				arr[i] = old[i];
+			public Node(E data, E min, Node<E> next) {
+				this.data = data;
+				this.min = min;
+				this.next = next;
 			}
 		}
 	}
