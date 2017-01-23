@@ -5,12 +5,12 @@ public class Hw312 {
 
 	public static void main(String[] args) {
 		List<String> r = permutation("0123456789ABCDEFGHIJ");
-		HashSet<String> set = new HashSet<String>();
-		for(String s : r) {
-			set.add(s.substring(0, 4));
-		}
-		System.out.println(set);
-		System.out.println(set.size());
+//		HashSet<String> set = new HashSet<String>();
+//		for(String s : r) {
+//			set.add(s.substring(0, 4));
+//		}
+//		System.out.println(set);
+//		System.out.println(set.size());
 		
 		
 		

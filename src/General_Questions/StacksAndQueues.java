@@ -7,8 +7,7 @@ import java.util.Queue;
 import java.util.Stack;
 
 public class StacksAndQueues {
-	
-	public static class MinStack<E extends Comparable<E>> {
+	public static class MinStack<E extends Comparable<E>> { // O(1) push, pop, and getMin
 		private Node<E> front;
 		private int size;
 		

@@ -3,7 +3,6 @@ import java.util.*;
 
 // rotates a matrix
 public class RotatePicture {
-	
 	public static void main(String[] args) {
 		int[][] test = new int[5][7];
 		for(int i = 0; i < test.length;i ++) {

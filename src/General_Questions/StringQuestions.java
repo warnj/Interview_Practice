@@ -10,64 +10,80 @@ public class StringQuestions {
 
 	}
 
-	// TEST THIS METHOD FOR CORRECTNESS
-	public static int longestPalindromicSubstring(String s, int start, int end) {
-		if(end-start == 1) {
-			if(s.charAt(start)==s.charAt(end)) return 2;
-			else return 1;
-		} else if(s.charAt(start)==s.charAt(end)) {
-			return 2 + longestPalindromicSubstring(s, start+1, end-1);
-		} else {
-			return 1 + Math.max(longestPalindromicSubstring(s, start+1, end), longestPalindromicSubstring(s, start, end-1));
+	
+	public String longestPalindrome(String s) {
+		int n = s.length();
+		if (n == 0) return "";
+		String longest = s.substring(0, 1);  // a single char itself is a palindrome
+		for (int i = 0; i < n-1; i++) { // try to find a palindrome at all possible centers in s
+			String p1 = expandAroundCenter(s, i, i);
+			if (p1.length() > longest.length())
+				longest = p1;
+
+			String p2 = expandAroundCenter(s, i, i+1);
+			if (p2.length() > longest.length())
+				longest = p2;
 		}
+		return longest;
 	}
-	
+	// returns the longest odd-length palindrome with a single center when c1=c2 or the longest even-length palindrome
+	// when c1 = c2-1.
+	public String expandAroundCenter(String s, int c1, int c2) {
+		int l = c1, r = c2;
+		int n = s.length();
+		while (l >= 0 && r < n && s.charAt(l) == s.charAt(r)) {
+			l--;
+			r++;
+		}
+		return s.substring(l+1, r);
+	}
+
 	public static String reverseWordsInPlace(String s) {// reverse the entire string, then go through and reverse each word
-	    char[] word = s.toCharArray();
-	    for(int i = 0; i < word.length /2; i++) {
-	        char temp = word[i];
-	        word[i] = word[word.length-1-i];
-	        word[word.length-1-i] = temp;
-	    }
-	    for(int i=0; i < word.length; i++) {
-	        while(i < word.length && word[i] == ' ') {
-	            i++;
-	        }
-	        if(i==word.length) break;
-	        int end = i;
-	        while(end < word.length && word[end] != ' ') {
-	            end++;
-	        }
-	        if(i < end) {
-	            for(int j = i; j < i+((end-i)/2); j++) {
-	                char temp = word[j];
-	                word[j] = word[end-1-(j-i)];
-	                word[end-1-(j-i)] = temp;
-	            }
-	            i = end;
-	        }
-	    }
-	    return new String(word);
+		char[] word = s.toCharArray();
+		for(int i = 0; i < word.length /2; i++) {
+			char temp = word[i];
+			word[i] = word[word.length-1-i];
+			word[word.length-1-i] = temp;
+		}
+		for(int i=0; i < word.length; i++) {
+			while(i < word.length && word[i] == ' ') {
+				i++;
+			}
+			if(i==word.length) break;
+			int end = i;
+			while(end < word.length && word[end] != ' ') {
+				end++;
+			}
+			if(i < end) {
+				for(int j = i; j < i+((end-i)/2); j++) {
+					char temp = word[j];
+					word[j] = word[end-1-(j-i)];
+					word[end-1-(j-i)] = temp;
+				}
+				i = end;
+			}
+		}
+		return new String(word);
 	}
-	
+
 	public static String reverseWordsBackToFront(String s){
 		StringBuilder sb = new StringBuilder();
-        for(int i = s.length() - 1; i >= 0;){
-            if(s.charAt(i) != ' '){
-                int j = i - 1;
-                //locate the starting index of the word
-                while(j >= 0 && s.charAt(j) != ' ')
-                    j--;
-                sb.append(s.substring(j + 1, i + 1));
-                sb.append(" ");
-                i = j - 1;
-            } else i--;
-        }
-        if(sb.length() > 0)
-            sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
+		for(int i = s.length() - 1; i >= 0;){
+			if(s.charAt(i) != ' '){
+				int j = i - 1;
+				//locate the starting index of the word
+				while(j >= 0 && s.charAt(j) != ' ')
+					j--;
+				sb.append(s.substring(j + 1, i + 1));
+				sb.append(" ");
+				i = j - 1;
+			} else i--;
+		}
+		if(sb.length() > 0)
+			sb.deleteCharAt(sb.length() - 1);
+		return sb.toString();
 	}
-	
+
 	public static String reverseWordsRegex(String s){
 		String[] words = s.split("\\s+"); // split over whitespace
 		StringBuilder sb = new StringBuilder();
@@ -79,7 +95,7 @@ public class StringQuestions {
 		}
 		return sb.toString();
 	}
-	
+
 	// Reverse words in a string (words are separated by one or more spaces). Now do it in-place.
 	public static String reverseWordsStack(String s){
 		Scanner scan = new Scanner(s);
@@ -96,7 +112,7 @@ public class StringQuestions {
 		}
 		return sb.toString();
 	}
-	
+
 	// replace all spaces in a string with'%20'.
 	public static String add20 (String s){
 		StringBuilder sb = new StringBuilder();

@@ -15,7 +15,7 @@ public class Subsets {
 	}
 	
 	// prints all the subsets of A of size k
-	public static void subset(int[] A, int k, int start, int currLen, boolean[] used) {
+	private static void subset(int[] A, int k, int start, int currLen, boolean[] used) {
 		if (currLen == k) {
 			for (int i = 0; i < A.length; i++) {
 				if (used[i] == true) {
@@ -40,6 +40,5 @@ public class Subsets {
 
 	public static void main(String[] args) {
 		allSubsets(new int[] { 1, 2, 3});
-		
 	}
 }
