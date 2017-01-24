@@ -4,29 +4,40 @@ import java.util.*;
 public class Hw312 {
 
 	public static void main(String[] args) {
-		List<String> r = permutation("0123456789ABCDEFGHIJ");
-//		HashSet<String> set = new HashSet<String>();
+//		List<String> r = permutation("WWWBB");
+//		Set<String> set = new LinkedHashSet<String>();
 //		for(String s : r) {
-//			set.add(s.substring(0, 4));
+//			set.add(s);
 //		}
 //		System.out.println(set);
 //		System.out.println(set.size());
 		
 		
 		
-//		String[] arr = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"};
-//		List<String[]> r = combinations(arr, 2);
-//        System.out.println(r);
+//		String[] arr = {"1","1","1","1","1","2","2","2","2","2","2","2","2","2","2"};
+//		List<String[]> r = combinations(arr, 5);
 //        System.out.println(r.size());
+//        int count = 0;
 //        for(int i = 0; i < r.size(); i++) {
 //        	String[] comb = r.get(i);
+//        	System.out.print(Arrays.toString(comb));
+//        	int c = 0;
 //        	for(int j = 0; j < comb.length; j++) {
 //        		if(comb[j].equals("1")) {
-//        			System.out.println(Arrays.toString(comb));
+//        			c++;
+//        			if(c >= 3) {
+//        				if(comb[0].equals("1") && comb[2].equals("1")) {
+//        					count++;
+//        					System.out.print("\tcontains 3 or more whites and 1st and 3rd are white");
+//        				}
+//        				
+//        				c = 0;
+//        			}
 //        		}
 //        	}
+//        	System.out.println();
 //        }
-//		
+//        System.out.println(count);
 
 		
 		//1680
@@ -36,8 +47,10 @@ public class Hw312 {
 		
 		
 		int n = 8;
-		int k = 3;
-		//System.out.println(nChooseR(n,k));
+		int k = 4;
+		System.out.println(nChooseR(n,k));
+		
+		//112/495
 //		
 //		
 ////		for(int i = 0; i <40; i++) {
