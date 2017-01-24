@@ -437,16 +437,23 @@ public class IntTree {
 	
 	// fails if tree contains Integer.MIN_VALUE
 	public boolean isBST() {
-		return checkBST(overallRoot, Integer.MIN_VALUE, Integer.MAX_VALUE);
+		return checkBST(overallRoot, Long.MIN_VALUE, Long.MAX_VALUE);
 	}	
-	private boolean checkBST(IntTreeNode n, int min, int max) {
+	private boolean checkBST(IntTreeNode n, long min, long max) {
 		if(n == null) {
 			return true;
-		} else if (n.data <= min || n.data > max) {
+		} else if (n.data <= min || n.data >= max) {
 			return false;
 		} else {
 			return checkBST(n.left, min, n.data) && checkBST(n.right, n.data, max);
 		}
+	}
+	public boolean isValidBST(IntTreeNode root) {
+	    return isValidBST(root, null, null);
+	}
+	private boolean isValidBST(IntTreeNode p, Integer low, Integer high) { // uses null case to avoid the Integer.MIN_VALUE and MAX_VALUE cases
+	    if (p == null) return true;
+	    return (low == null || p.data > low) && (high == null || p.data < high) && isValidBST(p.left, low, p.data) && isValidBST(p.right, p.data, high);
 	}
 	
 	public boolean equals(IntTree other) {
