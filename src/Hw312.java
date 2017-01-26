@@ -46,9 +46,9 @@ public class Hw312 {
 //		System.out.println(r.size());
 		
 		
-		int n = 8;
-		int k = 4;
-		System.out.println(nChooseR(n,k));
+//		int n = 8;
+//		int k = 4;
+//		System.out.println(nChooseR(n,k));
 		
 		//112/495
 //		
@@ -69,7 +69,40 @@ public class Hw312 {
 //		System.out.println(l);
 //		System.out.println(l % 13);
 		
-		//hw2q8();
+		hw3q7_2();
+	}
+	
+	private static void hw3q7_2() {
+		Integer[] seq = {0,0,0,0,0,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
+		ArrayList<Integer> twenty = new ArrayList<Integer>();
+		twenty.addAll(Arrays.asList(seq));
+		Random r = new Random();
+		
+		int count = 0;
+		for(int i = 0; i < 100000; i++) {
+			List<Integer> l = new ArrayList<Integer>(20);
+			for(int j = 0; j < 20; j++) {
+				l.add(twenty.remove(r.nextInt(twenty.size())));
+			}
+			List<Integer> l1 = l.subList(0, 4);
+			List<Integer> l2 = l.subList(4, 8);
+			List<Integer> l3 = l.subList(8, 12);
+			List<Integer> l4 = l.subList(12, 16);
+			List<Integer> l5 = l.subList(16, 20);
+			if(containsInt(l1, 0)==1 && containsInt(l2, 0)==1 &&containsInt(l3, 0)==1&&containsInt(l4, 0)==1&&containsInt(l5, 0)==1) {
+				//System.out.println(l);
+				count++;
+			}
+			twenty.addAll(Arrays.asList(seq));
+		}
+		System.out.println(count);
+	}
+	private static int containsInt(List<Integer> arr, int n){
+		int num = 0;
+		for(int i=0;i<arr.size();i++) {
+			if(arr.get(i)==n) num++;
+		}
+		return num;
 	}
 	
 	// hashing/birthdays problem

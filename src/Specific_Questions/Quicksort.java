@@ -9,32 +9,6 @@ public class Quicksort {
 		System.out.println(Arrays.toString(list));
 	}
 	
-	public static void quickSort2(int[] arr, int low, int high) {
-		if(low >= high) return;
-
-		int pivot = arr[(low + high ) / 2];
-
-		int i = low;
-		int j = high;
-
-		while(i <= j) {
-			while(arr[i] < pivot) i++;
-			while(arr[j] > pivot) j--;
-
-			if(i < j) {
-				int temp = arr[i];
-				arr[i] = arr[j];
-				arr[j] = temp;
-				i++;
-				j++;
-			}
-		}
-
-		if(i < high) quickSort(arr, i, high);
-		if(j > low) quickSort(arr, low, j);
-
-	}
-	
 	// avg O(n log(n)) time - each call is O(n) and each call divides the remaining work in half, constant space
 	public static void quickSort(int[] arr, int low, int high) {
 		if (low >= high || arr == null || arr.length == 0) return;
