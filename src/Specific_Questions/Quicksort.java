@@ -5,7 +5,7 @@ public class Quicksort {
 	
 	public static void main(String[] args) {
 		int[] list = {4,6,7,2,3,4,5,2,1,1,1,3,4,5,6,7,8,9,99,9,999,333,222,555,666};
-		quickSort2(list, 0, list.length - 1);
+		quickSort(list, 0, list.length - 1);
 		System.out.println(Arrays.toString(list));
 	}
 	
