@@ -69,7 +69,44 @@ public class Hw312 {
 //		System.out.println(l);
 //		System.out.println(l % 13);
 		
-		hw3q7_2();
+		//hw3q7_2();
+		
+	}
+	
+	private static void hw5_q1() {
+		Map<Integer, Integer> times = new HashMap<Integer, Integer>();
+		List<String> list = permutation("123456");
+		for(String s : list) {
+			int a = Integer.valueOf(s.charAt(0));
+			int b = Integer.valueOf(s.charAt(1));
+			int c = Integer.valueOf(s.charAt(2));
+			int d = Integer.valueOf(s.charAt(3));
+			int e = Integer.valueOf(s.charAt(4));
+			int f = Integer.valueOf(s.charAt(5));
+			
+			int[] arr = {a,b,c,d,e,f};
+			
+			
+			int max = arr[0];
+			int timesFalse = 0;
+			for(int i = 1; i < 6; i++){
+				if(max < arr[i] || i==5){ // (*)
+					if(i==5 && max >= arr[i]) timesFalse++;
+					Integer val = times.get(timesFalse);
+					if(val == null) {
+						times.put(timesFalse, 1);
+					} else {
+						times.put(timesFalse, ++val);
+					}
+					break;
+					//max = arr[i]; // (**)
+				} else {
+					timesFalse++;
+				}
+			}
+
+		}
+		System.out.println(times);
 	}
 	
 	private static void hw3q7_2() {
