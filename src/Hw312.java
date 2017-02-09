@@ -46,8 +46,8 @@ public class Hw312 {
 //		System.out.println(r.size());
 		
 		
-//		int n = 8;
-//		int k = 4;
+//		int n = 6;
+//		int k = 3;
 //		System.out.println(nChooseR(n,k));
 		
 		//112/495
@@ -69,8 +69,7 @@ public class Hw312 {
 //		System.out.println(l);
 //		System.out.println(l % 13);
 		
-		//hw3q7_2();
-		
+		hw5_q1();
 	}
 	
 	private static void hw5_q1() {
@@ -85,7 +84,6 @@ public class Hw312 {
 			int f = Integer.valueOf(s.charAt(5));
 			
 			int[] arr = {a,b,c,d,e,f};
-			
 			
 			int max = arr[0];
 			int timesFalse = 0;
@@ -107,6 +105,57 @@ public class Hw312 {
 
 		}
 		System.out.println(times);
+	}
+	
+	private static void hw4_2() {
+		
+		double[] arr = new double[9];
+//		arr[0] = 2.0/9.0 + 1.0/18.0;
+//		arr[1] = 2.0/9.0 + 1.0/18.0;
+//		arr[2] = 2.0/9.0 + 2.0/9.0;
+//		arr[3] = 1.0/18.0 + 1.0/18.0;
+//		arr[4] = 2.0/9.0 + 1.0/18.0;
+//		arr[5] = 1.0/18.0 + 1.0/18.0;
+//		arr[6] = 1.0/18.0 + 1.0/18.0;
+//		arr[7] = 1.0/18.0 + 1.0/18.0;
+//		arr[8] = 2.0/9.0 + 1.0/18.0;
+		
+		arr[0] = 2.0/3.0 * 1.0/6.0 * 1.0/9.0;
+		arr[1] = 2.0/3.0 * 1.0/6.0 * 1.0/9.0;
+		arr[2] = 2.0/3.0 * 2.0/3.0 * 1.0/9.0;
+		arr[3] = 1.0/6.0 * 1.0/6.0 * 1.0/9.0;
+		arr[4] = 2.0/3.0 * 1.0/6.0 * 1.0/9.0;
+		arr[5] = 1.0/6.0 * 1.0/6.0 * 1.0/9.0;
+		arr[6] = 1.0/6.0 * 1.0/6.0 * 1.0/9.0;
+		arr[7] = 1.0/6.0 * 1.0/6.0 * 1.0/9.0;
+		arr[8] = 2.0/3.0 * 1.0/6.0 * 1.0/9.0;
+		for(double j = .11; j < .12; j += .0001) {
+			double sum = 0;
+			for(int i = 0; i < arr.length; i++) {
+				sum += arr[i]/j;
+			}
+			System.out.println(j + "\t" + sum);
+		}
+		
+	}
+	
+	private static void hw4_3() {
+		double min = Math.pow(10, -6);
+		String s = "";
+		for(int i = 0; i < 30; i++) {
+			double v1 = (Math.pow(.5, i)*255.0/256.0)/(Math.pow(.5, i)*255.0/256.0 + 1.0/256.0);
+			double v2 = (1.0/256.0)/(Math.pow(.5, i)*255.0/256.0 + 1.0/256.0);
+			double odds = v1 / v2;
+			if(odds < min) s = "less than 10e-6";
+			System.out.println(i + "\t" + v1 + "\t" + odds + "\t" + s);
+		}
+	}
+	
+	private static void calcsBayes() {
+		double pf = 1.0/18.0;
+		//double val = (2.0/3.0*pf)/(2.0/3.0*pf + 1.0/6.0*(1.0-pf)); // actually facing sensor color
+		double val = (1.0/6.0*pf)/(1.0/6.0*pf + 2.0/3.0*(1.0-pf)); // not facing sensed color
+		System.out.println(val);
 	}
 	
 	private static void hw3q7_2() {
