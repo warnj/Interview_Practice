@@ -403,6 +403,21 @@ public class IntTree {
     	return root;
     }
     
+    public int secondSmallest() {
+    	return secondSmallest(overallRoot);
+    }
+    private int secondSmallest(IntTreeNode node) {
+    	if(node == null) {
+    		throw new IllegalArgumentException();
+    	} else if(node.left == null) {
+    		return getMin(node.right);
+    	} else if (node.left.left == null && node.left.right == null) {
+    		return node.data; // there is exactly one leaf node less than current node
+    	} else {
+    		return secondSmallest(node.left);
+    	}
+    }
+    
 	
 	/******** Practice-It Methods *****************************************************************************************************************/
 	

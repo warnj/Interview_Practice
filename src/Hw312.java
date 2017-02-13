@@ -96,6 +96,7 @@ public class Hw312 {
 					} else {
 						times.put(timesFalse, ++val);
 					}
+					if(timesFalse == 1) System.out.println(s);
 					break;
 					//max = arr[i]; // (**)
 				} else {
