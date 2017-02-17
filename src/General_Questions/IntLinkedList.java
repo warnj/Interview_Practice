@@ -145,10 +145,9 @@ public class IntLinkedList {
 	
 	public void reverse() {
 		ListNode prev = null;
-		ListNode next = null;
 		ListNode cur = front;
 		while(cur != null) {
-			next = cur.next;
+			ListNode next = cur.next;
 			cur.next = prev;
 			
 			prev = cur;

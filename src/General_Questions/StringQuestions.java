@@ -6,10 +6,11 @@ import java.util.Stack;
 public class StringQuestions {
 
 	public static void main(String[] args) {
-		System.out.println(reverseWordsInPlace(" a   FIRST second third  fourth   fifth   "));
-
+		System.out.println(reverseIgnoringSpace(" a   FIRST second third  fourth   fifth   "));
+		System.out.println(reverseIgnoringSpace(" a if"));
 	}
 
+	
 	
 	public String longestPalindrome(String s) {
 		int n = s.length();
@@ -37,10 +38,31 @@ public class StringQuestions {
 		}
 		return s.substring(l+1, r);
 	}
+	
+	// reverses the string preserving positions of spaces; i.e. " a if" -> " f ia"
+	public static String reverseIgnoringSpace(String s) {
+		char[] arr = s.toCharArray();
+		int front = 0;
+		int end = arr.length-1;
+		while(front < end) {
+			while(arr[front] == ' ') front++;
+			while(arr[end] == ' ') end--;
+			if(front < end) {
+				//swap
+				char temp = arr[front];
+				arr[front] = arr[end];
+				arr[end] = temp;
+			}
+			front++;
+			end--;
+		}
+		return new String(arr);
+	}
 
-	public static String reverseWordsInPlace(String s) {// reverse the entire string, then go through and reverse each word
+	// Amazon interview question 1-2017
+	public static String reverseWordsInPlace(String s) { // reverse the entire string, then go through and reverse each word
 		char[] word = s.toCharArray();
-		for(int i = 0; i < word.length /2; i++) {
+		for(int i = 0; i < word.length/2; i++) {
 			char temp = word[i];
 			word[i] = word[word.length-1-i];
 			word[word.length-1-i] = temp;
@@ -49,7 +71,7 @@ public class StringQuestions {
 			while(i < word.length && word[i] == ' ') {
 				i++;
 			}
-			if(i==word.length) break;
+			if(i == word.length) break;
 			int end = i;
 			while(end < word.length && word[end] != ' ') {
 				end++;

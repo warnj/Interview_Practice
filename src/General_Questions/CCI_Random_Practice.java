@@ -75,7 +75,7 @@ public class CCI_Random_Practice {
 		for (char c : s_array) letters[c]++;
 		for (int i = 0; i < t.length(); i++) {
 			int c = (int) t.charAt(i);
-			if (--letters[c] < c) return false;
+			if (--letters[c] < 0) return false;
 		}
 		return true;
 	}
