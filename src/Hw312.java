@@ -46,9 +46,9 @@ public class Hw312 {
 //		System.out.println(r.size());
 		
 		
-//		int n = 6;
-//		int k = 3;
-//		System.out.println(nChooseR(n,k));
+		int n = 10;
+		int k = 2;
+		System.out.println(nChooseR(n,k));
 		
 		//112/495
 //		
@@ -69,7 +69,7 @@ public class Hw312 {
 //		System.out.println(l);
 //		System.out.println(l % 13);
 		
-		hw5_q1();
+//		hw5_q1();
 	}
 	
 	private static void hw5_q1() {
