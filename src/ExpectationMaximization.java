@@ -12,11 +12,11 @@ import java.util.*;
 // performs the EM algorithm on multiple gaussian distributions
 public class ExpectationMaximization {
 	private static final int numDistributions = 3;
-	private static final double T = 1.0 / numDistributions;
+	private static final double TAU = 1.0 / numDistributions;
 	private static final double SIGMA = 1;
 	private static final double EPSILON = 0.001;
 	
-	private static List<Double> data;
+	private static List<Double> data; // given data points
 
 	public static void main(String[] args) {
 		//Scanner console = new Scanner(System.in);
@@ -24,20 +24,20 @@ public class ExpectationMaximization {
 		String test2 = "35 42 9 28 27 31 11 40 32";
 		String test3 = "-6 -5 -4 -5.5 4 5 6";
 		String test4 = "150 151 150.1 99.2 98.15 97.48 100.5 148.77 121.3 147.5 122.2";
-		Scanner console = new Scanner(test1);
+		Scanner console = new Scanner(test2);
 
 		data = new ArrayList<Double>();
 		while (console.hasNextDouble()) {
 			data.add(console.nextDouble());
 		}
-		System.out.println(data);
 
 		// initialize theta to be minimum, maximum and middle values
 		Collections.sort(data);
 		double[] curMeans = new double[numDistributions];
-//		curMeans[0] = 8.457;//data.get(0); // min
-//		curMeans[1] = 62.359;//data.get(data.size() / 2); // middle
-//		curMeans[2] = 74.277;//data.get(data.size()-1); // max
+		// deterministic initialization of means
+//		curMeans[0] = data.get(0); // min
+//		curMeans[1] = data.get(data.size() / 2); // middle
+//		curMeans[2] = data.get(data.size()-1); // max
 		
 		// random initialization of means
 		Random r = new Random();
@@ -54,16 +54,15 @@ public class ExpectationMaximization {
 		// print starting info
 		System.out.printf("%-6s ", "itr");
 		for (int i = 1; i <= numDistributions; i++) {
-			System.out.printf("%-10.5s ", "mu_" + i);
+			System.out.printf("%-10s ", "mu_" + i);
 		}
 		System.out.printf("%-10s\n", "Loglikelyhood");
 		
 		System.out.printf("%-6s ", "[0,]");
 		for (int i = 0; i < numDistributions; i++) {
-			System.out.printf("%-10.5f ", curMeans[i]);
+			System.out.printf("%-10s ", curMeans[i]);
 		}
 		System.out.println();
-		
 
 		// repeat E and M until converges
 		double difference = Double.POSITIVE_INFINITY;
@@ -92,14 +91,14 @@ public class ExpectationMaximization {
 		// print the final probabilities
 		System.out.printf("\n%-6s %-10s ", "i", "x_i");
 		for (int i = 1; i <= numDistributions; i++) {
-			System.out.printf("%-17s ", "P(cls " + i + " | x_i)");
+			System.out.printf("%-25s ", "P(cls " + i + " | x_i)");
 		}
 		System.out.println();
 		
 		for (int i = 0; i < expectations.length; i++) {
-			System.out.printf("%-6s %-10.2f ", "[" + (i+1) + ",]", data.get(i));
+			System.out.printf("%-6s %-10s ", "[" + (i+1) + ",]", data.get(i));
 			for (int j = 0; j < numDistributions; j++) {
-				System.out.printf("%-17f ", expectations[i][j]);
+				System.out.printf("%-25s ", expectations[i][j]);
 			}
 			System.out.println();
 		}
@@ -138,14 +137,14 @@ public class ExpectationMaximization {
 		// it is just canceled out in the division of the e-step
 		return Math.exp(-1 * Math.pow(x - mean, 2) / (2 * Math.pow(SIGMA, 2)));
 	}
-
-	// calculate the log likelihood
-	private static double getLogLikelihood(double[][] expectations, double[] nextMeans) {
-		double like = Math.log(T) * data.size() - Math.log(2 * Math.pow(SIGMA, 2) * Math.PI) * (data.size() / 2);
+	
+	// returns the log likelihood
+	private static double getLogLikelihood(double[][] expectations, double[] means) {
+		double like = Math.log(TAU) * data.size() - Math.log(2 * Math.pow(SIGMA, 2) * Math.PI) * (data.size() / 2);
 		for (int i = 0; i < numDistributions; i++) {
 			double temp = 0.0;
 			for (int j = 0; j < data.size(); j++) {
-				temp += (Math.pow(data.get(j) - nextMeans[i], 2) * expectations[j][i] / (2 * Math.pow(SIGMA, 2)));
+				temp += (Math.pow(data.get(j) - means[i], 2) * expectations[j][i] / (2 * Math.pow(SIGMA, 2)));
 			}
 			like -= temp;
 		}
