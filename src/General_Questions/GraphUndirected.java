@@ -7,20 +7,17 @@ package General_Questions;
 import java.io.*;
 import java.util.*;
 
-public class Graph {
-	private HashMap<Vertex, TreeSet<Vertex>> adjList;
-	private HashMap<String, Vertex> vertices;
+public class GraphUndirected {
+	private Map<Vertex, Set<Vertex>> adjList;
+	private Map<String, Vertex> vertices;
 	private static final TreeSet<Vertex> EMPTY_SET = new TreeSet<Vertex>();
 	private int numEdges;
 
-	/**
-	 * Construct empty Graph
-	 */
-	public Graph() {
-		adjList = new HashMap<Vertex, TreeSet<Vertex>>();
+	/** Construct empty Graph  */
+	public GraphUndirected() {
+		adjList = new HashMap<Vertex, Set<Vertex>>();
 		vertices = new HashMap<String, Vertex>();
 		numEdges = 0;
-
 	}
 
 	/**
@@ -71,7 +68,7 @@ public class Graph {
 			return false;
 		return adjList.get(vertices.get(from)).contains(vertices.get(to));
 	}
-	
+
 	/**
 	 * Add to to from's set of neighbors, and add from to to's
 	 * set of neighbors. Does not add an edge if another edge
@@ -80,9 +77,9 @@ public class Graph {
 	 * @param to the name of the second Vertex
 	 */
 	public void addEdge(String from, String to) {
-		Vertex v, w;
 		if (!hasEdge(from, to)) {
 			numEdges++;
+			Vertex v, w;
 			if ((v = getVertex(from)) == null)
 				v = addVertex(from);
 			if ((w = getVertex(to)) == null)
@@ -99,20 +96,15 @@ public class Graph {
 	 * to the Vertex named v, empty set if v is not in graph
 	 */
 	public Iterable<Vertex> adjacentTo(String name) {
-		if (!hasVertex(name))
+		if (!hasVertex(name)) {
 			return EMPTY_SET;
+		}
 		return adjList.get(getVertex(name));
 	}
-
-	/**
-	 * Return an iterator over the neighbors of Vertex v
-	 * @param v the Vertex
-	 * @return an Iterator over Vertices that are adjacent
-	 * to the Vertex v, empty set if v is not in graph
-	 */
 	public Iterable<Vertex> adjacentTo(Vertex v) {
-		if (!adjList.containsKey(v))
+		if (!adjList.containsKey(v)) {
 			return EMPTY_SET;
+		}
 		return adjList.get(v);
 	}
 
@@ -124,14 +116,12 @@ public class Graph {
 	public int numVertices() {
 		return vertices.size();
 	}
-	
+
 	public int numEdges() {
 		return numEdges;
 	}
-	
-	/*
-	 * Returns adjacency-list representation of graph
-	 */
+
+	// Returns adjacency-list representation of graph
 	public String toString() {
 		String s = "";
 		for (Vertex v : vertices.values()) {
@@ -148,10 +138,9 @@ public class Graph {
 		return "\'"+s+"\'";
 	}
 
-	public void outputGDF(String fileName)
-    {
-    	HashMap<Vertex, String> idToName = new HashMap<Vertex, String>();
-    	 try {
+	public void outputGDF(String fileName) {
+		HashMap<Vertex, String> idToName = new HashMap<Vertex, String>();
+		try {
 			FileWriter out = new FileWriter(fileName);
 			int count = 0;
 			out.write("nodedef> name,label,style,distance INTEGER\n");
@@ -165,51 +154,73 @@ public class Graph {
 			}
 			out.write("edgedef> node1,node2,color\n");
 			// write edges
-		    for (Vertex v : vertices.values())
-		    	for (Vertex w : adjList.get(v))  
-		    	if (v.compareTo(w) < 0)
-		    	{
-		    		out.write(idToName.get(v)+","+ 
-		    				idToName.get(w) + ",");
-		    		if (v.predecessor == w || 
-		    				w.predecessor == v)
-		    			out.write("blue");
-		    		else	
-		    			out.write("gray");
-		    		out.write("\n");
-		    	}
-		    out.close();
+			for (Vertex v : vertices.values())
+				for (Vertex w : adjList.get(v))  
+					if (v.compareTo(w) < 0)
+					{
+						out.write(idToName.get(v)+","+ 
+								idToName.get(w) + ",");
+						if (v.predecessor == w || 
+								w.predecessor == v)
+							out.write("blue");
+						else	
+							out.write("gray");
+						out.write("\n");
+					}
+			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    	 
-    }
+	}
+
+
+
 
 	public static void main(String[] args) {
-		Graph G = new Graph();
-		G.addEdge("A", "B");
-		G.addEdge("A", "C");
-		G.addEdge("C", "D");
-		G.addEdge("D", "E");
-		G.addEdge("D", "G");
-		G.addEdge("E", "G");
-		G.addVertex("H");
-		System.out.println(G.escapedVersion("Bacon, Kevin"));
-		// print out graph
-		System.out.println(G);
+		GraphUndirected g = new GraphUndirected();
 
-		// print out graph again by iterating over vertices and edges
-		for (Vertex v : G.getVertices()) {
-			System.out.print(v + ": ");
-			for (Vertex w : G.adjacentTo(v.name)) {
-				System.out.print(w + " ");
-			}
-			System.out.println();
-		}
-		G.outputGDF("graph.gdf");
+		g.addEdge("142", "143");
+		g.addEdge("143", "311");
+		g.addEdge("142", "154");
+		g.addEdge("311", "312");
+		g.addEdge("143", "331");
+		g.addEdge("143", "351");
+		g.addEdge("351", "333");
+		g.addEdge("143", "341");
+		g.addEdge("311", "344");
+		g.addEdge("311", "369");
+		g.addEdge("369", "371");
+		g.addEdge("331", "403");
+		g.addEdge("332", "403");
+		g.addEdge("311", "332");
+
+
+
+
+
+		//			g.addEdge("A", "B");
+		//			g.addEdge("A", "C");
+		//			g.addEdge("C", "D");
+		//			g.addEdge("D", "E");
+		//			g.addEdge("D", "G");
+		//			g.addEdge("E", "G");
+		//			g.addVertex("H");
+		//			System.out.println(g.escapedVersion("Bacon, Kevin"));
+		//			// print out graph
+		//			System.out.println(G);
+		//
+		//			// print out graph again by iterating over vertices and edges
+		//			for (Vertex v : g.getVertices()) {
+		//				System.out.print(v + ": ");
+		//				for (Vertex w : g.adjacentTo(v.name)) {
+		//					System.out.print(w + " ");
+		//				}
+		//				System.out.println();
+		//			}
+		//			g.outputGDF("graph.gdf");
 	}
-	
-	
+
+
 	/**
 	 * A C-style struct definition of a Vertex to be used with
 	 * the Graph class.
@@ -235,7 +246,7 @@ public class Graph {
 		 * previous vertex on path from sourxe
 		 */
 		public Vertex predecessor; // previous vertex
-		
+
 		/**
 		 * a measure of the structural importance of a vertex.
 		 * The value should initially be set to zero. A higher
@@ -264,7 +275,7 @@ public class Graph {
 		public int hashCode() {
 			return name.hashCode();
 		}
-		
+
 		public String toString() { 
 			return name;
 		}
@@ -280,6 +291,6 @@ public class Graph {
 				return name.compareTo(other.name);
 		}
 	}
-	
-	
+
+
 }
