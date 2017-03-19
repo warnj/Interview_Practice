@@ -68,7 +68,7 @@ public class GraphDirected {
 			return false;
 		return adjList.get(vertices.get(from)).contains(vertices.get(to));
 	}
-	
+
 	/**
 	 * Add to to from's set of neighbors, and add from to to's
 	 * set of neighbors. Does not add an edge if another edge
@@ -115,11 +115,11 @@ public class GraphDirected {
 	public int numVertices() {
 		return vertices.size();
 	}
-	
+
 	public int numEdges() {
 		return numEdges;
 	}
-	
+
 	// Returns adjacency-list representation of graph
 	public String toString() {
 		String s = "";
@@ -132,16 +132,58 @@ public class GraphDirected {
 		}
 		return s;
 	}
-	
+
 	public List<String> topoSort() {
 		List<String> sort = new ArrayList<String>();
 		Map<Vertex, Integer> inDegrees = new HashMap<>();
-		
+
 		for (Map.Entry<Vertex, Set<Vertex>> entry : adjList.entrySet()) {
-			
+			for(Vertex v : entry.getValue()) {
+				addCount(inDegrees, v);
+			}
 		}
 		
+		Queue<Vertex> worklist = new LinkedList<Vertex>();
+		for (Map.Entry<Vertex, Set<Vertex>> entry : adjList.entrySet()) {
+			if(!inDegrees.containsKey(entry.getKey())) {
+				worklist.add(entry.getKey());
+			}
+		}
+		
+		while(!worklist.isEmpty()) {
+			Vertex next = worklist.remove();
+			sort.add(next.toString());
+			for(Vertex child : adjacentTo(next)) {
+				if(removeCount(inDegrees, child)) {
+					worklist.add(child);
+				}
+			}
+		}
 		return sort;
+	}
+
+	private static void addCount(Map<Vertex, Integer> map, Vertex v) {
+		Integer val = map.get(v);
+		if (val == null) {
+			map.put(v, 1);
+		} else {
+			map.put(v, ++val);
+		}
+	}
+	
+	private static boolean removeCount(Map<Vertex, Integer> map, Vertex v) {
+		Integer val = map.get(v);
+		if (val != null) {
+			int newVal = --val;
+			if(newVal == 0) {
+				map.remove(v);
+				return true;
+			} else {
+				map.put(v, newVal);
+				return false;
+			}
+		}
+		return false;
 	}
 
 	private String escapedVersion(String s) {
@@ -149,8 +191,8 @@ public class GraphDirected {
 	}
 
 	public void outputGDF(String fileName) {
-    	HashMap<Vertex, String> idToName = new HashMap<Vertex, String>();
-    	 try {
+		HashMap<Vertex, String> idToName = new HashMap<Vertex, String>();
+		try {
 			FileWriter out = new FileWriter(fileName);
 			int count = 0;
 			out.write("nodedef> name,label,style,distance INTEGER\n");
@@ -164,31 +206,31 @@ public class GraphDirected {
 			}
 			out.write("edgedef> node1,node2,color\n");
 			// write edges
-		    for (Vertex v : vertices.values())
-		    	for (Vertex w : adjList.get(v))  
-		    	if (v.compareTo(w) < 0)
-		    	{
-		    		out.write(idToName.get(v)+","+ 
-		    				idToName.get(w) + ",");
-		    		if (v.predecessor == w || 
-		    				w.predecessor == v)
-		    			out.write("blue");
-		    		else	
-		    			out.write("gray");
-		    		out.write("\n");
-		    	}
-		    out.close();
+			for (Vertex v : vertices.values())
+				for (Vertex w : adjList.get(v))  
+					if (v.compareTo(w) < 0)
+					{
+						out.write(idToName.get(v)+","+ 
+								idToName.get(w) + ",");
+						if (v.predecessor == w || 
+								w.predecessor == v)
+							out.write("blue");
+						else	
+							out.write("gray");
+						out.write("\n");
+					}
+			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    }
-	
-	
-	
+	}
+
+
+
 
 	public static void main(String[] args) {
 		GraphDirected g = new GraphDirected();
-		
+
 		g.addEdge("142", "143");
 		g.addEdge("143", "311");
 		g.addEdge("142", "154");
@@ -203,34 +245,34 @@ public class GraphDirected {
 		g.addEdge("331", "403");
 		g.addEdge("332", "403");
 		g.addEdge("311", "332");
-		
+
 		System.out.println(g);
-		
-		
-		
-//		g.addEdge("A", "B");
-//		g.addEdge("A", "C");
-//		g.addEdge("C", "D");
-//		g.addEdge("D", "E");
-//		g.addEdge("D", "G");
-//		g.addEdge("E", "G");
-//		g.addVertex("H");
-//		System.out.println(g.escapedVersion("Bacon, Kevin"));
-//		// print out graph
-//		System.out.println(G);
-//
-//		// print out graph again by iterating over vertices and edges
-//		for (Vertex v : g.getVertices()) {
-//			System.out.print(v + ": ");
-//			for (Vertex w : g.adjacentTo(v.name)) {
-//				System.out.print(w + " ");
-//			}
-//			System.out.println();
-//		}
-//		g.outputGDF("graph.gdf");
+
+		System.out.println(g.topoSort());
+
+		//		g.addEdge("A", "B");
+		//		g.addEdge("A", "C");
+		//		g.addEdge("C", "D");
+		//		g.addEdge("D", "E");
+		//		g.addEdge("D", "G");
+		//		g.addEdge("E", "G");
+		//		g.addVertex("H");
+		//		System.out.println(g.escapedVersion("Bacon, Kevin"));
+		//		// print out graph
+		//		System.out.println(G);
+		//
+		//		// print out graph again by iterating over vertices and edges
+		//		for (Vertex v : g.getVertices()) {
+		//			System.out.print(v + ": ");
+		//			for (Vertex w : g.adjacentTo(v.name)) {
+		//				System.out.print(w + " ");
+		//			}
+		//			System.out.println();
+		//		}
+		//		g.outputGDF("graph.gdf");
 	}
-	
-	
+
+
 	/**
 	 * A C-style struct definition of a Vertex to be used with
 	 * the Graph class.
@@ -256,7 +298,7 @@ public class GraphDirected {
 		 * previous vertex on path from sourxe
 		 */
 		public Vertex predecessor; // previous vertex
-		
+
 		/**
 		 * a measure of the structural importance of a vertex.
 		 * The value should initially be set to zero. A higher
@@ -285,7 +327,7 @@ public class GraphDirected {
 		public int hashCode() {
 			return name.hashCode();
 		}
-		
+
 		public String toString() { 
 			return name;
 		}
@@ -301,6 +343,6 @@ public class GraphDirected {
 				return name.compareTo(other.name);
 		}
 	}
-	
-	
+
+
 }
