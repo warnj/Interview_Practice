@@ -1,6 +1,7 @@
 package General_Questions;
+// find great graph examples: http://algs4.cs.princeton.edu/40graphs/
 /**
- * Undirected, unweighted simple graph data type
+ * Directed, weighted graph data type
  * Parallel edges are not allowed
  * Self loops are allowed
  */
@@ -8,14 +9,14 @@ import java.io.*;
 import java.util.*;
 
 public class GraphDirected {
-	private Map<Vertex, Set<Vertex>> adjList;
+	private Map<Vertex, Map<Vertex, Double>> adjList;
 	private Map<String, Vertex> vertices;
-	private static final TreeSet<Vertex> EMPTY_SET = new TreeSet<Vertex>();
+	private static final TreeMap<Vertex, Double> EMPTY_MAP = new TreeMap<>();
 	private int numEdges;
 
 	/** Construct empty Graph  */
 	public GraphDirected() {
-		adjList = new HashMap<Vertex, Set<Vertex>>();
+		adjList = new HashMap<Vertex, Map<Vertex, Double>>();
 		vertices = new HashMap<String, Vertex>();
 		numEdges = 0;
 	}
@@ -29,7 +30,7 @@ public class GraphDirected {
 		if (v == null) {
 			v = new Vertex(name);
 			vertices.put(name, v);
-			adjList.put(v, new TreeSet<Vertex>());
+			adjList.put(v, new TreeMap<>());
 		}
 		return v;
 	}
@@ -66,7 +67,7 @@ public class GraphDirected {
 	public boolean hasEdge(String from, String to) {
 		if (!hasVertex(from) || !hasVertex(to))
 			return false;
-		return adjList.get(vertices.get(from)).contains(vertices.get(to));
+		return adjList.get(vertices.get(from)).containsKey(vertices.get(to));
 	}
 
 	/**
@@ -77,6 +78,9 @@ public class GraphDirected {
 	 * @param to the name of the second Vertex
 	 */
 	public void addEdge(String from, String to) {
+		addEdge(from, to, 0.0);
+	}
+	public void addEdge(String from, String to, double weight) {
 		if (!hasEdge(from, to)) {
 			numEdges++;
 			Vertex v, w;
@@ -84,7 +88,7 @@ public class GraphDirected {
 				v = addVertex(from);
 			if ((w = getVertex(to)) == null)
 				w = addVertex(to);
-			adjList.get(v).add(w);
+			adjList.get(v).put(w, weight);
 		}
 	}
 
@@ -94,17 +98,17 @@ public class GraphDirected {
 	 * @return an Iterator over Vertices that are adjacent
 	 * to the Vertex named v, empty set if v is not in graph
 	 */
-	public Iterable<Vertex> adjacentTo(String name) {
+	public Iterable<Map.Entry<Vertex, Double>> adjacentTo(String name) {
 		if (!hasVertex(name)) {
-			return EMPTY_SET;
+			return EMPTY_MAP.entrySet();
 		}
-		return adjList.get(getVertex(name));
+		return adjList.get(getVertex(name)).entrySet();
 	}
-	public Iterable<Vertex> adjacentTo(Vertex v) {
+	public Iterable<Map.Entry<Vertex, Double>> adjacentTo(Vertex v) {
 		if (!adjList.containsKey(v)) {
-			return EMPTY_SET;
+			return EMPTY_MAP.entrySet();
 		}
-		return adjList.get(v);
+		return adjList.get(v).entrySet();
 	}
 
 	/** @return an Iterator over all Vertices in this Graph */
@@ -122,29 +126,29 @@ public class GraphDirected {
 
 	// Returns adjacency-list representation of graph
 	public String toString() {
-		String s = "";
+		StringBuilder s = new StringBuilder();
 		for (Vertex v : vertices.values()) {
-			s += v + ": ";
-			for (Vertex w : adjList.get(v)) {
-				s += w + " ";
+			s.append(v + ": ");
+			for (Map.Entry<Vertex, Double> entry : adjList.get(v).entrySet()) {
+				s.append(entry.getKey() + " (" + entry.getValue() + ") ");
 			}
-			s += "\n";
+			s.append("\n");
 		}
-		return s;
+		return s.toString();
 	}
 
 	public List<String> topoSort() {
 		List<String> sort = new ArrayList<String>();
 		Map<Vertex, Integer> inDegrees = new HashMap<>();
 
-		for (Map.Entry<Vertex, Set<Vertex>> entry : adjList.entrySet()) {
-			for(Vertex v : entry.getValue()) {
+		for (Map.Entry<Vertex, Map<Vertex, Double>> entry : adjList.entrySet()) {
+			for (Vertex v : entry.getValue().keySet()) {
 				addCount(inDegrees, v);
 			}
 		}
 		
 		Queue<Vertex> worklist = new LinkedList<Vertex>();
-		for (Map.Entry<Vertex, Set<Vertex>> entry : adjList.entrySet()) {
+		for (Map.Entry<Vertex, Map<Vertex, Double>> entry : adjList.entrySet()) {
 			if(!inDegrees.containsKey(entry.getKey())) {
 				worklist.add(entry.getKey());
 			}
@@ -153,9 +157,9 @@ public class GraphDirected {
 		while(!worklist.isEmpty()) {
 			Vertex next = worklist.remove();
 			sort.add(next.toString());
-			for(Vertex child : adjacentTo(next)) {
-				if(removeCount(inDegrees, child)) {
-					worklist.add(child);
+			for(Map.Entry<Vertex, Double> child : adjacentTo(next)) {
+				if(removeCount(inDegrees, child.getKey())) {
+					worklist.add(child.getKey());
 				}
 			}
 		}
@@ -190,40 +194,40 @@ public class GraphDirected {
 		return "\'"+s+"\'";
 	}
 
-	public void outputGDF(String fileName) {
-		HashMap<Vertex, String> idToName = new HashMap<Vertex, String>();
-		try {
-			FileWriter out = new FileWriter(fileName);
-			int count = 0;
-			out.write("nodedef> name,label,style,distance INTEGER\n");
-			// write vertices
-			for (Vertex v: vertices.values())
-			{
-				String id = "v"+ count++;
-				idToName.put(v, id);
-				out.write(id + "," + escapedVersion(v.name));
-				out.write(",6,"+v.distance+"\n");
-			}
-			out.write("edgedef> node1,node2,color\n");
-			// write edges
-			for (Vertex v : vertices.values())
-				for (Vertex w : adjList.get(v))  
-					if (v.compareTo(w) < 0)
-					{
-						out.write(idToName.get(v)+","+ 
-								idToName.get(w) + ",");
-						if (v.predecessor == w || 
-								w.predecessor == v)
-							out.write("blue");
-						else	
-							out.write("gray");
-						out.write("\n");
-					}
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+//	public void outputGDF(String fileName) {
+//		HashMap<Vertex, String> idToName = new HashMap<Vertex, String>();
+//		try {
+//			FileWriter out = new FileWriter(fileName);
+//			int count = 0;
+//			out.write("nodedef> name,label,style,distance INTEGER\n");
+//			// write vertices
+//			for (Vertex v: vertices.values())
+//			{
+//				String id = "v"+ count++;
+//				idToName.put(v, id);
+//				out.write(id + "," + escapedVersion(v.name));
+//				out.write(",6,"+v.distance+"\n");
+//			}
+//			out.write("edgedef> node1,node2,color\n");
+//			// write edges
+//			for (Vertex v : vertices.values())
+//				for (Vertex w : adjList.get(v))  
+//					if (v.compareTo(w) < 0)
+//					{
+//						out.write(idToName.get(v)+","+ 
+//								idToName.get(w) + ",");
+//						if (v.predecessor == w || 
+//								w.predecessor == v)
+//							out.write("blue");
+//						else	
+//							out.write("gray");
+//						out.write("\n");
+//					}
+//			out.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 
 
