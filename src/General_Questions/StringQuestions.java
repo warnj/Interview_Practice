@@ -177,7 +177,6 @@ public class StringQuestions {
 	public static void permutation(String str) {
 		permutation("", str);
 	}
-
 	private static void permutation(String prefix, String str) {
 		int n = str.length();
 		if (n == 0) System.out.println(prefix);

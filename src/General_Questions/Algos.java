@@ -5,10 +5,27 @@ import java.math.*;
 public class Algos {
 	public static void main(String[] args) {
 
-
 	}
 
-
+	// Returns all distinct results of choosing the given number of items from the given array. Order does not matter.
+	// example of input: combinations(new String[]{"1","2","3","4"}, 2);
+	// example of output: [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+	public static List<String[]> combinations(String[] array, int choose) {
+		if (choose > array.length || choose < 0) throw new IllegalArgumentException();
+		List<String[]> list = new ArrayList<String[]>();
+		combinations(array, choose, 0, new String[choose], list);
+		return list;
+	}
+	private static void combinations(String[] arr, int len, int startPosition, String[] result, List<String[]> resultList) {
+		if (len == 0) {
+			resultList.add(Arrays.copyOf(result, result.length));
+		} else {
+			for (int i = startPosition; i <= arr.length-len; i++) {
+				result[result.length - len] = arr[i];
+				combinations(arr, len-1, i+1, result, resultList);
+			}
+		}
+	}
 
 	public static void printDescendingFreq(String words) {
 		String[] wds = words.split("\\s+");
