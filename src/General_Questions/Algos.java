@@ -6,27 +6,10 @@ public class Algos {
 	public static void main(String[] args) {
 
 	}
+	
+	// SEE StringQuestions.java for combinations and permutations
 
-	// Returns all distinct results of choosing the given number of items from the given array. Order does not matter.
-	// example of input: combinations(new String[]{"1","2","3","4"}, 2);
-	// example of output: [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
-	public static List<String[]> combinations(String[] array, int choose) {
-		if (choose > array.length || choose < 0) throw new IllegalArgumentException();
-		List<String[]> list = new ArrayList<String[]>();
-		combinations(array, choose, 0, new String[choose], list);
-		return list;
-	}
-	private static void combinations(String[] arr, int len, int startPosition, String[] result, List<String[]> resultList) {
-		if (len == 0) {
-			resultList.add(Arrays.copyOf(result, result.length));
-		} else {
-			for (int i = startPosition; i <= arr.length-len; i++) {
-				result[result.length - len] = arr[i];
-				combinations(arr, len-1, i+1, result, resultList);
-			}
-		}
-	}
-
+	// prints the whitespace-separated words in the given string in order of descending freq 
 	public static void printDescendingFreq(String words) {
 		String[] wds = words.split("\\s+");
 		Map<String, Integer> freqs = new HashMap<String, Integer>();
@@ -49,15 +32,12 @@ public class Algos {
 		}
 	}
 
-
-
-	// hash a range of values together, want all the values within the range to have same hashcode
-	//Simply populate a Map for all valid key values, with multiple keys mapping to the same value.
-	//Assuming that you use HashMaps, this should be the most time efficient (O(1) lookups),
-	//though you have more work at setup time and you use more space (when compared to a NavigableMap and use floorEntry(key)
+	// HASH A RANGE OF VALUES - want all the values within the range to have same hashcode
+	// Simply populate a Map for all valid key values, with multiple keys mapping to the same value.
+	// Assuming that you use HashMaps, this should be the most time efficient (O(1) lookups),
+	// though you have more work at setup time and you use more space (when compared to a NavigableMap and use floorEntry(key)
 	// to do the lookups. This should be less time efficient (O(log(N) lookups) but more space efficient.)
-	//http://stackoverflow.com/questions/1314650/using-java-map-for-range-searches
-
+	// http://stackoverflow.com/questions/1314650/using-java-map-for-range-searches
 
 	public static List<Integer> primeFactors(int n) {
 		List<Integer> factors = new ArrayList<Integer>();

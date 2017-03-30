@@ -1,17 +1,22 @@
 package General_Questions;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
 
 public class StringQuestions {
 
 	public static void main(String[] args) {
-		System.out.println(reverseIgnoringSpace(" a   FIRST second third  fourth   fifth   "));
-		System.out.println(reverseIgnoringSpace(" a if"));
+		List<String> combs = combinations("1234", 3);
+		System.out.println(combs);
+		List<String> perms = permutations("1234");
+		System.out.println(perms);
 	}
 
-	
-	
+
+
 	public String longestPalindrome(String s) {
 		int n = s.length();
 		if (n == 0) return "";
@@ -38,7 +43,7 @@ public class StringQuestions {
 		}
 		return s.substring(l+1, r);
 	}
-	
+
 	// reverses the string preserving positions of spaces; i.e. " a if" -> " f ia"
 	public static String reverseIgnoringSpace(String s) {
 		char[] arr = s.toCharArray();
@@ -146,17 +151,39 @@ public class StringQuestions {
 			}
 		}
 		return sb.toString();
-	}	
+	}
+
+	// Returns all distinct results of choosing the given number of items from the given array. Order does not matter.
+	// example of input: combinations(new String[]{"1","2","3","4"}, 2);
+	// example of output: [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+	public static List<String> combinations(String s, int choose) {
+		if (choose > s.length() || choose < 0) throw new IllegalArgumentException();
+		List<String> list = new ArrayList<>();
+		combinations(s.toCharArray(), 0, choose, new char[choose], list);
+		return list;
+	}
+	private static void combinations(char[] arr, int startPosition, int len, char[] result, List<String> resultList) {
+		if (len == 0) {
+			resultList.add(new String(result));
+		} else { // this is incredibly brilliant, potent code that is really hard to wrap your head around
+			for (int i = startPosition; i <= arr.length-len; i++) { // loop through # of ways to pick the next-lowest element in the result array between startPosition & arr.length-1 choosing len items
+				result[result.length - len] = arr[i]; // fill in the next-lowest index of the temp result array with the chosen element
+				combinations(arr, i+1, len-1, result, resultList); // explore, picking one-less item from the remaining section of the array
+			}
+		}
+	}
 
 	// Outputs all permutations of the given string.
 	// https://courses.cs.washington.edu/courses/cse143/15au/lectures/11-09/17-recursive-backtracking.pdf
-	public static void permute(String s) {
-		permute(s, "");
+	public static List<String> permutations(String s) {
+		List<String> list = new ArrayList<String>();
+		permutations(s, "", list);
+		return list;
 	}
-	private static void permute(String s, String chosen) {
+	private static void permutations(String s, String chosen, List<String> list) {
 		if (s.length() == 0) {
 			// base case: no choices left to be made
-			System.out.println(chosen);
+			list.add(chosen);
 		} else {
 			// recursive case: choose each possible next letter
 			for (int i = 0; i < s.length(); i++) {
@@ -165,7 +192,7 @@ public class StringQuestions {
 				s = s.substring(0, i) + s.substring(i + 1);
 				chosen += c;
 				// explore
-				permute(s, chosen);
+				permutations(s, chosen, list);
 				// un-choose; put s back the way it was, remove last letter of chosen
 				s = s.substring(0, i) + c + s.substring(i);
 				chosen = chosen.substring(0, chosen.length() - 1);
@@ -173,7 +200,7 @@ public class StringQuestions {
 		}
 	}
 
-	// shorter way of doing same thing
+	// shorter way of doing same thing as above
 	public static void permutation(String str) {
 		permutation("", str);
 	}
