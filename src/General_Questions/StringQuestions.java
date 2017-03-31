@@ -15,7 +15,14 @@ public class StringQuestions {
 		System.out.println(perms);
 	}
 
-
+	// prints all substrings of the given string - O(n^2)
+	public static void printSubstrings(String word) {
+	    for (int from = 0; from < word.length(); from++) {
+	        for (int to = from + 1; to <= word.length(); to++) {
+	            System.out.println(word.substring(from, to));
+	        }
+	    }
+	}
 
 	public String longestPalindrome(String s) {
 		int n = s.length();
