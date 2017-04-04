@@ -8,15 +8,53 @@ import java.util.Random;
 public class ArrayQuestions {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		System.out.println(indexOfRotated(new int[] {1,3}, 3));
+	}
+	
+	// finds the target value in arr in O(lg(n)) time where arr is sorted array w/o duplicates that has been rotated (e.g. 45123)
+	public static int indexOfRotated(int[] arr, int target) {
+		if(arr.length == 0) return -1;
+		if(arr.length == 1) return arr[0] == target ? 0 : -1;
+		// find the rotation pivot point
+		int low = 0;
+		int high = arr.length - 1;
+		int highest = -1;
+		while (high >= low) {
+			int mid = low + (high-low) / 2;
+			if(arr[mid] > arr[(mid+1) % arr.length]) {
+				highest = mid;
+				break;
+			} else if (arr[low] <= arr[mid]) {
+				low = mid + 1;
+			} else { // arr[low] > arr[mid]
+				high = mid;
+			}
+		}
+		if(target >= arr[0]) {
+			low = 0;
+			high = highest;
+		} else {
+			low = (highest + 1) % arr.length;
+			high = arr.length-1;
+		}
+		while(high >= low) {
+			int mid = low + (high-low) / 2;
+			if(arr[mid] == target) {
+				return mid;
+			} else if (arr[mid] < target) {
+				low = mid + 1;
+			} else { // arr[mid] > key
+				high = mid - 1;
+			}
+		}
+		return -1;
 	}
 
 	public static int indexOfBinarySearch(int[] arr, int target) {
 		int low = 0;
 		int high = arr.length - 1;
 		while(high >= low) {
-			int mid = (low + high) / 2;
+			int mid = low + (high-low) / 2;
 			if(arr[mid] == target) {
 				return mid;
 			} else if (arr[mid] < target) {
