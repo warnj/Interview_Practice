@@ -357,13 +357,19 @@ public class IntLinkedList {
 		}
 		while(curA != null) {
 			assert(curA.data <= 9): "a and b must only contain single digits in each node";
-			resultEnd.next = new ListNode(curA.data);
+			int toAdd = curA.data;
+			if (carry) toAdd++;
+			carry = toAdd > 9;
+			resultEnd.next = new ListNode(toAdd % 10);
 			resultEnd = resultEnd.next;
 			curA = curA.next;
 		}
 		while(curB != null) {
 			assert(curB.data <= 9): "a and b must only contain single digits in each node";
-			resultEnd.next = new ListNode(curB.data);
+			int toAdd = curB.data;
+			if (carry) toAdd++;
+			carry = toAdd > 9;
+			resultEnd.next = new ListNode(toAdd % 10);
 			resultEnd = resultEnd.next;
 			curB = curB.next;
 		}

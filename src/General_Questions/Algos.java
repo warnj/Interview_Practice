@@ -4,15 +4,45 @@ import java.math.*;
 
 public class Algos {
 	public static void main(String[] args) {
-		Set<String> dict = new HashSet<String>();
-		dict.add("sales");
-		dict.add("sale");
-		dict.add("force");
-		dict.add("for");
-		dict.add("justin");
-		dict.add("a");
-		dict.add("how");
-		System.out.println(spaceWordsEfficient("salesforce", dict));
+		System.out.println(letterCombinations("23"));
+	}
+	
+	// Given a digit string, return all possible letter combinations that the number could represent.
+	public static List<String> letterCombinations(String digits) {
+        Map<Character, String> phoneLetters = new HashMap<>();
+        phoneLetters.put('2', "abc");
+        phoneLetters.put('3', "def");
+        phoneLetters.put('4', "ghi");
+        phoneLetters.put('5', "jkl");
+        phoneLetters.put('6', "mno");
+        phoneLetters.put('7', "pqrs");
+        phoneLetters.put('8', "tuv");
+        phoneLetters.put('9', "wxyz");
+        
+        
+        List<String> result = new ArrayList<>();
+        List<String> letters = new ArrayList<>();
+        for(int i = 0; i < digits.length(); i++) {
+        	letters.add(phoneLetters.get(digits.charAt(i)));
+        }
+        // now find all combinations from the list of lists
+        for(int i = 0; i < letters.size(); i++) {
+        	for(int j = 0; j < letters.get(i).length(); j++) {
+        		
+        	}
+        }
+        return result;
+    }
+	
+	// returns the int obtained by reversing the digits of x. Returns 0 when the reversed integer overflows.
+	public static int reverse(int x) {
+        long rev = 0;
+        while (x != 0) {
+            rev = rev * 10 + x % 10;
+            x /= 10;
+            if (rev > Integer.MAX_VALUE || rev < Integer.MIN_VALUE) return 0;
+        }
+        return (int) rev;
 	}
 
 	// given String s and dictionary of words find all of the words in s

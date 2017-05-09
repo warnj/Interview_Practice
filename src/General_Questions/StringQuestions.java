@@ -1,27 +1,62 @@
 package General_Questions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 
 public class StringQuestions {
 
 	public static void main(String[] args) {
-		List<String> combs = combinations("1234", 3);
-		System.out.println(combs);
-		List<String> perms = permutations("1234");
-		System.out.println(perms);
+		
+	}
+
+	// This is not an ideal solution - ideal solution is to build a FSM for the needle, then run over haystack.
+	public static int strStr(String haystack, String needle) {
+		if(needle.length() > haystack.length()) return -1;
+		else if (needle.length() == haystack.length()) return needle.equals(haystack) ? 0 : -1;
+		else if (needle.isEmpty()) return 0;
+
+		for (int i = 0; i <= haystack.length() - needle.length(); i++) {
+			int j = i, k = 0;
+			while (j < haystack.length() && k < needle.length() && haystack.charAt(j++) == needle.charAt(k++)) {
+				if (k == needle.length()) return i;
+			}
+		}
+		return -1;
+	}
+	public static int strStrElegant(String haystack, String needle) {
+		for (int i = 0; ; i++) {
+			for (int j = 0; ; j++) {
+				if (j == needle.length()) return i;
+				if (i + j == haystack.length()) return -1;
+				if (needle.charAt(j) != haystack.charAt(i + j)) break;
+			}
+		}
+	}
+
+	// Given a string, find the length of the longest substring without repeating characters. O(n) solution since low and high only increase.
+	public static int lengthOfLongestSubstring(String s) {
+		Set<Character> set = new HashSet<>(); // technically might be better to use bitset since only 256 possible chars
+		int low = 0, high = 0, max = 0;
+		while (high < s.length()) { // inv: set contains the chars from s[low] to s[high-1]
+			char c = s.charAt(high);
+			if (set.contains(c)) { // pause high, remove from the chars from the low end until no more duplicates 
+				set.remove(s.charAt(low));
+				low++;
+			} else { // add to set and increment high
+				set.add(c); // set contains the chars from s[low] to s[high]
+				high++;		// set contains the chars from s[low] to s[high-1]
+				if (set.size() > max) max = set.size();
+			}
+		}
+		return max;
 	}
 
 	// prints all substrings of the given string - O(n^2)
 	public static void printSubstrings(String word) {
-	    for (int from = 0; from < word.length(); from++) {
-	        for (int to = from + 1; to <= word.length(); to++) {
-	            System.out.println(word.substring(from, to));
-	        }
-	    }
+		for (int from = 0; from < word.length(); from++) {
+			for (int to = from + 1; to <= word.length(); to++) {
+				System.out.println(word.substring(from, to));
+			}
+		}
 	}
 
 	public String longestPalindrome(String s) {
