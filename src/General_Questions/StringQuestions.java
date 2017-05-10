@@ -5,8 +5,24 @@ import java.util.*;
 public class StringQuestions {
 
 	public static void main(String[] args) {
-		
+		System.out.println(longestCommonPrefix(new String[] {"there", "the", "them"}));
+		System.out.println(longestCommonPrefix(new String[] {"the", "there", "them"}));
 	}
+	
+	// example: {"the", "there", "them"} returns "the"
+	public static String longestCommonPrefix(String[] strs) {
+		if (strs.length == 0 || strs[0].isEmpty()) return "";
+        int common = 0;
+        boolean run = true;
+        while (common < strs[0].length()) {
+        	char c = strs[0].charAt(common);
+        	for (int i = 1; i < strs.length; i++) {
+        		if (common >= strs[i].length() || strs[i].charAt(common) != c) return strs[0].substring(0, common);
+        	}
+        	common++;
+        }
+        return strs[0].substring(0, common);
+    }
 
 	// This is not an ideal solution - ideal solution is to build a FSM for the needle, then run over haystack.
 	public static int strStr(String haystack, String needle) {

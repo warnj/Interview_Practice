@@ -23,4 +23,10 @@ public class StringQuestionsTests {
 		assertEquals(StringQuestions.strStr("mississippi", "issipi"), -1);
 	}
 	
+	@Test
+	public void testLongestPrefix() {
+		assertEquals(StringQuestions.longestCommonPrefix(new String[] {"there", "the", "them"}), "the");
+		assertEquals(StringQuestions.longestCommonPrefix(new String[] {"the", "there", "them"}), "the");
+	}
+	
 }

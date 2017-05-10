@@ -29,5 +29,10 @@ public class AlgosTests {
 		assertEquals(Algos.reverse(-123), -321);
 		assertEquals(Algos.reverse(1534236469), 0);
 	}
+	
+	@Test
+	public void testLetterCombinations() {
+		assertEquals(Algos.letterCombinations("23").toString(), "[ad, ae, af, bd, be, bf, cd, ce, cf]");
+	}
 
 }
