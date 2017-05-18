@@ -1,20 +1,68 @@
 package General_Questions;
 import java.util.*;
+import java.util.List;
 import java.math.*;
+import java.awt.*;
 
 public class Algos {
 	public static void main(String[] args) {
-//		System.out.println(coinChange(new int[]{1, 4, 5}, 12));//3
-//		System.out.println(coinChange(new int[]{1}, 1));//1
-//		System.out.println(coinChange(new int[]{2}, 1));//-1
-		System.out.println(coinChange(new int[]{2}, 3));//-1
+	}
+
+	// Given a 2D board and a word, find if the word exists in the grid. The word can be constructed from letters of sequentially adjacent cell, 
+	// where "adjacent" cells are those horizontally or vertically neighboring. The same letter cell may not be used more than once.
+	public static boolean exist(char[][] board, String word) {
+		if (board.length == 0) return false;
+		if (word.isEmpty()) return true;
+		int height = board.length;
+		int width = board[0].length;
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (board[y][x] == word.charAt(0)) { // found first letter
+					Set<Point> visited = new HashSet<Point>();
+					visited.add(new Point(x, y));
+					if (search(y, x, board, word, 1, visited)) {// explore
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	private static boolean search (int y, int x, char[][] board, String word, int index, Set<Point> visited) {
+		if (index >= word.length()) return true;
+		int height = board.length;
+		int width = board[0].length;
+		char target = word.charAt(index);
+		Point p = new Point(x, y+1);
+		if (y + 1 < height && board[y+1][x] == target && !visited.contains(p)) {// found next letter above
+			visited.add(p);
+			if(search(y+1, x, board, word, index+1, visited)) return true;
+			visited.remove(p);
+		}
+		p = new Point(x, y-1);
+		if (y - 1 >= 0 && board[y-1][x] == target && !visited.contains(p)) {// found next letter below
+			visited.add(p);
+			if(search(y-1, x, board, word, index+1, visited)) return true;
+			visited.remove(p);
+		}
+		p = new Point(x+1, y);
+		if (x + 1 < width && board[y][x+1] == target && !visited.contains(p)) {// found next letter to right
+			visited.add(p);
+			if(search(y, x+1, board, word, index+1, visited)) return true;
+			visited.remove(p);
+		}
+		p = new Point(x-1, y);
+		if (x - 1 >= 0 && board[y][x-1] == target && !visited.contains(p)) {// found next letter to left
+			visited.add(p);
+			if(search(y, x-1, board, word, index+1, visited)) return true;
+		}
+		return false;
 	}
 
 	// Write a function to compute the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1
 	// coins = [1, 2, 5], amount = 11	return 3 (11 = 5 + 5 + 1)
 	// coins = [2], amount = 3	return -1
-	// coins = [1, 4, 5], amount = 12 return 3
-	// O(n) runtime where n = value of amount
+	// O(n) runtime and space where n = value of amount
 	// to find exactly which coins to use - could keep backpointers in the table that tell which coin added at each step, then traverse back
 	public static int coinChange(int[] coins, int amount) {
 		if (amount == 0) return 0;
@@ -27,14 +75,13 @@ public class Algos {
 					min = Math.min(min, 1); // no way to do better than a single coin
 					break;
 				}
-				if (i - coins[j] >= 0) { // there is a way to sum to this value
-					System.out.println("i: " + i);
+				if (i - coins[j] >= 0 && table[i-coins[j]] != 0) { // there is a way to sum to this value
 					min = Math.min(min, table[i-coins[j]] + 1); // check how many coins it took to get to the previous value without coins[j], then add 1
 				}
 			}
 			if (min != Integer.MAX_VALUE) table[i] = min;
 		}
-		System.out.println(Arrays.toString(table));
+		//		System.out.println(Arrays.toString(table));
 		return table[amount-1] == 0 ? -1 : table[amount-1]; // the illegal values will have the initial value of 0, return -1 in this case
 	}
 
@@ -126,94 +173,6 @@ public class Algos {
 		return result;
 	}
 
-	// Given an input string and a dictionary of words, segment the input string into a space-separated
-	// sequence of dictionary words if possible. For example, if the input string is "applepie" and
-	// dictionary contains a standard set of English words,	then we would return the string "apple pie" as output.
-	// http://thenoisychannel.com/2011/08/08/retiring-a-great-interview-problem
-	// SOLUTION: use recursive backtracing. Worst case, explore every possible segmentation of input so runtime is O(2^n) - just like finding the powerset
-	public static String spaceWords(String input, Set<String> dict) {
-		return spaceWords(input, dict, "", 0);
-	}
-	private static String spaceWords(String input, Set<String> dict, String result, int index) { // my solution
-		String end = input.substring(index);
-		if (dict.contains(end)) {
-			return result + end;
-		} else {
-			for (int i = index+1; i < input.length(); i++) { // substrings don't include last char since that was checked in base case
-				String part = input.substring(index, i);
-				if (dict.contains(part)) {
-					String s = spaceWords(input, dict, result + part + " ", i);
-					if(s != null) {
-						return s;
-					}
-				}
-			}
-			return null;
-		}
-	}
-	public static String spaceWordsPretty(String input, Set<String> dict) { // example solution
-		if (dict.contains(input)) return input;
-		for (int i = 1; i < input.length(); i++) {
-			String prefix = input.substring(0, i);
-			if (dict.contains(prefix)) {
-				String suffix = input.substring(i);
-				String segSuffix = spaceWordsPretty(suffix, dict);
-				if (segSuffix != null) {
-					return prefix + " " + segSuffix;
-				}
-			}
-		}
-		return null;
-	}
-	private static Map<String, String> memoized = new HashMap<>(); // uses to remember previously calculated input divisions
-	public static String spaceWordsEfficient(String input, Set<String> dict) { // O(n^2) - assuming substring is O(1)
-		if (dict.contains(input)) return input;
-		if (memoized.containsKey(input)) {
-			return memoized.get(input);
-		}
-		for (int i = 1; i < input.length(); i++) {
-			String prefix = input.substring(0, i);
-			if (dict.contains(prefix)) {
-				String suffix = input.substring(i);
-				String segSuffix = spaceWordsEfficient(suffix, dict);
-				if (segSuffix != null) {
-					memoized.put(input, prefix + " " + segSuffix);
-					return prefix + " " + segSuffix;
-				}
-			}
-		}
-		memoized.put(input, null);
-		return null;
-	}
-
-	// prints all subsets (the powerset) of the given array
-	public static void printSubsets(char[] set) {
-		// loop runs 2^n times - once for each subset & uses this value as a bitmask to select the #s that are in the subset
-		for (int i = 0; i < Math.pow(2, set.length); i++) { // Math.pow(2, n) = (1 << n)
-			System.out.print("{ ");
-			// print current subset
-			for (int j = 0; j < set.length; j++) {
-				// (1<<j) is a number with jth bit 1 so when we 'and' them with the
-				// subset number we get which numbers are present in the subset and which are not
-				if ((i & (1 << j)) > 0) 
-					System.out.print(set[j] + " ");
-			}
-			System.out.println("}");
-		}
-		// Example with [a,b,c] - know there are 8 subsets:
-		// i:		subset:
-		// 000		{}
-		// 001		{a}			1's place with value 1 means 'a' is in set
-		// 010		{b}			2's place with value 1 means 'b' is in set
-		// 011		{b,a}
-		// 100		{c}			4's place with value 1 means 'c' is in set
-		// 101		{c,a}
-		// 110		{c,b}
-		// 111		{c,b,a}
-	}
-
-	// SEE StringQuestions.java for combinations and permutations
-
 	// prints the whitespace-separated words in the given string in order of descending freq 
 	public static void printDescendingFreq(String words) {
 		String[] wds = words.split("\\s+");
@@ -260,44 +219,4 @@ public class Algos {
 		}
 		return factors;
 	}
-
-	// Returns the count of ways we can sum  S[0...m-1] coins to get sum n
-	public static int countWaysRecursive( int S[], int m, int n ) {
-		if (n == 0) return 1;// 1 solution
-		if (n < 0) return 0; //no solution exists
-		if (m <= 0 && n >= 1) return 0; //no coins and n is greater than 0, no solution
-
-		// count is sum of solutions (i) including S[m-1] (ii) excluding S[m-1]
-		return countWaysRecursive( S, m - 1, n ) + countWaysRecursive( S, m, n-S[m-1] );
-	}
-	// uses dynamic programming to avoid redundant coin combinations and be more efficient
-	public static long countWaysDynamic(int S[], int m, int n) {
-		//Time complexity of this function: O(mn)
-		//Space Complexity of this function: O(n)
-
-		// table[i] will be storing the number of solutions
-		// for value i. We need n+1 rows as the table is
-		// constructed in bottom up manner using the base
-		// case (n = 0)
-		long[] table = new long[n+1];
-
-		// Initialize all table values as 0
-		Arrays.fill(table, 0);   //O(n)
-
-		// Base case (If given value is 0)
-		table[0] = 1;
-
-		// Pick all coins one by one and update the table[]
-		// values after the index greater than or equal to
-		// the value of the picked coin
-		for (int i=0; i<m; i++)
-			for (int j=S[i]; j<=n; j++)
-				table[j] += table[j-S[i]];
-
-		return table[n];
-	}
-
-
-
-
 }

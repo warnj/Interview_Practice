@@ -5,8 +5,7 @@ import java.util.*;
 public class StringQuestions {
 
 	public static void main(String[] args) {
-		System.out.println(longestCommonPrefix(new String[] {"there", "the", "them"}));
-		System.out.println(longestCommonPrefix(new String[] {"the", "there", "them"}));
+		
 	}
 	
 	// example: {"the", "there", "them"} returns "the"
@@ -24,8 +23,8 @@ public class StringQuestions {
         return strs[0].substring(0, common);
     }
 
-	// This is not an ideal solution - ideal solution is to build a FSM for the needle, then run over haystack.
-	public static int strStr(String haystack, String needle) {
+	// Returns indexOf needle in haystack, -1 if not found. This is not an ideal solution - ideal solution is to build a FSM for the needle, then run over haystack.
+	public static int indexOf(String haystack, String needle) {
 		if(needle.length() > haystack.length()) return -1;
 		else if (needle.length() == haystack.length()) return needle.equals(haystack) ? 0 : -1;
 		else if (needle.isEmpty()) return 0;
@@ -151,6 +150,7 @@ public class StringQuestions {
 		return new String(word);
 	}
 
+	// start at the end of s, find words, pull them out and add to a new stringbuilder
 	public static String reverseWordsBackToFront(String s){
 		StringBuilder sb = new StringBuilder();
 		for(int i = s.length() - 1; i >= 0;){
@@ -210,67 +210,6 @@ public class StringQuestions {
 		}
 		return sb.toString();
 	}
-
-	// Returns all distinct results of choosing the given number of items from the given array. Order does not matter.
-	// example of input: combinations(new String[]{"1","2","3","4"}, 2);
-	// example of output: [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
-	public static List<String> combinations(String s, int choose) {
-		if (choose > s.length() || choose < 0) throw new IllegalArgumentException();
-		List<String> list = new ArrayList<>();
-		combinations(s.toCharArray(), 0, choose, new char[choose], list);
-		return list;
-	}
-	private static void combinations(char[] arr, int startPosition, int len, char[] result, List<String> resultList) {
-		if (len == 0) {
-			resultList.add(new String(result));
-		} else { // this is incredibly brilliant, potent code that is really hard to wrap your head around
-			for (int i = startPosition; i <= arr.length-len; i++) { // loop through # of ways to pick the next-lowest element in the result array between startPosition & arr.length-1 choosing len items
-				result[result.length - len] = arr[i]; // fill in the next-lowest index of the temp result array with the chosen element
-				combinations(arr, i+1, len-1, result, resultList); // explore, picking one-less item from the remaining section of the array
-			}
-		}
-	}
-
-	// Outputs all permutations of the given string.
-	// https://courses.cs.washington.edu/courses/cse143/15au/lectures/11-09/17-recursive-backtracking.pdf
-	public static List<String> permutations(String s) {
-		List<String> list = new ArrayList<String>();
-		permutations(s, "", list);
-		return list;
-	}
-	private static void permutations(String s, String chosen, List<String> list) {
-		if (s.length() == 0) {
-			// base case: no choices left to be made
-			list.add(chosen);
-		} else {
-			// recursive case: choose each possible next letter
-			for (int i = 0; i < s.length(); i++) {
-				// choose; cut out a letter from each index in s, add to chosen
-				char c = s.charAt(i); // choose
-				s = s.substring(0, i) + s.substring(i + 1);
-				chosen += c;
-				// explore
-				permutations(s, chosen, list);
-				// un-choose; put s back the way it was, remove last letter of chosen
-				s = s.substring(0, i) + c + s.substring(i);
-				chosen = chosen.substring(0, chosen.length() - 1);
-			}
-		}
-	}
-
-	// shorter way of doing same thing as above
-	public static void permutation(String str) {
-		permutation("", str);
-	}
-	private static void permutation(String prefix, String str) {
-		int n = str.length();
-		if (n == 0) System.out.println(prefix);
-		else {
-			for (int i = 0; i < n; i++)
-				permutation(prefix + str.charAt(i), str.substring(0, i) + str.substring(i+1, n));
-		}
-	}
-
 
 	/**
 	 * Compares two version strings.

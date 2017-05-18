@@ -17,10 +17,10 @@ public class StringQuestionsTests {
 	}
 
 	@Test
-	public void testStrStr() {
-		assertEquals(StringQuestions.strStr("THISIS The Haystack", "he"), 8);
-		assertEquals(StringQuestions.strStr("aaa", "aaaa"), -1);
-		assertEquals(StringQuestions.strStr("mississippi", "issipi"), -1);
+	public void testindexOf() {
+		assertEquals(StringQuestions.indexOf("THISIS The Haystack", "he"), 8);
+		assertEquals(StringQuestions.indexOf("aaa", "aaaa"), -1);
+		assertEquals(StringQuestions.indexOf("mississippi", "issipi"), -1);
 	}
 	
 	@Test
