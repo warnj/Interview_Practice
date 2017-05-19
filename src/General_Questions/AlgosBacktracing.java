@@ -4,10 +4,29 @@ import java.util.*;
 
 public class AlgosBacktracing {
 	public static void main(String[] args) {
-		System.out.println(permute(new int[] {1,2,3}));
+		System.out.println(permuteUnique(new int[] {1,1,3}));
 	}
 	
 	// https://leetcode.com/problems/permutations/#/solutions
+	public static List<List<Integer>> combinationSum(int[] candidates, int target) {// requires nums to not contain any duplicates
+		List<List<Integer>> result = new ArrayList<List<Integer>>();
+		combinationSum(candidates, target, 0, new ArrayList<Integer>(), result);
+		return result;
+	}
+	private static void combinationSum(int[] nums, int target, int sum, List<Integer> data, List<List<Integer>> result) {
+		if (sum == target) {
+			result.add(new ArrayList<Integer>(data));
+		} else {
+			for (int i = 0; i < nums.length; i++) {
+				if (data.contains(nums[i])) continue; // would allow any number of duplicates if this was not 
+				// here: [1, 2] = [[1, 1], [1, 2], [2, 1], [2, 2]]: runtime = O(n^n) where n = nums.length 
+				data.add(nums[i]);
+				permute(nums, data, result);
+				data.remove(data.size()-1);
+			}
+		}
+	}
+	
 	
 	public static List<List<Integer>> permute(int[] nums) {// requires nums to not contain any duplicates
 		List<List<Integer>> result = new ArrayList<List<Integer>>();
@@ -30,21 +49,27 @@ public class AlgosBacktracing {
 	
 	// Given a collection of numbers that might contain duplicates, return all possible unique permutations.
 	// [1,1,2] -> [[1,1,2], [1,2,1], [2,1,1]]
-	public List<List<Integer>> permuteUnique(int[] nums) {
+	public static List<List<Integer>> permuteUnique(int[] nums) {
 	    List<List<Integer>> list = new ArrayList<>();
 	    Arrays.sort(nums);
-	    permuteUnique(list, new ArrayList<>(), nums, new boolean[nums.length]);
+	    permuteUnique(list, new ArrayList<>(), nums, new boolean[nums.length], 0);
 	    return list;
 	}
-	private void permuteUnique(List<List<Integer>> list, List<Integer> tempList, int [] nums, boolean [] used){
-	    if(tempList.size() == nums.length){
+	private static void permuteUnique(List<List<Integer>> list, List<Integer> tempList, int[] nums, boolean[] used, int level){
+	    if (tempList.size() == nums.length){
+//	    	for (int j=0;j<level;j++)System.out.print('\t');
+//        	System.out.println(tempList);
 	        list.add(new ArrayList<>(tempList));
 	    } else{
 	        for(int i = 0; i < nums.length; i++){
-	            if(used[i] || i > 0 && nums[i] == nums[i-1] && !used[i - 1]) continue;
+	            if (used[i] || (i > 0 && nums[i] == nums[i-1] && !used[i-1])) continue; // don't re-explore where we started or 
+	            // do what we've done before (on the 2nd duplicate when the first isn't used indicates a duplicate scenario - still not 100% how)
+	            
+//	            for (int j=0;j<level;j++)System.out.print('\t');
+//	        	System.out.println(tempList);
 	            used[i] = true; 
 	            tempList.add(nums[i]);
-	            permuteUnique(list, tempList, nums, used);
+	            permuteUnique(list, tempList, nums, used, level+1);
 	            used[i] = false; 
 	            tempList.remove(tempList.size() - 1);
 	        }
