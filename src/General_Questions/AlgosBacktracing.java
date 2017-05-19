@@ -4,38 +4,85 @@ import java.util.*;
 
 public class AlgosBacktracing {
 	public static void main(String[] args) {
-		System.out.println(permuteUnique(new int[] {1,1,3}));
+		System.out.println(partitionPalindrome("aab"));
 	}
-	
+
 	// https://leetcode.com/problems/permutations/#/solutions
-	public static List<List<Integer>> combinationSum(int[] candidates, int target) {// requires nums to not contain any duplicates
-		List<List<Integer>> result = new ArrayList<List<Integer>>();
-		combinationSum(candidates, target, 0, new ArrayList<Integer>(), result);
+
+	// Given a string s, partition s such that every substring of the partition is a palindrome. "aab" returns [["aa","b"], ["a","a","b"]]
+	public static List<List<String>> partitionPalindrome(String s) {
+		List<List<String>> result = new ArrayList<>();
+		partitionPalindrome(s, new ArrayList<>(), result, 0);
 		return result;
 	}
-	private static void combinationSum(int[] nums, int target, int sum, List<Integer> data, List<List<Integer>> result) {
-		if (sum == target) {
-			result.add(new ArrayList<Integer>(data));
+	private static void partitionPalindrome(String s, List<String> data, List<List<String>> result, int start) {
+		if(start == s.length()) {
+			result.add(new ArrayList<>(data));
 		} else {
-			for (int i = 0; i < nums.length; i++) {
-				if (data.contains(nums[i])) continue; // would allow any number of duplicates if this was not 
-				// here: [1, 2] = [[1, 1], [1, 2], [2, 1], [2, 2]]: runtime = O(n^n) where n = nums.length 
+			for(int i = start; i < s.length(); i++) { // start to end ensures no duplicate palindrome partitions
+				if (isPalindrome(s, start, i)) {
+					data.add(s.substring(start, i + 1));
+					partitionPalindrome(s, data, result, i + 1);
+					data.remove(data.size() - 1);
+				}
+			}
+		}
+	}
+	private static boolean isPalindrome(String s, int start, int end) {
+		while (end > start) {
+			if (s.charAt(end--) != s.charAt(start++)) return false;
+		}
+		return true;
+	}
+
+	// Given a set of candidate numbers (C) and a target number (T), find all unique combinations in C where the candidate numbers sums to T.
+	// The same repeated number may be chosen from C unlimited number of times. The solution set must not contain duplicate combinations.
+	// candidates will not contain any duplicates & all numbers (target included) will be positive
+	public static List<List<Integer>> combinationSum(int[] candidates, int target) {
+		List<List<Integer>> result = new ArrayList<>();
+		combinationSum(candidates, target, new ArrayList<>(), result, 0);
+		return result;
+	}
+	private static void combinationSum(int[] nums, int target, List<Integer> data, List<List<Integer>> result, int start) {
+		if (0 == target) {
+			result.add(new ArrayList<>(data));
+		} else {
+			for (int i = start; i < nums.length; i++) { // avoid duplicate results using start to end rather than 0 to end
+				if (target - nums[i] < 0) continue; // the next sum is > target, skip it
 				data.add(nums[i]);
-				permute(nums, data, result);
+				combinationSum(nums, target-nums[i], data, result, i); // not i + 1 because we can reuse same elements
 				data.remove(data.size()-1);
 			}
 		}
 	}
-	
-	
+	// same as above, but numbers in candidates can only be used once
+	public static List<List<Integer>> combinationSumNoRepeat(int[] candidates, int target) {
+		Arrays.sort(candidates);
+		List<List<Integer>> result = new ArrayList<>();
+		combinationSumNoRepeat(candidates, target, new ArrayList<>(), result, 0);
+		return result;
+	}
+	private static void combinationSumNoRepeat(int[] nums, int target, List<Integer> data, List<List<Integer>> result, int start) {
+		if (0 == target) {
+			result.add(new ArrayList<>(data));
+		} else {
+			for (int i = start; i < nums.length; i++) { // avoid duplicate results using start to end rather than 0 to end
+				if (target - nums[i] < 0 || (i > start && nums[i] == nums[i-1])) continue; // skip duplicates
+				data.add(nums[i]);
+				combinationSumNoRepeat(nums, target-nums[i], data, result, i+1);
+				data.remove(data.size()-1);
+			}
+		}
+	}
+
 	public static List<List<Integer>> permute(int[] nums) {// requires nums to not contain any duplicates
-		List<List<Integer>> result = new ArrayList<List<Integer>>();
+		List<List<Integer>> result = new ArrayList<>();
 		permute(nums, new ArrayList<Integer>(), result);
 		return result;
 	}
 	private static void permute(int[] nums, List<Integer> data, List<List<Integer>> result) {
 		if (data.size() == nums.length) {
-			result.add(new ArrayList<Integer>(data));
+			result.add(new ArrayList<>(data));
 		} else {
 			for (int i = 0; i < nums.length; i++) { // explore all values of nums that != nums[i]
 				if (data.contains(nums[i])) continue; // would allow any number of duplicates if this was not 
@@ -46,36 +93,35 @@ public class AlgosBacktracing {
 			}
 		}
 	}
-	
 	// Given a collection of numbers that might contain duplicates, return all possible unique permutations.
 	// [1,1,2] -> [[1,1,2], [1,2,1], [2,1,1]]
 	public static List<List<Integer>> permuteUnique(int[] nums) {
-	    List<List<Integer>> list = new ArrayList<>();
-	    Arrays.sort(nums);
-	    permuteUnique(list, new ArrayList<>(), nums, new boolean[nums.length], 0);
-	    return list;
+		List<List<Integer>> list = new ArrayList<>();
+		Arrays.sort(nums);
+		permuteUnique(list, new ArrayList<>(), nums, new boolean[nums.length], 0);
+		return list;
 	}
 	private static void permuteUnique(List<List<Integer>> list, List<Integer> tempList, int[] nums, boolean[] used, int level){
-	    if (tempList.size() == nums.length){
-//	    	for (int j=0;j<level;j++)System.out.print('\t');
-//        	System.out.println(tempList);
-	        list.add(new ArrayList<>(tempList));
-	    } else{
-	        for(int i = 0; i < nums.length; i++){
-	            if (used[i] || (i > 0 && nums[i] == nums[i-1] && !used[i-1])) continue; // don't re-explore where we started or 
-	            // do what we've done before (on the 2nd duplicate when the first isn't used indicates a duplicate scenario - still not 100% how)
-	            
-//	            for (int j=0;j<level;j++)System.out.print('\t');
-//	        	System.out.println(tempList);
-	            used[i] = true; 
-	            tempList.add(nums[i]);
-	            permuteUnique(list, tempList, nums, used, level+1);
-	            used[i] = false; 
-	            tempList.remove(tempList.size() - 1);
-	        }
-	    }
+		if (tempList.size() == nums.length){
+			//	    	for (int j=0;j<level;j++)System.out.print('\t');
+			//        	System.out.println(tempList);
+			list.add(new ArrayList<>(tempList));
+		} else{
+			for(int i = 0; i < nums.length; i++){
+				if (used[i] || (i > 0 && nums[i] == nums[i-1] && !used[i-1])) continue; // don't re-explore where we started or 
+				// do what we've done before (on the 2nd duplicate when the first isn't used indicates a duplicate scenario - still not 100% how)
+
+				//	            for (int j=0;j<level;j++)System.out.print('\t');
+				//	        	System.out.println(tempList);
+				used[i] = true; 
+				tempList.add(nums[i]);
+				permuteUnique(list, tempList, nums, used, level+1);
+				used[i] = false; 
+				tempList.remove(tempList.size() - 1);
+			}
+		}
 	}
-	
+
 	public static List<List<Integer>> subsets(int[] nums) {// requires nums to not contain any duplicates
 		List<List<Integer>> list = new ArrayList<>();
 		subsets(list, new ArrayList<>(), nums, 0);
@@ -89,22 +135,21 @@ public class AlgosBacktracing {
 			tempList.remove(tempList.size() - 1);
 		}
 	}
-	
 	// Given a collection of integers that might contain duplicates, nums, return all possible subsets. The solution set must not contain duplicate subsets.
 	public List<List<Integer>> subsetsWithDup(int[] nums) {
 		Arrays.sort(nums);
-	    List<List<Integer>> list = new ArrayList<>();
-	    subsetsWithDup(list, new ArrayList<>(), nums, 0);
-	    return list;
+		List<List<Integer>> list = new ArrayList<>();
+		subsetsWithDup(list, new ArrayList<>(), nums, 0);
+		return list;
 	}
 	private void subsetsWithDup(List<List<Integer>> list, List<Integer> tempList, int [] nums, int start){
-	    list.add(new ArrayList<>(tempList));
-	    for (int i = start; i < nums.length; i++){
-	        if (i > start && nums[i] == nums[i-1]) continue; // skip duplicates since we know nums is sorted
-	        tempList.add(nums[i]);
-	        subsetsWithDup(list, tempList, nums, i + 1);
-	        tempList.remove(tempList.size() - 1);
-	    }
+		list.add(new ArrayList<>(tempList));
+		for (int i = start; i < nums.length; i++){
+			if (i > start && nums[i] == nums[i-1]) continue; // skip duplicates since we know nums is sorted
+			tempList.add(nums[i]);
+			subsetsWithDup(list, tempList, nums, i + 1);
+			tempList.remove(tempList.size() - 1);
+		}
 	}
 
 	// prints all subsets (the powerset) of the given array
