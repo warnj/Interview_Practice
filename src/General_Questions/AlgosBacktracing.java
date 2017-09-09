@@ -153,7 +153,7 @@ public class AlgosBacktracing {
 	}
 
 	// prints all subsets (the powerset) of the given array
-	public static void printSubsets(char[] set) {
+	public static void printSubsetsIterative(char[] set) {
 		// loop runs 2^n times - once for each subset & uses this value as a bitmask to select the #s that are in the subset
 		for (int i = 0; i < Math.pow(2, set.length); i++) { // Math.pow(2, n) = (1 << n)
 			System.out.print("{ ");

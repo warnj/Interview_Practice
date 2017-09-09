@@ -221,6 +221,25 @@ public class IntLinkedList {
 		return lists.get(0);
 	}
 	
+	// rotate the list to the right by k places, where k is non-negative.
+	// Given 1->2->3->4->5->NULL and k = 2, return 4->5->1->2->3->NULL
+	// https://leetcode.com/problems/rotate-list/description/
+	public ListNode rotateRight(int k) {
+		if (front == null) return null;
+		ListNode copyHead = front;
+		int len = 1;
+		while (copyHead.next != null) {
+			copyHead = copyHead.next;
+			len++;
+		}
+		copyHead.next = front; // connect end to front
+		for (int i = len - k % len; i > 1; i--)
+			front = front.next;
+		copyHead = front.next; // set the new front
+		front.next = null; // set the end of new list
+		return copyHead;
+	}
+	
 	// returns the kth to last element in the list. k=1 returns last element, k=2 returns 2nd to last. requires k <= size, throws NullPointerException if k > size
 	public int kthToLast(int k) {
 		ListNode first = front;
@@ -234,6 +253,22 @@ public class IntLinkedList {
 		}
 		return last.data;
 	}
+	
+	public ListNode removeNthFromEnd(int n) {
+        ListNode start = new ListNode(0);
+        start.next = front;
+        ListNode first = start;
+		for(int i = 0; i <= n; i++) { // move n+1 times forward
+			first = first.next;
+		}
+		ListNode last = start;
+		while(first != null) {
+			first = first.next;
+			last = last.next;
+		}
+        last.next = last.next.next;
+		return start.next; // the placeholder for the front of the list
+    }
 	
 	// returns null if there is no loop, otherwise returns the int at the point where the loop begins
 	public Integer hasLoop() {
@@ -270,17 +305,6 @@ public class IntLinkedList {
 					cur = cur.next;
 				}
 			}
-		}
-	}
-	
-	// deletes the given node from the list. n cannot be the last node in the list
-	private static boolean deleteNode(ListNode n) {
-		if(n==null || n.next==null) {
-			return false;
-		} else { // copy the data from next node to given node and delete next node
-			n.data = n.next.data;
-			n.next = n.next.next;
-			return true;
 		}
 	}
 	

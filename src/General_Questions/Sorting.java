@@ -11,9 +11,9 @@ public class Sorting {
 	public static void sortEven(int[] arr) {
 		int front = 0;
 		int back = arr.length - 1;
-		while(back > front) {
-			if(arr[front] % 2 == 1) { // move odd to back
-				while(arr[back] % 2 == 1) { // find even at the end
+		while (back > front) {
+			if (arr[front] % 2 == 1) { // move odd to back
+				while (arr[back] % 2 == 1) { // find even at the end
 					back--;
 				}
 				if(back > front) {

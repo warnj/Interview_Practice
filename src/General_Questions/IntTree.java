@@ -247,7 +247,6 @@ public class IntTree {
 			return Integer.MIN_VALUE;
 		}
     }
-
 	private IntTreeNode getLca(IntTreeNode root, int v1, int v2) {
 		// look for the two target nodes (v1 and v2)
 	    if(root == null) return null;
