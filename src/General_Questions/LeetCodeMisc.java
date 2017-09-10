@@ -5,10 +5,63 @@ import java.util.*;
 public class LeetCodeMisc {
 
 	public static void main(String[] args) {
-
+		System.out.println(maxProduct(new int[] {0,2}));
 	}
 	
+	// https://leetcode.com/problems/maximum-product-subarray/discuss/
+	// Find the contiguous subarray within an array (containing at least one number) which has the largest product.
+	public static int maxProduct(int[] nums) { // ingenious O(n) time
+		int max = nums[0];
+	    // keep track of the previous max (and min since product of 2 negatives = positive)
+		int maxherepre = nums[0];
+	    int minherepre = nums[0];
+	    
+	    for (int i = 1; i < nums.length; i++) {
+	    	int maxhere = Math.max(Math.max(maxherepre * nums[i], minherepre * nums[i]), nums[i]);
+	    	int minhere = Math.min(Math.min(maxherepre * nums[i], minherepre * nums[i]), nums[i]);
+	        max = Math.max(maxhere, max);
+	        maxherepre = maxhere;
+	        minherepre = minhere;
+	    }
+	    return max;
+    }
+	public static int maxProductSlow(int[] nums) { // brute force O(n^2) time
+		int max = nums[0];
+        for (int i = 0; i < nums.length; i++) {
+        	for (int j = i; j < nums.length; j++) {
+//        		System.out.println(i+" "+j);
+        		int p = product(nums, i, j); 
+        		if (p > max) max = p;
+        	}
+        }
+        return max;
+    }
+	private static int product(int[] a, int lo, int hi) {
+		int prod = 1;
+		for (int i = lo; i <= hi; i++) {
+			prod *= a[i];
+		}
+		return prod;
+	}
 	
+	// https://leetcode.com/problems/generate-parentheses/discuss/
+	// n = 2 => [()(), (())]
+	// n = 3 => [((())), (()()), (())(), ()(()), ()()()]
+	public static List<String> generateParenthesis(int n) {
+		List<String> result = new ArrayList<>();
+		generateParenthesis(result, n, 0, 0, "");
+		return result;
+    }
+	private static void generateParenthesis(List<String> result, int max, int open, int close, String s) {
+		if (s.length() == 2*max) {
+			result.add(s);
+		} else {
+			if (open < max) // it is legal to add a "("
+				generateParenthesis(result, max, open+1, close, s+"(");
+			if (open > close) // it is legal to add a ")"
+				generateParenthesis(result, max, open, close+1, s+")");
+		}
+	}
 
 	// Write an efficient algorithm that searches for a value in an m x n matrix. This matrix has the following properties:
 	// Integers in each row are sorted from left to right.

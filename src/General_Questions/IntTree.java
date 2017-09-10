@@ -21,6 +21,11 @@ public class IntTree {
 		overallRoot = root;
 	}
 	
+	// https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/description/
+	public IntTree(int[] preorder, int[] inorder) {
+		
+	}
+	
 	// Returns true if the value is in this tree, false otherwise.
 	public boolean contains(int value) {
 		return contains(overallRoot, value);
@@ -226,22 +231,76 @@ public class IntTree {
 	
 	// this is just BFS
 	public void printLevelOrder() {
-		Queue<IntTreeNode> q = new LinkedList<IntTreeNode>();
-		q.add(overallRoot);
-		while(!q.isEmpty()) {
-			IntTreeNode n = q.remove();
-			if(n != null) {
+		if (overallRoot != null) {
+			Queue<IntTreeNode> q = new LinkedList<>();
+			q.add(overallRoot);
+			while (!q.isEmpty()) {
+				IntTreeNode n = q.remove();
 				System.out.print(n.data + " ");
-				q.add(n.left);
-				q.add(n.right);
+				if (n.left != null) q.add(n.left);
+                if (n.right != null) q.add(n.right);
 			}
 		}
 	}
 	
+	// returns list of the data at each level of the tree, top to bottom, left to right
+	// https://leetcode.com/problems/binary-tree-level-order-traversal/description/
+	public List<List<Integer>> levelOrder() {
+        List<List<Integer>> allLevels = new LinkedList<>();
+        if (overallRoot == null) return allLevels;
+        
+        Queue<IntTreeNode> q = new LinkedList<>(); // for BFS
+        q.add(overallRoot);
+        while (!q.isEmpty()) {
+            int levelNum = q.size(); // everything in the q currently is on the same level of tree
+            List<Integer> oneLevel = new LinkedList<>();
+            for (int i = 0; i < levelNum; i++) { // add their children, which will be on same level as each other
+            	IntTreeNode n = q.remove();
+                if (n.left != null) q.add(n.left);
+                if (n.right != null) q.add(n.right);
+                oneLevel.add(n.data);
+            }
+            allLevels.add(oneLevel);
+        }
+        return allLevels;
+    }
+	
+	// Given a binary tree, flatten it to a linked list in-place.
+	// THIS IS THE MOST HARD TO WRITE 5 LINES OF CODE EVER
+	// https://leetcode.com/problems/flatten-binary-tree-to-linked-list/description/
+	public void flatten() {
+		flatten(overallRoot);
+	}
+	private IntTreeNode prev = null;
+	private void flatten(IntTreeNode root) {
+        if (root != null) {
+        	flatten(root.right);
+            flatten(root.left);
+            root.right = prev;
+            root.left = null; // singly linked list
+            prev = root;
+        }
+    }
+	public void flattenIterative() {
+        if (overallRoot == null) return;
+        Stack<IntTreeNode> s = new Stack<>();
+        s.push(overallRoot);
+        while (!s.isEmpty()) {
+        	IntTreeNode cur = s.pop(); // cur is the end of the list as we build it
+            if (cur.right != null) // want right side at end of linked list, so put on bottom of stack by adding first
+                 s.push(cur.right);
+            if (cur.left != null) 
+                 s.push(cur.left);
+            if (!s.isEmpty()) // connect end of list to next node 
+                 cur.right = s.peek();
+            cur.left = null; // singly linked list
+        }
+    }
+	
 	// returns the least-valued common ancestor of the two given nodes
 	public int lca(IntTreeNode root, int v1, int v2) {
 		IntTreeNode lca = getLca(root, v1, v2);
-		if(lca != null) {
+		if (lca != null) {
 			return lca.data;
 		} else {
 			return Integer.MIN_VALUE;
@@ -624,6 +683,10 @@ public class IntTree {
 			this.data = data;
 			this.left = left;
 			this.right = right;
+		}
+		
+		public String toString() {
+			return Integer.toString(data);
 		}
 	}
 	

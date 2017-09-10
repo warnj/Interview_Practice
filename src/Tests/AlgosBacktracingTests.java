@@ -21,7 +21,12 @@ public class AlgosBacktracingTests {
 		dict.add("justin");
 		dict.add("a");
 		dict.add("how");
-		System.out.println(AlgosBacktracing.spaceWordsEfficient("salesforce", dict));
+		assertEquals("sales force", AlgosBacktracing.spaceWordsEfficient("salesforce", dict));
 	}
 
+	@Test
+	public void testSubsets() {
+		System.out.println(AlgosBacktracing.permuteIterative(new int[] {1,2,3}));
+		
+	}
 }

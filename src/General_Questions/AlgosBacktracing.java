@@ -93,6 +93,22 @@ public class AlgosBacktracing {
 			}
 		}
 	}
+	public static List<List<Integer>> permuteIterative(int[] nums) {
+	    LinkedList<List<Integer>> result = new LinkedList<>();
+	    result.add(new ArrayList<>());
+	    for (int n : nums) {
+	        int size = result.size();
+	        for (; size > 0; size--) {// get each partial list previously built
+	            List<Integer> partial = result.pollFirst(); // taking partial lists from front
+	            for (int i = 0; i <= partial.size(); i++) {
+	                List<Integer> t = new ArrayList<>(partial);
+	                t.add(i, n); // insert n into every possible location within partial list
+	                result.add(t); // adding longer, more complete lists to back
+	            }
+	        }
+	    }
+	    return result;
+	}
 	// Given a collection of numbers that might contain duplicates, return all possible unique permutations.
 	// [1,1,2] -> [[1,1,2], [1,2,1], [2,1,1]]
 	public static List<List<Integer>> permuteUnique(int[] nums) {
@@ -128,10 +144,11 @@ public class AlgosBacktracing {
 		return list;
 	}
 	private static void subsets(List<List<Integer>> list, List<Integer> tempList, int[] nums, int start) {
+		System.out.println(start + "\t" + tempList);
 		for (int i = start; i < nums.length; i++) { // only look at the values between start and end
 			tempList.add(nums[i]);
 			list.add(new ArrayList<>(tempList));
-			subsets(list, tempList, nums, i + 1);  // recursive calls explore progressively smaller pieces of nums
+			subsets(list, tempList, nums, i + 1);  // explore remaining section of nums
 			tempList.remove(tempList.size() - 1);
 		}
 	}
@@ -255,9 +272,7 @@ public class AlgosBacktracing {
 				String part = input.substring(index, i);
 				if (dict.contains(part)) {
 					String s = spaceWords(input, dict, result + part + " ", i);
-					if(s != null) {
-						return s;
-					}
+					if(s != null) return s;
 				}
 			}
 			return null;
