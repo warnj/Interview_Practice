@@ -46,18 +46,10 @@ public class IntTreeTests {
 	}
 	
 	@Test
-	public void testLevelOrder() {
-		IntTree tree = new IntTree();
-		tree.add(1);
-		tree.add(2);
-		tree.add(5);
-		tree.add(3);
-		tree.add(4);
-		tree.add(6);
-		System.out.println(tree);
-		tree.flatten();
-//		tree.printInorder();
-		System.out.println(tree);
+	public void testBuild() {
+		int[] pre = new int[] {1,2,9,4,3};
+		int[] in = new int[] {9,2,4,1,3};
+		IntTree tree = new IntTree(pre, in);
 	}
 
 }

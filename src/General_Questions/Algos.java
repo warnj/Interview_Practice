@@ -6,63 +6,14 @@ import java.awt.*;
 
 public class Algos {
 	public static void main(String[] args) {
+	
 	}
 
-	// Given a 2D board and a word, find if the word exists in the grid. The word can be constructed from letters of sequentially adjacent cell, 
-	// where "adjacent" cells are those horizontally or vertically neighboring. The same letter cell may not be used more than once.
-	public static boolean exist(char[][] board, String word) {
-		if (board.length == 0) return false;
-		if (word.isEmpty()) return true;
-		int height = board.length;
-		int width = board[0].length;
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				if (board[y][x] == word.charAt(0)) { // found first letter
-					Set<Point> visited = new HashSet<Point>();
-					visited.add(new Point(x, y));
-					if (search(y, x, board, word, 1, visited)) {// explore
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-	private static boolean search (int y, int x, char[][] board, String word, int index, Set<Point> visited) {
-		if (index >= word.length()) return true;
-		int height = board.length;
-		int width = board[0].length;
-		char target = word.charAt(index);
-		Point p = new Point(x, y+1);
-		if (y + 1 < height && board[y+1][x] == target && !visited.contains(p)) {// found next letter above
-			visited.add(p);
-			if(search(y+1, x, board, word, index+1, visited)) return true;
-			visited.remove(p);
-		}
-		p = new Point(x, y-1);
-		if (y - 1 >= 0 && board[y-1][x] == target && !visited.contains(p)) {// found next letter below
-			visited.add(p);
-			if(search(y-1, x, board, word, index+1, visited)) return true;
-			visited.remove(p);
-		}
-		p = new Point(x+1, y);
-		if (x + 1 < width && board[y][x+1] == target && !visited.contains(p)) {// found next letter to right
-			visited.add(p);
-			if(search(y, x+1, board, word, index+1, visited)) return true;
-			visited.remove(p);
-		}
-		p = new Point(x-1, y);
-		if (x - 1 >= 0 && board[y][x-1] == target && !visited.contains(p)) {// found next letter to left
-			visited.add(p);
-			if(search(y, x-1, board, word, index+1, visited)) return true;
-		}
-		return false;
-	}
 
 	// Write a function to compute the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1
 	// coins = [1, 2, 5], amount = 11	return 3 (11 = 5 + 5 + 1)
 	// coins = [2], amount = 3	return -1
-	// O(n) runtime and space where n = value of amount
+	// O(n*c) runtime, O(n) space, where n = value of amount and c = # of coins
 	// to find exactly which coins to use - could keep backpointers in the table that tell which coin added at each step, then traverse back
 	public static int coinChange(int[] coins, int amount) {
 		if (amount == 0) return 0;
@@ -73,9 +24,7 @@ public class Algos {
 			for (int j = 0; j < coins.length; j++) { // go through the possible coins
 				if (i+1 == coins[j]) {
 					min = Math.min(min, 1); // no way to do better than a single coin
-					break;
-				}
-				if (i - coins[j] >= 0 && table[i-coins[j]] != 0) { // there is a way to sum to this value
+				} else if (i - coins[j] >= 0 && table[i-coins[j]] != 0) { // there is a way to sum to this value
 					min = Math.min(min, table[i-coins[j]] + 1); // check how many coins it took to get to the previous value without coins[j], then add 1
 				}
 			}

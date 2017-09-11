@@ -12,11 +12,11 @@ public class IntLinkedList {
 
 	// Adds the given value to the end of the list.
 	public void add(int value) {
-		if(front == null) {
+		if (front == null) {
 			front = new ListNode(value);
 		} else {
 			ListNode current = front;
-			while(current.next != null) {
+			while (current.next != null) {
 				current = current.next;
 			}
 			current.next = new ListNode(value);
@@ -64,11 +64,11 @@ public class IntLinkedList {
 	// Pre: list is sorted
 	// Post: list is sorted
 	public void addSorted(int value) {
-		if(front == null || value < front.data) {
+		if (front == null || value < front.data) {
 			front = new ListNode(value, front);
 		} else {
 			ListNode current = front;
-			while(current.next != null && current.next.data < value) {
+			while (current.next != null && current.next.data < value) {
 				current = current.next;
 			}
 			current.next = new ListNode(value, current.next);
@@ -105,7 +105,7 @@ public class IntLinkedList {
 	public int size() {
 		ListNode current = front;
 		int size = 0;
-		while(current != null) {
+		while (current != null) {
 			size++;
 			current = current.next;
 		}
@@ -146,7 +146,7 @@ public class IntLinkedList {
 	public void reverse() {
 		ListNode prev = null;
 		ListNode cur = front;
-		while(cur != null) {
+		while (cur != null) {
 			ListNode next = cur.next;
 			cur.next = prev;
 
@@ -185,7 +185,7 @@ public class IntLinkedList {
 	public static IntLinkedList mergeSortedLists(List<IntLinkedList> lists) {
 		// pairs the given lists, merges them, and repeats until have 1 big list
 		// probably more efficient to pair and merge similarly sized lists, but not a big issue
-		while(lists.size() > 1) {
+		while (lists.size() > 1) {
 			IntLinkedList mergeTo = mergeSortedLists(lists.get(0), lists.get(1));
 			lists.remove(0);
 			lists.set(0, mergeTo);
@@ -221,9 +221,9 @@ public class IntLinkedList {
 	}
 	// recursive way to do the same as above
 	public ListNode mergeSortedLists(ListNode l1, ListNode l2){
-		if(l1 == null) return l2;
-		if(l2 == null) return l1;
-		if(l1.data < l2.data){
+		if (l1 == null) return l2;
+		if (l2 == null) return l1;
+		if (l1.data < l2.data){
 			l1.next = mergeSortedLists(l1.next, l2);
 			return l1;
 		} else{
@@ -231,7 +231,7 @@ public class IntLinkedList {
 			return l2;
 		}
 	}
-
+	
 	// rotate the list to the right by k places, where k is non-negative.
 	// Given 1->2->3->4->5->NULL and k = 2, return 4->5->1->2->3->NULL
 	// https://leetcode.com/problems/rotate-list/description/
@@ -258,7 +258,7 @@ public class IntLinkedList {
 			first = first.next;
 		}
 		ListNode last = front;
-		while(first != null) {
+		while (first != null) {
 			first = first.next;
 			last = last.next;
 		}
@@ -273,7 +273,7 @@ public class IntLinkedList {
 			first = first.next;
 		}
 		ListNode last = start;
-		while(first != null) {
+		while (first != null) {
 			first = first.next;
 			last = last.next;
 		}
@@ -285,12 +285,12 @@ public class IntLinkedList {
 	public Integer hasLoop() {
 		ListNode fast = front;
 		ListNode slow = front;
-		while(fast != null && fast.next != null) {
+		while (fast != null && fast.next != null) {
 			slow = slow.next;
 			fast = fast.next.next;
-			if(slow == fast) break;
+			if (slow == fast) break;
 		}
-		if(fast == null || fast.next == null) return null;
+		if (fast == null || fast.next == null) return null;
 		// fast is k (the # of nodes before the start of the loop) ahead of slow when slow enters loop
 		// slow and fast meet after LOOP_SIZE - k turns so both are k nodes from the front of the loop
 		// to find loop start, set one ptr to front and they will collide at the first node of the loop
@@ -304,12 +304,12 @@ public class IntLinkedList {
 
 	// O(n) space and time
 	public void removeDuplicates() {
-		if(front != null && front.next != null){
-			Set<Integer> contents = new HashSet<Integer>();
+		if (front != null && front.next != null){
+			Set<Integer> contents = new HashSet<>();
 			contents.add(front.data);
 			ListNode cur = front;
-			while(cur.next != null) {
-				if(contents.contains(cur.next.data)) { // remove
+			while (cur.next != null) {
+				if (contents.contains(cur.next.data)) { // remove
 					cur.next = cur.next.next;
 				} else {
 					contents.add(cur.next.data);
@@ -318,17 +318,53 @@ public class IntLinkedList {
 			}
 		}
 	}
+	
+	// https://leetcode.com/problems/partition-list/description/
+	// partition list such that all nodes less than x come before nodes greater than or equal to x.
+	public void partitionKeepOrder(int val) {
+		ListNode cur = front;
+		ListNode less = null, lessEnd = null, greater = null, greaterEnd = null;
+		// make 2 lists - one < val the other >= val
+		while (cur != null) {
+			if (cur.data < val) {
+				if (lessEnd == null) { // setup front of less list
+					lessEnd = cur;
+					less = lessEnd;
+				} else { // append to less list
+					lessEnd.next = cur;
+					lessEnd = lessEnd.next;
+				}
+			} else {
+				if (greaterEnd == null) { // setup front of greater list
+					greaterEnd = cur;
+					greater = greaterEnd;
+				} else { // append to greater list
+					greaterEnd.next = cur;
+					greaterEnd = greaterEnd.next;
+				}
+			}
+			cur = cur.next;
+		}
+		if (greaterEnd != null) greaterEnd.next = null;
+		// merge lists
+		if (less == null) {
+			front = greater;
+		} else {
+			lessEnd.next = greater;
+			front = less;
+		}
+	}
 
-	// modifies this list so all values < val are before values >= to val
+	// modifies this list so all values < val are before values >= to val, does not retain original relative order
 	public void partition(int val) {
 		ListNode cur = front;
-		ListNode less = null;
-		ListNode greater = null;
+		ListNode less = null; ListNode lessEnd = null;
+		ListNode greater = null; ListNode greaterEnd = null;
 		// make 2 lists - one < val the other >= val
-		while(cur != null) {
+		while (cur != null) {
 			ListNode temp = cur.next;
-			if(cur.data < val) {
-				cur.next = less;
+			if (cur.data < val) {
+				cur.next = less; // adding to front of less list
 				less = cur;
 			} else {
 				cur.next = greater;
@@ -341,7 +377,7 @@ public class IntLinkedList {
 			less = greater;
 		} else if (greater != null) {
 			cur = less;
-			while(cur.next != null) cur = cur.next;
+			while (cur.next != null) cur = cur.next;
 			cur.next = greater;
 		}
 		front = less;
@@ -351,14 +387,14 @@ public class IntLinkedList {
 		Stack<Integer> s = new Stack<Integer>();
 		ListNode slow = front;
 		ListNode fast = front;
-		while(fast != null && fast.next != null) {
+		while (fast != null && fast.next != null) {
 			s.add(slow.data);
 			slow = slow.next;
 			fast = fast.next.next;
 		}
-		if(fast != null) slow = slow.next; // odd length, then middle element won't equal the top of stack
-		while(slow != null) {
-			if(s.pop() != slow.data) {
+		if (fast != null) slow = slow.next; // odd length, then middle element won't equal the top of stack
+		while (slow != null) {
+			if (s.pop() != slow.data) {
 				return false;
 			}
 			slow = slow.next;
@@ -373,13 +409,13 @@ public class IntLinkedList {
 		ListNode result = null;
 		ListNode resultEnd = null;
 		boolean carry = false;
-		while(curA != null && curB != null) {
+		while (curA != null && curB != null) {
 			int sum = curA.data + curB.data;
 			assert(sum <= 18): "a and b must only contain single digits in each node";
-			if(carry) sum++;
+			if (carry) sum++;
 			carry = sum > 9;
 
-			if(result == null) {
+			if (result == null) {
 				result = new ListNode(sum % 10);
 				resultEnd = result;
 			} else {
@@ -390,7 +426,7 @@ public class IntLinkedList {
 			curA = curA.next;
 			curB = curB.next;
 		}
-		while(curA != null) {
+		while (curA != null) {
 			assert(curA.data <= 9): "a and b must only contain single digits in each node";
 			int toAdd = curA.data;
 			if (carry) toAdd++;
@@ -399,7 +435,7 @@ public class IntLinkedList {
 			resultEnd = resultEnd.next;
 			curA = curA.next;
 		}
-		while(curB != null) {
+		while (curB != null) {
 			assert(curB.data <= 9): "a and b must only contain single digits in each node";
 			int toAdd = curB.data;
 			if (carry) toAdd++;
@@ -408,7 +444,7 @@ public class IntLinkedList {
 			resultEnd = resultEnd.next;
 			curB = curB.next;
 		}
-		if(carry) {
+		if (carry) {
 			resultEnd.next = new ListNode(1);
 		}
 		// differing digit numbers
@@ -421,11 +457,11 @@ public class IntLinkedList {
 
 	// pre: the list is sorted by absolute value
 	public void sort() {
-		if(front != null) {
+		if (front != null) {
 			ListNode cur = front;
 			int n = front.data;
-			while(cur.next != null) {
-				if(cur.next.data < n) {
+			while (cur.next != null) {
+				if (cur.next.data < n) {
 					//remove, put at front
 					ListNode temp = front;
 					front = cur.next;
@@ -440,13 +476,13 @@ public class IntLinkedList {
 
 	// O(1) space, O(n^2) time
 	public void removeDuplicatesConstantSpace() {
-		if(front != null && front.next != null){
+		if (front != null && front.next != null){
 			ListNode cur = front;
 			ListNode pre = front;
-			while(pre !=null && pre.next !=null) {
+			while (pre !=null && pre.next !=null) {
 				int n = pre.data;
-				while(cur.next != null) {
-					if(cur.next.data == n) {
+				while (cur.next != null) {
+					if (cur.next.data == n) {
 						cur.next = cur.next.next;
 					} else {
 						cur = cur.next;
@@ -460,14 +496,14 @@ public class IntLinkedList {
 
 	// removes n elements from the front and back of the list
 	public void trimEnds(int k) {
-		if(k>0){
+		if (k>0){
 			int size = 0;
 			ListNode cur = front;
-			while(cur !=null) {
+			while (cur !=null) {
 				size++;
 				cur=cur.next;
 			}
-			if(2*k > size) throw new IllegalArgumentException();
+			if (2*k > size) throw new IllegalArgumentException();
 			else {
 				// remove from front
 				cur = front;
@@ -480,7 +516,7 @@ public class IntLinkedList {
 				for(int i = 0; i <k+1; i++) {
 					cur = cur.next;
 				}
-				while(cur != null){
+				while (cur != null){
 					cur = cur.next;
 					pre=pre.next;
 				}
@@ -491,8 +527,8 @@ public class IntLinkedList {
 
 	public void sortPairs() {
 		ListNode cur = front;
-		if(cur != null && cur.next != null) {
-			if(cur.data > cur.next.data) {
+		if (cur != null && cur.next != null) {
+			if (cur.data > cur.next.data) {
 				ListNode temp = cur;
 				cur = cur.next;
 				temp.next = cur.next;
@@ -500,8 +536,8 @@ public class IntLinkedList {
 				front = cur;
 			}
 			cur = cur.next;
-			while(cur.next != null && cur.next.next != null) {
-				if(cur.next.data > cur.next.next.data) {
+			while (cur.next != null && cur.next.next != null) {
+				if (cur.next.data > cur.next.next.data) {
 					ListNode temp = cur.next;
 					cur.next=temp.next;
 					temp.next = cur.next.next;
@@ -514,19 +550,19 @@ public class IntLinkedList {
 
 	// removes even-numbered elements and places a node at the end with the number removed
 	public void removeEvens() {
-		if(front != null) {
+		if (front != null) {
 			int count = 0;
 			ListNode cur = front;
-			while(cur != null && cur.data %2 == 0) {
+			while (cur != null && cur.data %2 == 0) {
 				count++;
 				cur = cur.next;
 			}
 			//either cur points to odd or at end of list
-			if(cur == null) front = new ListNode(count);
+			if (cur == null) front = new ListNode(count);
 			else {
 				front = cur;
-				while(cur.next != null) {
-					if(cur.next.data % 2 ==0) {
+				while (cur.next != null) {
+					if (cur.next.data % 2 ==0) {
 						cur.next = cur.next.next;
 						count++;
 					} else

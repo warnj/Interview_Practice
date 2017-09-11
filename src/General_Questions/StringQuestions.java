@@ -5,14 +5,13 @@ import java.util.*;
 public class StringQuestions {
 
 	public static void main(String[] args) {
-		
+		System.out.println(longestCommonPrefix(new String[]{"the", "the", "the"}));
 	}
 	
 	// example: {"the", "there", "them"} returns "the"
 	public static String longestCommonPrefix(String[] strs) {
 		if (strs.length == 0 || strs[0].isEmpty()) return "";
         int common = 0;
-        boolean run = true;
         while (common < strs[0].length()) {
         	char c = strs[0].charAt(common);
         	for (int i = 1; i < strs.length; i++) {
@@ -74,6 +73,8 @@ public class StringQuestions {
 		}
 	}
 
+	// runtime = O(n^2) where n = s.length. Check n possible centers, checking for palindrome at
+	// each location could be O(n) worst case
 	public String longestPalindrome(String s) {
 		int n = s.length();
 		if (n == 0) return "";

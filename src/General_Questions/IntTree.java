@@ -22,8 +22,24 @@ public class IntTree {
 	}
 	
 	// https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/description/
-	public IntTree(int[] preorder, int[] inorder) {
-		
+	public IntTree(int[] pre, int[] in) {
+		overallRoot = buildTree(pre, 0, in, 0, in.length-1);
+	}
+	private IntTreeNode buildTree(int[] pre, int preStart, int[] in, int inStart, int inEnd) {
+		if (preStart >= pre.length || inStart > inEnd) return null;
+		IntTreeNode node = new IntTreeNode(pre[preStart]);
+		int inIndex = 0;
+		for (int i = inStart; i <= inEnd; i++) {
+			if (in[i] == pre[preStart]) {
+				inIndex = i; // found the index of this new node in the inorder traversal
+				break;
+			}
+		}
+		// left node is just next in the preorder
+		node.left = buildTree(pre, preStart+1, in, inStart, inIndex-1);
+		// next right node in preorder is the number of nodes in the left subtree away, which = inIndex - inStart
+		node.right = buildTree(pre, preStart + 1 + inIndex - inStart, in, inIndex+1, inEnd);
+		return node;
 	}
 	
 	// Returns true if the value is in this tree, false otherwise.
@@ -266,14 +282,13 @@ public class IntTree {
     }
 	
 	// Given a binary tree, flatten it to a linked list in-place.
-	// THIS IS THE MOST HARD TO WRITE 5 LINES OF CODE EVER
 	// https://leetcode.com/problems/flatten-binary-tree-to-linked-list/description/
 	public void flatten() {
 		flatten(overallRoot);
 	}
 	private IntTreeNode prev = null;
 	private void flatten(IntTreeNode root) {
-        if (root != null) {
+        if (root != null) { // THIS IS THE MOST HARD TO WRITE 5 LINES OF CODE EVER
         	flatten(root.right);
             flatten(root.left);
             root.right = prev;
@@ -297,7 +312,7 @@ public class IntTree {
         }
     }
 	
-	// returns the least-valued common ancestor of the two given nodes
+	// returns the least-valued common ancestor of the two given nodes. A node can be a descendant of itself.
 	public int lca(IntTreeNode root, int v1, int v2) {
 		IntTreeNode lca = getLca(root, v1, v2);
 		if (lca != null) {
