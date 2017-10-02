@@ -9,18 +9,18 @@ import java.util.*;
 
 public class IntTree {	
 	private IntTreeNode overallRoot;
-	
+
 	// Constructs an empty binary tree.
 	public IntTree() {
 		overallRoot = null;
 	}
-	
+
 	// Constructs a binary tree with the given node as its root.
 	// Note: this is hacky and just useful for testing
 	private IntTree(IntTreeNode root) {
 		overallRoot = root;
 	}
-	
+
 	// https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/description/
 	public IntTree(int[] pre, int[] in) {
 		overallRoot = buildTree(pre, 0, in, 0, in.length-1);
@@ -41,7 +41,7 @@ public class IntTree {
 		node.right = buildTree(pre, preStart + 1 + inIndex - inStart, in, inIndex+1, inEnd);
 		return node;
 	}
-	
+
 	// Returns true if the value is in this tree, false otherwise.
 	public boolean contains(int value) {
 		return contains(overallRoot, value);
@@ -58,7 +58,7 @@ public class IntTree {
 			return contains(root.right, value);
 		}
 	}
-	
+
 	// Adds the given value to this BST.
 	// Post: the tree is still a valid BST
 	public void add(int value) {
@@ -76,7 +76,7 @@ public class IntTree {
 		}
 		return root;
 	}
-	
+
 	public int getMin() {
 		if(overallRoot == null) throw new NoSuchElementException();
 		return getMin(overallRoot);
@@ -88,7 +88,7 @@ public class IntTree {
 			return getMin(root.left);
 		}
 	}
-	
+
 	// Removes the node with the given value from this BST.
 	public void remove(int value) {
 		overallRoot = remove(overallRoot, value);
@@ -117,7 +117,7 @@ public class IntTree {
 		}
 		return root;
 	}
-	
+
 	public void removeLeafs() {
 		removeLeafs(overallRoot);
 	}	
@@ -131,7 +131,7 @@ public class IntTree {
 		}
 		return root;
 	}
-	
+
 	// Prints a pre-order traversal of this tree.
 	public void printPreorder() {
 		printPreorder(overallRoot);
@@ -145,7 +145,7 @@ public class IntTree {
 			printPreorder(root.right);
 		}
 	}
-	
+
 	// Prints an in-order traversal of this tree.
 	public void printInorder() {
 		printInorder(overallRoot);
@@ -159,7 +159,7 @@ public class IntTree {
 			printInorder(root.right);
 		}
 	}
-	
+
 	// Prints a post-order traversal of this tree.
 	public void printPostorder() {
 		printPostorder(overallRoot);
@@ -173,15 +173,15 @@ public class IntTree {
 			System.out.print(root.data + " ");
 		}
 	}
-	
-	
+
+
 	/******** My Added Methods ***************************************************************************************************************/
-	
+
 	// this is just DFS
 	public void printPreorderIterative() {
 		Stack<IntTreeNode> s = new Stack<IntTreeNode>();
 		s.push(overallRoot);
-		
+
 		while(!s.isEmpty()) {
 			IntTreeNode cur = s.pop();
 			if(cur != null) { // overallRoot was null
@@ -196,7 +196,7 @@ public class IntTree {
 		}
 		System.out.println();
 	}
-	
+
 	public void printInorderIterative() {
 		Stack<IntTreeNode> s = new Stack<IntTreeNode>();
 		IntTreeNode start = overallRoot;
@@ -205,10 +205,10 @@ public class IntTree {
 			s.push(start);
 			start = start.left;
 		}
-		
+
 		while(!s.isEmpty()) {
 			IntTreeNode cur = s.pop();
-			
+
 			System.out.print(cur.data + " ");
 			IntTreeNode temp = cur.right;
 			while(temp != null) {
@@ -218,7 +218,7 @@ public class IntTree {
 		}
 		System.out.println();
 	}
-	
+
 	public void printPostorderIterative() {
 		Stack<IntTreeNode> s = new Stack<IntTreeNode>();
 		s.push(overallRoot);
@@ -226,7 +226,7 @@ public class IntTree {
 		// initialize with overallRoot since setting to null can trigger finishedSubtrees to be initially true when it shouldn't be
 		while(!s.isEmpty()) {
 			IntTreeNode next = s.peek();
-			
+
 			boolean finishedSubtrees = (next.right == temp || next.left == temp);
 			boolean isLeaf = (next.left == null && next.right == null);
 			if (finishedSubtrees || isLeaf) {
@@ -244,7 +244,7 @@ public class IntTree {
 		}
 		System.out.println();
 	}
-	
+
 	// this is just BFS
 	public void printLevelOrder() {
 		if (overallRoot != null) {
@@ -254,33 +254,33 @@ public class IntTree {
 				IntTreeNode n = q.remove();
 				System.out.print(n.data + " ");
 				if (n.left != null) q.add(n.left);
-                if (n.right != null) q.add(n.right);
+				if (n.right != null) q.add(n.right);
 			}
 		}
 	}
-	
+
 	// returns list of the data at each level of the tree, top to bottom, left to right
 	// https://leetcode.com/problems/binary-tree-level-order-traversal/description/
 	public List<List<Integer>> levelOrder() {
-        List<List<Integer>> allLevels = new LinkedList<>();
-        if (overallRoot == null) return allLevels;
-        
-        Queue<IntTreeNode> q = new LinkedList<>(); // for BFS
-        q.add(overallRoot);
-        while (!q.isEmpty()) {
-            int levelNum = q.size(); // everything in the q currently is on the same level of tree
-            List<Integer> oneLevel = new LinkedList<>();
-            for (int i = 0; i < levelNum; i++) { // add their children, which will be on same level as each other
-            	IntTreeNode n = q.remove();
-                if (n.left != null) q.add(n.left);
-                if (n.right != null) q.add(n.right);
-                oneLevel.add(n.data);
-            }
-            allLevels.add(oneLevel);
-        }
-        return allLevels;
-    }
-	
+		List<List<Integer>> allLevels = new LinkedList<>();
+		if (overallRoot == null) return allLevels;
+
+		Queue<IntTreeNode> q = new LinkedList<>(); // for BFS
+		q.add(overallRoot);
+		while (!q.isEmpty()) {
+			int levelNum = q.size(); // everything in the q currently is on the same level of tree
+			List<Integer> oneLevel = new LinkedList<>();
+			for (int i = 0; i < levelNum; i++) { // add their children, which will be on same level as each other
+				IntTreeNode n = q.remove();
+				if (n.left != null) q.add(n.left);
+				if (n.right != null) q.add(n.right);
+				oneLevel.add(n.data);
+			}
+			allLevels.add(oneLevel);
+		}
+		return allLevels;
+	}
+
 	// Given a binary tree, flatten it to a linked list in-place.
 	// https://leetcode.com/problems/flatten-binary-tree-to-linked-list/description/
 	public void flatten() {
@@ -288,30 +288,30 @@ public class IntTree {
 	}
 	private IntTreeNode prev = null;
 	private void flatten(IntTreeNode root) {
-        if (root != null) { // THIS IS THE MOST HARD TO WRITE 5 LINES OF CODE EVER
-        	flatten(root.right);
-            flatten(root.left);
-            root.right = prev;
-            root.left = null; // singly linked list
-            prev = root;
-        }
-    }
+		if (root != null) { // THIS IS THE MOST HARD TO WRITE 5 LINES OF CODE EVER
+			flatten(root.right);
+			flatten(root.left);
+			root.right = prev;
+			root.left = null; // singly linked list
+			prev = root;
+		}
+	}
 	public void flattenIterative() {
-        if (overallRoot == null) return;
-        Stack<IntTreeNode> s = new Stack<>();
-        s.push(overallRoot);
-        while (!s.isEmpty()) {
-        	IntTreeNode cur = s.pop(); // cur is the end of the list as we build it
-            if (cur.right != null) // want right side at end of linked list, so put on bottom of stack by adding first
-                 s.push(cur.right);
-            if (cur.left != null) 
-                 s.push(cur.left);
-            if (!s.isEmpty()) // connect end of list to next node 
-                 cur.right = s.peek();
-            cur.left = null; // singly linked list
-        }
-    }
-	
+		if (overallRoot == null) return;
+		Stack<IntTreeNode> s = new Stack<>();
+		s.push(overallRoot);
+		while (!s.isEmpty()) {
+			IntTreeNode cur = s.pop(); // cur is the end of the list as we build it
+			if (cur.right != null) // want right side at end of linked list, so put on bottom of stack by adding first
+				s.push(cur.right);
+			if (cur.left != null) 
+				s.push(cur.left);
+			if (!s.isEmpty()) // connect end of list to next node 
+				cur.right = s.peek();
+			cur.left = null; // singly linked list
+		}
+	}
+
 	// returns the least-valued common ancestor of the two given nodes. A node can be a descendant of itself.
 	public int lca(IntTreeNode root, int v1, int v2) {
 		IntTreeNode lca = getLca(root, v1, v2);
@@ -320,20 +320,20 @@ public class IntTree {
 		} else {
 			return Integer.MIN_VALUE;
 		}
-    }
+	}
 	private IntTreeNode getLca(IntTreeNode root, int v1, int v2) {
 		// look for the two target nodes (v1 and v2)
-	    if(root == null) return null;
-	    if(root.data == v1 || root.data == v2) return root; 
-	    IntTreeNode leftVal = getLca(root.left, v1, v2);
-	    IntTreeNode rightVal = getLca(root.right, v1, v2);
-	    
-	    if(leftVal != null && rightVal != null) return root; // this node is the ancestor
-	    
-	    if (leftVal != null) return leftVal; // the ancestor was found in the left subtree
-	    else return rightVal; // the ancestor was found (or not found) in the right subtree
+		if(root == null) return null;
+		if(root.data == v1 || root.data == v2) return root; 
+		IntTreeNode leftVal = getLca(root.left, v1, v2);
+		IntTreeNode rightVal = getLca(root.right, v1, v2);
+
+		if(leftVal != null && rightVal != null) return root; // this node is the ancestor
+
+		if (leftVal != null) return leftVal; // the ancestor was found in the left subtree
+		else return rightVal; // the ancestor was found (or not found) in the right subtree
 	}
-	
+
 	public int size() {
 		return size(overallRoot);
 	}	
@@ -343,156 +343,168 @@ public class IntTree {
 		}
 		return 0;
 	}
-	
+
 	// if k=1, then returns the min value, if k=2 returns the second smallest val....
 	// if k = this.size() returns the max value
 	// Iterative in-order traversal with a counter that decrements as look at a node. O(n) time
 	public int kthSmallest(int k) {
 		Stack<IntTreeNode> stack = new Stack<IntTreeNode>();
 		IntTreeNode p = overallRoot;
-	 
-	    while(!stack.isEmpty() || p != null){
-	        if(p != null){
-	            stack.push(p);
-	            p = p.left; // add nodes to stack as go down & left as far as possible
-	        } else {
-	        	// hit the lower left of a subtree
-	        	IntTreeNode t = stack.pop(); // the parent node going back up tree (node added before fell off the tree)
-	            k--;
-	            if(k==0) return t.data;
-	            p = t.right; // nowhere left to go or already done the left, so look to right
-	        }
-	    }
-	    return Integer.MIN_VALUE; // k out of range (k > size or k <= 0)
+
+		while(!stack.isEmpty() || p != null){
+			if(p != null){
+				stack.push(p);
+				p = p.left; // add nodes to stack as go down & left as far as possible
+			} else {
+				// hit the lower left of a subtree
+				IntTreeNode t = stack.pop(); // the parent node going back up tree (node added before fell off the tree)
+				k--;
+				if(k==0) return t.data;
+				p = t.right; // nowhere left to go or already done the left, so look to right
+			}
+		}
+		return Integer.MIN_VALUE; // k out of range (k > size or k <= 0)
 	}
-	
+
 	// recursive in-order traversal with counter. O(n)
 	public int kthSmallestRecursive(int k) {
-        return kthSmallest(overallRoot, k);
-    }    
-    private int kthSmallest(IntTreeNode root, int k) {
-        if (root == null) return Integer.MIN_VALUE;
-        
-        int result = kthSmallest(root.left, k);
-         
-        k--;
-        if (k == 0) return root.data;
-         
-        int result2 = kthSmallest(root.right, k);
-        return Math.max(result, result2);
-    }
-    
-    // recursive version using the sizes of subtrees, O(n^2) time i think
- 	public int kthSmallestRecursive2(int k) {
-         return kthSmallest2(overallRoot, k);
-    }    
-    public int kthSmallest2(IntTreeNode root, int k) {
-        if (root == null) return Integer.MIN_VALUE;
-         
-        int leftNodes = size(root.left);
-        if(k == leftNodes + 1) {
-            return root.data;
-        } else if (k > leftNodes + 1) {
-            return kthSmallest(root.right, k - leftNodes - 1);
-        } else {
+		return kthSmallest(overallRoot, k);
+	}    
+	private int kthSmallest(IntTreeNode root, int k) {
+		if (root == null) return Integer.MIN_VALUE;
+
+		int result = kthSmallest(root.left, k);
+
+		k--;
+		if (k == 0) return root.data;
+
+		int result2 = kthSmallest(root.right, k);
+		return Math.max(result, result2);
+	}
+
+	// recursive version using the sizes of subtrees
+	public int kthSmallestRecursive2(int k) {
+		if (overallRoot == null) return Integer.MIN_VALUE;
+		return kthSmallest2(overallRoot, k);
+	}    
+	public int kthSmallest2(IntTreeNode root, int k) {
+		int leftNodes = size(root.left);
+        if (k <= leftNodes) {
             return kthSmallest(root.left, k);
+        } else if (k > leftNodes + 1) {
+            return kthSmallest(root.right, k-1-leftNodes); // remove the left side of the tree & the parent (root) from k to find target in root.right's subtree
+        } else { // k = leftNodes + 1
+        	return root.data;
         }
-    }
-    
-    // returns true if tree has a root to leaf path that adds to equal sum
-    public boolean hasPathSum(int sum) {
-    	return hasPathSum(overallRoot, sum);
-    }
-    private boolean hasPathSum(IntTreeNode root, int sum) {
-    	if(root != null) {
-    		sum -= root.data;
-    		if(sum == 0 && root.left == null && root.right == null) {
-    			return true;
-    		}
-    		
-    		boolean answer = false;
-    		if (root.left != null) {
-    			answer = hasPathSum(root.left, sum);
-    		} 
-    		if (root.right != null){
-    			answer = answer || hasPathSum(root.right, sum);
-    		}
-    		return answer;
-    	}
-    	return sum == 0;
-    }
-    
-//    public boolean isBalanced() { // O(n^2)
-//    	return isBalanced(overallRoot);
-//    }
-//    private boolean isBalanced(IntTreeNode root) {
-//    	if(root == null) return true;
-//    	
-//    	if (Math.abs(height(root.left) - height(root.right)) > 1) {
-//    		return false;
-//    	} else {
-//    		return isBalanced(root.left) && isBalanced(root.right);
-//    	}
-//    }
-    
-    // 0(N) time and 0(H) space, where H is the height of the tree
-    public boolean isBalanced() {
-    	return checkHeight(overallRoot) != -1;
-    }
-    private int checkHeight(IntTreeNode root) {
-    	if(root == null) return 0;
-    	
-    	int leftHeight = checkHeight(root.left);
-    	if(leftHeight == -1) return -1;
-    	int rightHeight = checkHeight(root.right);
-    	if(rightHeight == -1) return -1;
-    	
-    	if (Math.abs(leftHeight - rightHeight) > 1) {
-    		return -1;
-    	} else {
-    		return 1 + Math.max(leftHeight, rightHeight);
-    	}
-    }
-    
-    public void removeEvens() {
-    	overallRoot = removeEvens(overallRoot);
-    }
-    private IntTreeNode removeEvens(IntTreeNode root) {
-    	if(root == null) return null;
-    	root.left = removeEvens(root.left);
-    	root.right = removeEvens(root.right);
-    	
-    	if (root.data % 2 == 0) {
-    		if(root.left == null) {
-    			return root.right;
-    		} else if (root.right == null) {
-    			return root.left;
-    		} else { // both children are non-null
-    			int val = getMin(root.right);
-    			remove(root.right, val);
-    			root.data = val;
-    		}
-    	}
-    	return root;
-    }
-    
-    public int secondSmallest() {
-    	return secondSmallest(overallRoot);
-    }
-    private int secondSmallest(IntTreeNode node) {
-    	if(node == null) {
-    		throw new IllegalArgumentException();
-    	} else if(node.left == null) {
-    		return getMin(node.right);
-    	} else if (node.left.left == null && node.left.right == null) {
-    		return node.data; // there is exactly one leaf node less than current node
-    	} else {
-    		return secondSmallest(node.left);
-    	}
-    }
-	
+	}
+
+	// Given a binary tree containing digits from 0-9 only, each root-to-leaf path could represent a number.
+	// An example is the root-to-leaf path 1->2->3 which represents the number 123.
+	// Find the total sum of all root-to-leaf numbers.
+	public int sumNumbers() {
+		return sumNumbers(overallRoot, 0);
+	}
+	private int sumNumbers(IntTreeNode root, int sum) { // sum is the intermediate number from concatenating the parent numbers above root
+		if (root == null) return 0;
+		if (root.left == null && root.right == null) return sum*10 + root.data;
+		// working from top of tree down, so shift existing sum (multiply by 10) add root.data to sum
+		return sumNumbers(root.left, sum*10 + root.data) + sumNumbers(root.right, sum*10 + root.data);
+	}
+
+	// returns true if tree has a root to leaf path that adds to equal sum
+	public boolean hasPathSum(int sum) {
+		return hasPathSum(overallRoot, sum);
+	}
+	private boolean hasPathSum(IntTreeNode root, int sum) {
+		if(root != null) {
+			sum -= root.data;
+			if(sum == 0 && root.left == null && root.right == null) {
+				return true;
+			}
+
+			boolean answer = false;
+			if (root.left != null) {
+				answer = hasPathSum(root.left, sum);
+			} 
+			if (root.right != null){
+				answer = answer || hasPathSum(root.right, sum);
+			}
+			return answer;
+		}
+		return sum == 0;
+	}
+
+	//    public boolean isBalanced() { // O(n^2)
+	//    	return isBalanced(overallRoot);
+	//    }
+	//    private boolean isBalanced(IntTreeNode root) {
+	//    	if(root == null) return true;
+	//    	
+	//    	if (Math.abs(height(root.left) - height(root.right)) > 1) {
+	//    		return false;
+	//    	} else {
+	//    		return isBalanced(root.left) && isBalanced(root.right);
+	//    	}
+	//    }
+
+	// 0(N) time and 0(H) space, where H is the height of the tree
+	public boolean isBalanced() {
+		return checkHeight(overallRoot) != -1;
+	}
+	private int checkHeight(IntTreeNode root) {
+		if(root == null) return 0;
+
+		int leftHeight = checkHeight(root.left);
+		if(leftHeight == -1) return -1;
+		int rightHeight = checkHeight(root.right);
+		if(rightHeight == -1) return -1;
+
+		if (Math.abs(leftHeight - rightHeight) > 1) {
+			return -1;
+		} else {
+			return 1 + Math.max(leftHeight, rightHeight);
+		}
+	}
+
+	public void removeEvens() {
+		overallRoot = removeEvens(overallRoot);
+	}
+	private IntTreeNode removeEvens(IntTreeNode root) {
+		if(root == null) return null;
+		root.left = removeEvens(root.left);
+		root.right = removeEvens(root.right);
+
+		if (root.data % 2 == 0) {
+			if(root.left == null) {
+				return root.right;
+			} else if (root.right == null) {
+				return root.left;
+			} else { // both children are non-null
+				int val = getMin(root.right);
+				remove(root.right, val);
+				root.data = val;
+			}
+		}
+		return root;
+	}
+
+	public int secondSmallest() {
+		return secondSmallest(overallRoot);
+	}
+	private int secondSmallest(IntTreeNode node) {
+		if(node == null) {
+			throw new IllegalArgumentException();
+		} else if(node.left == null) {
+			return getMin(node.right);
+		} else if (node.left.left == null && node.left.right == null) {
+			return node.data; // there is exactly one leaf node less than current node
+		} else {
+			return secondSmallest(node.left);
+		}
+	}
+
 	/******** Practice-It Methods *****************************************************************************************************************/
-	
+
 	// removes the nodes in the tree not between min and max inclusive. Tree must be a BST
 	public void trimRange(int min, int max) {
 		overallRoot = trimRange(overallRoot, min, max);
@@ -511,7 +523,7 @@ public class IntTree {
 		}
 		return root;
 	}
-	
+
 	public int height() {
 		return height(overallRoot);
 	}	
@@ -521,7 +533,7 @@ public class IntTree {
 			return 1 + Math.max(height(root.left), height(root.right));
 		}
 	}
-	
+
 	// fails if tree contains Integer.MIN_VALUE
 	public boolean isBST() {
 		return checkBST(overallRoot, Long.MIN_VALUE, Long.MAX_VALUE);
@@ -536,13 +548,13 @@ public class IntTree {
 		}
 	}
 	public boolean isValidBST(IntTreeNode root) {
-	    return isValidBST(root, null, null);
+		return isValidBST(root, null, null);
 	}
 	private boolean isValidBST(IntTreeNode p, Integer low, Integer high) { // uses null case to avoid the Integer.MIN_VALUE and MAX_VALUE cases
-	    if (p == null) return true;
-	    return (low == null || p.data > low) && (high == null || p.data < high) && isValidBST(p.left, low, p.data) && isValidBST(p.right, p.data, high);
+		if (p == null) return true;
+		return (low == null || p.data > low) && (high == null || p.data < high) && isValidBST(p.left, low, p.data) && isValidBST(p.right, p.data, high);
 	}
-	
+
 	public boolean equals(IntTree other) {
 		return equals(overallRoot, other.overallRoot);
 	}
@@ -556,7 +568,7 @@ public class IntTree {
 		}
 		else return (a==null && b==null);
 	}
-	
+
 	// swaps all the child nodes of each node in the tree, BST no longer holds
 	public void flip() {
 		overallRoot = flip(overallRoot);
@@ -573,7 +585,7 @@ public class IntTree {
 		}
 		return root;
 	}
-	
+
 	// recursively searches for a path from the start to the target, returning true if a
 	// path exists and false otherwise
 	public boolean hasPath(int start, int target) {
@@ -590,7 +602,7 @@ public class IntTree {
 				return hasPath(root.left, start, target, seen) || hasPath(root.right, start, target, seen);
 		}
 	}
-	
+
 	// returns the size of this entire tree if n = 1 
 	public int countBelow(int n) {
 		if(n < 1) throw new IllegalArgumentException();
@@ -606,7 +618,7 @@ public class IntTree {
 			return 0;
 		}		
 	}
-	
+
 	public void removeMatchingLeaves(IntTree other) {
 		overallRoot = removeMatchingLeaves(overallRoot, other.overallRoot);
 	}	
@@ -621,7 +633,7 @@ public class IntTree {
 		}
 		return r1;
 	}
-	
+
 	public int sumLeaves() {
 		return sumLeaves(overallRoot);
 	}	
@@ -635,7 +647,7 @@ public class IntTree {
 			}
 		}
 	}
-	
+
 	// fills in the current tree by adding nodes with 0
 	public void makePerfect() {
 		overallRoot = makePerfect(overallRoot, 1, height());
@@ -650,127 +662,127 @@ public class IntTree {
 		}
 		return root;
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 	public static void main(String[] args) {
 		Random r = new Random();
 		IntTree t = new IntTree();
 		for(int i = 0; i < 11; i++) t.add(i % 6);
 		System.out.println(t);
-		
-//		IntTreeNode root = new IntTreeNode(5,
-//			new IntTreeNode(3,
-//					new IntTreeNode(2),
-//					new IntTreeNode(4)
-//			),
-//			
-//			new IntTreeNode(7,
-//					new IntTreeNode(6),
-//					new IntTreeNode(8)
-//			)
-//		);
-//		
-//		IntTree t = new IntTree(root);
-//		
-//		System.out.println(t.isBalanced());
+
+		//		IntTreeNode root = new IntTreeNode(5,
+		//			new IntTreeNode(3,
+		//					new IntTreeNode(2),
+		//					new IntTreeNode(4)
+		//			),
+		//			
+		//			new IntTreeNode(7,
+		//					new IntTreeNode(6),
+		//					new IntTreeNode(8)
+		//			)
+		//		);
+		//		
+		//		IntTree t = new IntTree(root);
+		//		
+		//		System.out.println(t.isBalanced());
 	}
-	
-	
-	
+
+
+
 	//IntTreeNode objects stores a single node of a binary tree of ints.
 	private static class IntTreeNode {
 		public int data; // data stored at this node
 		public IntTreeNode left; // reference to left subtree
 		public IntTreeNode right; // reference to right subtree
-		
+
 		// Constructs a leaf node with the given data.
 		public IntTreeNode(int data) {
 			this(data, null, null);
 		}
-		
+
 		// Constructs a leaf or branch node with the given data and links.
 		public IntTreeNode(int data, IntTreeNode left, IntTreeNode right) {
 			this.data = data;
 			this.left = left;
 			this.right = right;
 		}
-		
+
 		public String toString() {
 			return Integer.toString(data);
 		}
 	}
-	
+
 	public String toString() {
-    	BTreePrinter.printNode(overallRoot);
-    	return "";
-    }
-    static class BTreePrinter {
-        public static void printNode(IntTreeNode root) {
-            int maxLevel = BTreePrinter.maxLevel(root);
-            printNodeInternal(Collections.singletonList(root), 1, maxLevel);
-        }
-        private static void printNodeInternal(List<IntTreeNode> nodes, int level, int maxLevel) {
-            if (nodes.isEmpty() || BTreePrinter.isAllElementsNull(nodes)) return;
-            int floor = maxLevel - level;
-            int endgeLines = (int) Math.pow(2, (Math.max(floor - 1, 0)));
-            int firstSpaces = (int) Math.pow(2, (floor)) - 1;
-            int betweenSpaces = (int) Math.pow(2, (floor + 1)) - 1;
-            BTreePrinter.printWhitespaces(firstSpaces);
-            List<IntTreeNode> newNodes = new ArrayList<IntTreeNode>();
-            for (IntTreeNode node : nodes) {
-                if (node != null) {
-                    System.out.print(node.data);
-                    newNodes.add(node.left);
-                    newNodes.add(node.right);
-                } else {
-                    newNodes.add(null);
-                    newNodes.add(null);
-                    System.out.print(" ");
-                }
-                BTreePrinter.printWhitespaces(betweenSpaces);
-            }
-            System.out.println("");
-            for (int i = 1; i <= endgeLines; i++) {
-                for (int j = 0; j < nodes.size(); j++) {
-                    BTreePrinter.printWhitespaces(firstSpaces - i);
-                    if (nodes.get(j) == null) {
-                        BTreePrinter.printWhitespaces(endgeLines + endgeLines + i + 1);
-                        continue;
-                    }
-                    if (nodes.get(j).left != null)
-                        System.out.print("/");
-                    else
-                        BTreePrinter.printWhitespaces(1);
-                    BTreePrinter.printWhitespaces(i + i - 1);
-                    if (nodes.get(j).right != null)
-                        System.out.print("\\");
-                    else
-                        BTreePrinter.printWhitespaces(1);
-                    BTreePrinter.printWhitespaces(endgeLines + endgeLines - i);
-                }
-                System.out.println("");
-            }
-            printNodeInternal(newNodes, level + 1, maxLevel);
-        }
-        private static void printWhitespaces(int count) {
-            for (int i = 0; i < count; i++)
-                System.out.print(" ");
-        }
-        private static <T extends Comparable<?>> int maxLevel(IntTreeNode node) {
-            if (node == null) return 0;
-            return Math.max(BTreePrinter.maxLevel(node.left), BTreePrinter.maxLevel(node.right)) + 1;
-        }
-        private static <T> boolean isAllElementsNull(List<T> list) {
-            for (Object object : list) {
-                if (object != null) return false;
-            }
-            return true;
-        }
-    }
+		BTreePrinter.printNode(overallRoot);
+		return "";
+	}
+	static class BTreePrinter {
+		public static void printNode(IntTreeNode root) {
+			int maxLevel = BTreePrinter.maxLevel(root);
+			printNodeInternal(Collections.singletonList(root), 1, maxLevel);
+		}
+		private static void printNodeInternal(List<IntTreeNode> nodes, int level, int maxLevel) {
+			if (nodes.isEmpty() || BTreePrinter.isAllElementsNull(nodes)) return;
+			int floor = maxLevel - level;
+			int endgeLines = (int) Math.pow(2, (Math.max(floor - 1, 0)));
+			int firstSpaces = (int) Math.pow(2, (floor)) - 1;
+			int betweenSpaces = (int) Math.pow(2, (floor + 1)) - 1;
+			BTreePrinter.printWhitespaces(firstSpaces);
+			List<IntTreeNode> newNodes = new ArrayList<IntTreeNode>();
+			for (IntTreeNode node : nodes) {
+				if (node != null) {
+					System.out.print(node.data);
+					newNodes.add(node.left);
+					newNodes.add(node.right);
+				} else {
+					newNodes.add(null);
+					newNodes.add(null);
+					System.out.print(" ");
+				}
+				BTreePrinter.printWhitespaces(betweenSpaces);
+			}
+			System.out.println("");
+			for (int i = 1; i <= endgeLines; i++) {
+				for (int j = 0; j < nodes.size(); j++) {
+					BTreePrinter.printWhitespaces(firstSpaces - i);
+					if (nodes.get(j) == null) {
+						BTreePrinter.printWhitespaces(endgeLines + endgeLines + i + 1);
+						continue;
+					}
+					if (nodes.get(j).left != null)
+						System.out.print("/");
+					else
+						BTreePrinter.printWhitespaces(1);
+					BTreePrinter.printWhitespaces(i + i - 1);
+					if (nodes.get(j).right != null)
+						System.out.print("\\");
+					else
+						BTreePrinter.printWhitespaces(1);
+					BTreePrinter.printWhitespaces(endgeLines + endgeLines - i);
+				}
+				System.out.println("");
+			}
+			printNodeInternal(newNodes, level + 1, maxLevel);
+		}
+		private static void printWhitespaces(int count) {
+			for (int i = 0; i < count; i++)
+				System.out.print(" ");
+		}
+		private static <T extends Comparable<?>> int maxLevel(IntTreeNode node) {
+			if (node == null) return 0;
+			return Math.max(BTreePrinter.maxLevel(node.left), BTreePrinter.maxLevel(node.right)) + 1;
+		}
+		private static <T> boolean isAllElementsNull(List<T> list) {
+			for (Object object : list) {
+				if (object != null) return false;
+			}
+			return true;
+		}
+	}
 }
 

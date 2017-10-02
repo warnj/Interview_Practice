@@ -1,14 +1,32 @@
 package General_Questions;
 
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.math.*;
+import java.util.*;
 
 public class ArrayQuestions {
 
 	public static void main(String[] args) {
 		System.out.println(indexOfRotated(new int[] {1,3}, 3));
+	}
+	
+	/* Kth Largest Element in array:
+	 * https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/
+	 * 1. Sort, then take kth index in array. O(N lg N) running time + O(1) memory
+	 * 2. Priority queue (min queue containing the k largest elements). O(N lg K) running time + O(K) memory
+	 * 3. Selection Algo: https://en.wikipedia.org/wiki/Selection_algorithm. O(N) running time if input not sorted + O(1) space
+	*/
+	public int findKthLargest(int[] nums, int k) {
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+        for (int val : nums) {
+            pq.add(val);
+            if (pq.size() > k) pq.remove();
+        }
+        return pq.peek();
+    }
+	public int findKthLargestUsingSorting(int[] nums, int k) { 
+        int n = nums.length;
+        Arrays.sort(nums);
+        return nums[n - k];
 	}
 	
 	// finds the target value in arr in O(lg(n)) time where arr is sorted array w/o duplicates that has been rotated (e.g. 45123)
@@ -179,15 +197,15 @@ public class ArrayQuestions {
 		return null;
 	}
 
-	public static int[] shuffle(int[] arr) {
+	// Fisher–Yates shuffle: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+	public static void shuffle(int[] arr) {
 		Random r = new Random();
-		for(int i = arr.length-1; i > 0; i--) {
-			int rand = r.nextInt(i+1);
+		for (int i = arr.length-1; i >= 1; i--) {
+			int rand = r.nextInt(i+1); // random element from the original (unshuffled) part of the array
 			int temp = arr[i];
-			arr[i] = arr[rand];
-			arr[rand] = temp;
+			arr[i] = arr[rand]; // put the chosen element at the end of the original part of the array, building the shuffled part of the array from back to front
+			arr[rand] = temp; // maintain the shrinking unshuffled part of the array at the front, with the swap
 		}
-		return arr;
 	}
 
 }

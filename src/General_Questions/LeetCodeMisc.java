@@ -5,12 +5,35 @@ import java.util.*;
 public class LeetCodeMisc {
 
 	public static void main(String[] args) {
-
-
+		String[] wordList = {"hot","dot","dog","lot","log","cog"};
+		System.out.println(ladderLength("", "", Arrays.asList(wordList)));
+	}
+	
+	// https://leetcode.com/problems/word-ladder/description/
+	public static int ladderLength(String beginWord, String endWord, List<String> wordList) {
+        
+    }
+	
+	
+	
+	// Remove all duplicates that occur in the given sorted array, return the length of the new array
+	public static int removeDuplicates(int[] nums) {
+		int i = 0;
+		for (int n : nums) 
+			if (i < 1 || n > nums[i-1])
+				nums[i++] = n;
+		return i;
 	}
 
-
-
+	// https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/description/
+	// Remove all duplicates that occur more than twice in the given sorted array.
+	public static int removeMoreThanTwoDuplicates(int[] nums) {
+		int i = 0;
+	    for (int n : nums)
+	        if (i < 2 || n > nums[i-2])
+	            nums[i++] = n;
+	    return i;
+    }
 
 	// return all elements of the matrix in spiral order.
 	// https://leetcode.com/problems/spiral-matrix/description/
@@ -24,7 +47,6 @@ public class LeetCodeMisc {
 		int rowEnd = matrix.length-1;
 		while (rowStart <= rowEnd && colStart <= colEnd) {
 			for (int i = colStart; i <= colEnd; i++) { // across top
-				System.out.println("Accessing i="+i+"  rowstart="+rowStart);
 				result.add(matrix[rowStart][i]);
 			}
 			rowStart++;

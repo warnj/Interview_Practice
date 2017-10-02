@@ -4,7 +4,7 @@ import java.util.*;
 
 public class AlgosBacktracing {
 	public static void main(String[] args) {
-		System.out.println(partitionPalindrome("aab"));
+		System.out.println(combinations("1234", 2));
 	}
 
 	// https://leetcode.com/problems/permutations/#/solutions
@@ -194,9 +194,28 @@ public class AlgosBacktracing {
 		// 110		{c,b}
 		// 111		{c,b,a}
 	}
+	
+	// Given two integers n and k, return all possible combinations of k numbers out of 1 ... n.
+	// https://leetcode.com/problems/combinations
+	public static List<List<Integer>> combine(int n, int k) {
+		List<List<Integer>> results = new ArrayList<>();
+		combine(n, k, 1, new ArrayList<>(), results);
+		return results;
+	}
+	private static void combine(int n, int k, int start, List<Integer> current, List<List<Integer>> results) {
+		if (current.size() == k) {
+			results.add(new ArrayList<>(current));
+		} else {
+			for (int i = start; i <= n; i++) {
+				current.add(i);
+				combine(n, k, i+1, current, results); // don't need to worry about duplicates since next will start at i+1
+				current.remove(current.size()-1);
+			}
+		}
+	}
 
 	// Returns all distinct results of choosing the given number of items from the given array. Order does not matter.
-	// example of input: combinations(new String[]{"1","2","3","4"}, 2);
+	// example of input: combinations("1234", 2);
 	// example of output: [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
 	public static List<String> combinations(String s, int choose) {
 		if (choose > s.length() || choose < 0) throw new IllegalArgumentException();
