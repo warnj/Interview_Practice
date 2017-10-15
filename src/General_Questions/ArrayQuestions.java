@@ -8,27 +8,27 @@ public class ArrayQuestions {
 	public static void main(String[] args) {
 		System.out.println(indexOfRotated(new int[] {1,3}, 3));
 	}
-	
+
 	/* Kth Largest Element in array:
 	 * https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/
 	 * 1. Sort, then take kth index in array. O(N lg N) running time + O(1) memory
 	 * 2. Priority queue (min queue containing the k largest elements). O(N lg K) running time + O(K) memory
 	 * 3. Selection Algo: https://en.wikipedia.org/wiki/Selection_algorithm. O(N) running time if input not sorted + O(1) space
-	*/
+	 */
 	public int findKthLargest(int[] nums, int k) {
-        PriorityQueue<Integer> pq = new PriorityQueue<>();
-        for (int val : nums) {
-            pq.add(val);
-            if (pq.size() > k) pq.remove();
-        }
-        return pq.peek();
-    }
-	public int findKthLargestUsingSorting(int[] nums, int k) { 
-        int n = nums.length;
-        Arrays.sort(nums);
-        return nums[n - k];
+		PriorityQueue<Integer> pq = new PriorityQueue<>();
+		for (int val : nums) {
+			pq.add(val);
+			if (pq.size() > k) pq.remove();
+		}
+		return pq.peek();
 	}
-	
+	public int findKthLargestUsingSorting(int[] nums, int k) { 
+		int n = nums.length;
+		Arrays.sort(nums);
+		return nums[n - k];
+	}
+
 	// finds the target value in arr in O(lg(n)) time where arr is sorted array w/o duplicates that has been rotated (e.g. 45123)
 	public static int indexOfRotated(int[] arr, int target) {
 		if(arr.length == 0) return -1;
@@ -191,7 +191,7 @@ public class ArrayQuestions {
 				else if (nums[i] + nums[l] + nums[r] < target)
 					l++;
 				else // A[i] + A[l] + A[r] > sum
-				r--;
+					r--;
 			}
 		}
 		return null;

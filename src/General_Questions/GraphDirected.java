@@ -1,5 +1,11 @@
 package General_Questions;
-// find great graph examples: http://algs4.cs.princeton.edu/40graphs/
+
+/*	http://www.geeksforgeeks.org/algorithms-gq/graph-traversals-gq/
+		best way to identify cycle in graph: DFS - only need to know: There is an edge 
+		from currently being visited node to an ancestor of currently visited node in DFS forest to find a cycle.
+		
+	find great graph examples: http://algs4.cs.princeton.edu/40graphs/
+ */
 /**
  * Directed, weighted graph data type
  * Parallel edges are not allowed

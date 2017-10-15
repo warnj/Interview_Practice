@@ -23,7 +23,7 @@ public class Algos {
 			int min = Integer.MAX_VALUE;
 			for (int j = 0; j < coins.length; j++) { // go through the possible coins
 				if (i+1 == coins[j]) {
-					min = Math.min(min, 1); // no way to do better than a single coin
+					min = 1; // no way to do better than a single coin
 				} else if (i - coins[j] >= 0 && table[i-coins[j]] != 0) { // there is a way to sum to this value
 					min = Math.min(min, table[i-coins[j]] + 1); // check how many coins it took to get to the previous value without coins[j], then add 1
 				}
