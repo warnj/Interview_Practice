@@ -207,5 +207,26 @@ public class ArrayQuestions {
 			arr[rand] = temp; // maintain the shrinking unshuffled part of the array at the front, with the swap
 		}
 	}
+	
+//	Given an array nums and a value val, remove all instances of that value in-place and return the new length.
+//	Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
+//	The order of elements can be changed. It doesn't matter what you leave beyond the new length.
+//	Given nums = [3,2,2,3], val = 3,
+//	Your function should return length = 2, with the first two elements of nums being 2.
+	public int removeElement(int[] nums, int val) {
+        int end = nums.length - 1;
+        int sum = 0;
+        for (int i = 0; i < nums.length && i <= end; i++) {
+            if (nums[i] == val) {
+                nums[i] = nums[end];
+                nums[end] = val;
+                end--;
+                i--;
+            } else {
+                sum++;
+            }
+        }
+        return sum;
+    }
 
 }

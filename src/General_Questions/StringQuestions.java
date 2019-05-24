@@ -7,20 +7,51 @@ public class StringQuestions {
 	public static void main(String[] args) {
 		System.out.println(longestCommonPrefix(new String[]{"the", "the", "the"}));
 	}
-	
+
+	// Given an input string (s) and a pattern (p), implement wildcard pattern matching with support for '?' and '*'.
+	// '?' Matches any single character.
+	// '*' Matches any sequence of characters (including the empty sequence).
+	// O(m+n) time and space
+	public static boolean isMatch(String s, String p) {
+		int m = p.length();
+		int n = s.length();
+		boolean[][] dp = new boolean[m+1][n+1]; // dp[i][j] is true if first i characters in pattern match the first j characters of string
+
+		dp[0][0] = true;
+
+		for(int i = 0; i < m; i++) { // iterate over pattern
+			for(int j = 0; j <= n; j++) { // iterate over string
+				if(dp[i][j]) { // do not check old combinations that do not match
+					if(p.charAt(i) == '*') {
+						dp[i+1][j] = true; // set entire remainder of i+1 column to true since wildcard can match the entire remainder of s
+						while(j < n) { // don't set the top of column true otherwise we go out of bounds on next iteration
+							dp[i+1][j+1] = true;
+							j++;
+						}
+						break;
+					} else if (j < n && (p.charAt(i) == '?' || p.charAt(i) == s.charAt(j)) ) {
+						dp[i+1][j+1] = true;
+					}
+				}
+			}
+		}
+
+		return dp[m][n];
+	}
+
 	// example: {"the", "there", "them"} returns "the"
 	public static String longestCommonPrefix(String[] strs) {
 		if (strs.length == 0 || strs[0].isEmpty()) return "";
-        int common = 0;
-        while (common < strs[0].length()) {
-        	char c = strs[0].charAt(common);
-        	for (int i = 1; i < strs.length; i++) {
-        		if (common >= strs[i].length() || strs[i].charAt(common) != c) return strs[0].substring(0, common);
-        	}
-        	common++;
-        }
-        return strs[0].substring(0, common);
-    }
+		int common = 0;
+		while (common < strs[0].length()) {
+			char c = strs[0].charAt(common);
+			for (int i = 1; i < strs.length; i++) {
+				if (common >= strs[i].length() || strs[i].charAt(common) != c) return strs[0].substring(0, common);
+			}
+			common++;
+		}
+		return strs[0].substring(0, common);
+	}
 
 	// Returns indexOf needle in haystack, -1 if not found. This is not an ideal solution - ideal solution is to build a FSM for the needle, then run over haystack.
 	public static int indexOf(String haystack, String needle) {
