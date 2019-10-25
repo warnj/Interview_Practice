@@ -9,6 +9,48 @@ public class ArrayQuestions {
 		System.out.println(indexOfRotated(new int[] {1,3}, 3));
 	}
 
+
+	// returns the winner of the given tic tac toe board. Board is 3x3. If no winner, returns empty string.
+	// [[X, X, X],         [[X, O, X],       [[X, O, X],       [[X, O, X],
+	//  [O, O, X],  = X     [O, O, ],  = O    [O, , ],  = ""    [O, X, ],  = "X"
+	//  [X, O, O]]          [X, O, X]]        [X, O, X]]        [O, O, X]]
+	private String threeEqual(String a, String b, String c) {
+		if (a.equals(b) && b.equals(c)) {
+			return a;
+		} else {
+			return "";
+		}
+	}
+	public String ticTacToeWinner(String[][] board) {
+		// rows
+		for (int i = 0; i < board.length; i++) {
+			String result = threeEqual(board[i][0], board[i][1], board[i][2]);
+			if (!result.equals("")) {
+				return result;
+			}
+		}
+
+		// columns
+		for (int i = 0; i < board[0].length; i++) {
+			String result = threeEqual(board[0][i], board[1][i], board[2][i]);
+			if (!result.equals("")) {
+				return result;
+			}
+		}
+
+		// diagonals
+		String result = threeEqual(board[0][0], board[1][1], board[2][2]);
+		if (!result.equals("")) {
+			return result;
+		}
+		result = threeEqual(board[0][2], board[1][1], board[2][0]);
+		if (!result.equals("")) {
+			return result;
+		}
+
+		return "";
+	}
+
 	/* Kth Largest Element in array:
 	 * https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/
 	 * 1. Sort, then take kth index in array. O(N lg N) running time + O(1) memory
@@ -197,7 +239,7 @@ public class ArrayQuestions {
 		return null;
 	}
 
-	// Fisher–Yates shuffle: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+	// Fisherï¿½Yates shuffle: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 	public static void shuffle(int[] arr) {
 		Random r = new Random();
 		for (int i = arr.length-1; i >= 1; i--) {
