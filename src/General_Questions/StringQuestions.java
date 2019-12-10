@@ -5,8 +5,48 @@ import java.util.*;
 public class StringQuestions {
 
 	public static void main(String[] args) {
-		System.out.println(longestCommonPrefix(new String[]{"the", "the", "the"}));
+		System.out.println(convert("PAYPALISHIRING", 3));
 	}
+	
+	// https://leetcode.com/problems/zigzag-conversion/
+	public static String convert(String s, int numRows) {
+		int hop = 2*numRows-2;
+		
+		int hop2 = hop - 2; 
+		
+		
+		
+		// 3
+		0, 4, 8, 12
+		1, 3, 5, 7, 9, 11, 13
+		2, 6, 10
+		
+		4, 4, 4
+		2, 2, 2, 2
+		4, 4
+		
+		
+		
+		// 4
+		0,      6,       12
+		1,    5, 7,    11, 13
+		2, 4,     8, 10
+		3,         9
+		
+		6, 6
+		4, 2, 4, 2
+		2, 4, 2, 4
+		6
+		
+		
+		String result = "";
+		for (int i = 0; i < numRows; i++) {
+			for (int j = i; j < s.length(); j += hop) {
+				result += s.charAt(j);
+			}
+		}
+        return result;
+    }
 
 	// Given an input string (s) and a pattern (p), implement wildcard pattern matching with support for '?' and '*'.
 	// '?' Matches any single character.

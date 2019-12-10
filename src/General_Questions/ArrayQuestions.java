@@ -6,9 +6,126 @@ import java.util.*;
 public class ArrayQuestions {
 
 	public static void main(String[] args) {
-		System.out.println(indexOfRotated(new int[] {1,3}, 3));
+//		int[][] a = new int[][] {new int[] {0,1,0}, new int[] {1,1,1}, new int[] {1,1,1}};
+//		setZeroesEfficient(a);
+//		for (int i = 0; i < a.length; i++) {
+//			System.out.println(Arrays.toString(a[i]));
+//		}
+//		System.out.println();
+		
+		System.out.println(canJump(new int[] {2,3,1,1,4}));
+		System.out.println(canJump(new int[] {3,2,1,0,4}));
+		System.out.println(canJump(new int[] {0}));
+		System.out.println(canJump(new int[] {1,2}));
 	}
-
+	
+	// https://leetcode.com/problems/jump-game/submissions/
+	public static boolean canJump(int[] nums) {
+        if (nums.length == 0 || nums.length == 1) return true;
+        
+        int jumpPoint = 0;
+        while (jumpPoint < nums.length) {
+        	
+        	int start = jumpPoint;
+        	int end = jumpPoint+nums[jumpPoint];
+        	int maxPoint = start;
+        	int maxValue = end;
+//        	System.out.println("jump range: " + start + " - " + end);
+        	
+        	for (int i = jumpPoint; i <= end; i++) {
+        		if (i >= nums.length-1) return true;
+        		
+        		if (i + nums[i] > maxValue) {
+        			maxPoint = i;
+        			maxValue = i + nums[i];
+        		}
+        	}
+//        	System.out.println("max point: " + maxPoint);
+        	
+        	if (maxPoint == start) return false; // no progress made, stuck
+        	jumpPoint = maxPoint;
+        }
+        return false;
+    }
+	
+	public static boolean canJumpNaive(int[] nums) {
+        if (nums.length == 0) return true;
+        
+        return canJumpNaive(nums, 0);
+    }
+	private static boolean canJumpNaive(int[] nums, int start) {
+        if (start == nums.length-1) return true;
+        
+        int jump = nums[start];
+        for (int i = start+1; i <= start + jump; i++) {
+        	if (canJumpNaive(nums, i)) {
+        		return true;
+        	}
+        }
+        return false;
+    }
+	
+	public static void setZeroes(int[][] matrix) {
+		List<Integer> rows = new ArrayList<>();
+		List<Integer> cols = new ArrayList<>();
+		
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[0].length; j++) {
+				if (matrix[i][j] == 0) {
+					rows.add(i);
+					cols.add(j);
+				}
+			}
+		}
+		
+		for (int n = 0; n < rows.size(); n++) {
+			int i = rows.get(n);
+			int j = cols.get(n);
+			for (int k = 0; k < matrix.length; k++) {
+				matrix[k][j] = 0;
+			}
+			for (int k = 0; k < matrix[0].length; k++) {
+				matrix[i][k] = 0;
+			}
+		}
+    }
+	public static void setZeroesEfficient(int[][] matrix) {
+		// use first row and first col as flags indicating the row needs to be set to 0
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[0].length; j++) {
+				if (matrix[i][j] == 0) {
+					matrix[i][0] = 0;
+					matrix[0][j] = 0;
+				}
+			}
+		}
+		
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[0].length; j++) {
+				if (matrix[i][0] == 0 || matrix[0][j] == 0) {
+					matrix[i][j] = 0;
+				}
+			}
+		}
+		
+		// zero the rows
+//		for (int i = 0; i < matrix.length; i++) {
+//			if (matrix[i][0] == 0) {
+//				for (int k = 0; k < matrix[i].length; k++) {
+//					matrix[i][k] = 0;
+//				}
+//			}
+//		}
+//		
+//		// zero the cols
+//		for (int i = 0; i < matrix[0].length; i++) {
+//			if (matrix[0][i] == 0) {
+//				for (int k = 0; k < matrix.length; k++) {
+//					matrix[k][i] = 0;
+//				}
+//			}
+//		}
+    }
 
 	// returns the winner of the given tic tac toe board. Board is 3x3. If no winner, returns empty string.
 	// [[X, X, X],         [[X, O, X],       [[X, O, X],       [[X, O, X],
