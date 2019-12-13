@@ -47,7 +47,6 @@ public class ArrayQuestions {
         }
         return false;
     }
-	
 	public static boolean canJumpNaive(int[] nums) {
         if (nums.length == 0) return true;
         

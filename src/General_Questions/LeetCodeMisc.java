@@ -5,14 +5,14 @@ import java.util.*;
 public class LeetCodeMisc {
 
 	public static void main(String[] args) {
-		String[] wordList = {"hot","dot","dog","lot","log","cog"};
-		System.out.println(ladderLength("", "", Arrays.asList(wordList)));
+//		String[] wordList = {"hot","dot","dog","lot","log","cog"};
+//		System.out.println(ladderLength("", "", Arrays.asList(wordList)));
 	}
 	
 	// https://leetcode.com/problems/word-ladder/description/
-	public static int ladderLength(String beginWord, String endWord, List<String> wordList) {
-        
-    }
+//	public static int ladderLength(String beginWord, String endWord, List<String> wordList) {
+//
+//    }
 	
 	
 	
