@@ -6,20 +6,62 @@ import java.util.*;
 public class ArrayQuestions {
 
 	public static void main(String[] args) {
-//		int[][] a = new int[][] {new int[] {0,1,0}, new int[] {1,1,1}, new int[] {1,1,1}};
-//		setZeroesEfficient(a);
-//		for (int i = 0; i < a.length; i++) {
-//			System.out.println(Arrays.toString(a[i]));
-//		}
-//		System.out.println();
-		
-		System.out.println(canJump(new int[] {2,3,1,1,4}));
-		System.out.println(canJump(new int[] {3,2,1,0,4}));
-		System.out.println(canJump(new int[] {0}));
-		System.out.println(canJump(new int[] {1,2}));
+
+	}
+
+	// Given a non-empty array of digits representing a non-negative integer, plus one to the integer.
+	//    The digits are stored such that the most significant digit is at the head of the list,
+	//    and each element in the array contain a single digit.
+	//    You may assume the integer does not contain any leading zero, except the number 0 itself.
+	public static int[] addOne(int[] nums) {
+		int i = nums.length-1;
+		while (i >= 0) {
+			int last = nums[i];
+
+			if (last != 9) {
+				nums[i]++;
+				return nums;
+			} else {
+				nums[i] = 0;
+				i--;
+			}
+		}
+
+		int[] result = new int[nums.length+1];
+		result[0] = 1;
+		System.arraycopy(nums, 0, result, 1, nums.length);
+		return result;
+	}
+
+	// Given 2D array contains rows that are sorted and cols that are sorted. Duplicates may occur.
+	// worstcase runtime O(n+m)
+	public static boolean contains(int[][] arr, int target) {
+		//	Pick upper right number
+		//	If greater, go left
+		//	If less than, go down
+
+		// ensure arr not zero length
+		int x = arr[0].length-1; // col
+		int y = 0; // row
+
+		while (x >= 0 && y < arr.length) {
+			int mid = arr[y][x];
+
+			if (mid == target) {
+				return true;
+			} else if (mid > target) {
+				x--;
+			} else {
+				y++;
+			}
+		}
+		return false;
 	}
 	
 	// https://leetcode.com/problems/jump-game/submissions/
+	// Given an array of non-negative integers, you are initially positioned at the first index of the array.
+	// Each element in the array represents your maximum jump length at that position.
+	// Determine if you are able to reach the last index.
 	public static boolean canJump(int[] nums) {
         if (nums.length == 0 || nums.length == 1) return true;
         
@@ -63,7 +105,9 @@ public class ArrayQuestions {
         }
         return false;
     }
-	
+
+    // https://leetcode.com/problems/set-matrix-zeroes/
+	// Given a m x n matrix, if an element is 0, set its entire row and column to 0. Do it in-place.
 	public static void setZeroes(int[][] matrix) {
 		List<Integer> rows = new ArrayList<>();
 		List<Integer> cols = new ArrayList<>();
@@ -88,24 +132,24 @@ public class ArrayQuestions {
 			}
 		}
     }
-	public static void setZeroesEfficient(int[][] matrix) {
-		// use first row and first col as flags indicating the row needs to be set to 0
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[0].length; j++) {
-				if (matrix[i][j] == 0) {
-					matrix[i][0] = 0;
-					matrix[0][j] = 0;
-				}
-			}
-		}
-		
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[0].length; j++) {
-				if (matrix[i][0] == 0 || matrix[0][j] == 0) {
-					matrix[i][j] = 0;
-				}
-			}
-		}
+//	public static void setZeroesEfficient(int[][] matrix) {
+//		// use first row and first col as flags indicating the row needs to be set to 0
+//		for (int i = 0; i < matrix.length; i++) {
+//			for (int j = 0; j < matrix[0].length; j++) {
+//				if (matrix[i][j] == 0) {
+//					matrix[i][0] = 0;
+//					matrix[0][j] = 0;
+//				}
+//			}
+//		}
+//
+//		for (int i = 0; i < matrix.length; i++) {
+//			for (int j = 0; j < matrix[0].length; j++) {
+//				if (matrix[i][0] == 0 || matrix[0][j] == 0) {
+//					matrix[i][j] = 0;
+//				}
+//			}
+//		}
 		
 		// zero the rows
 //		for (int i = 0; i < matrix.length; i++) {
@@ -124,20 +168,20 @@ public class ArrayQuestions {
 //				}
 //			}
 //		}
-    }
+//    }
 
 	// returns the winner of the given tic tac toe board. Board is 3x3. If no winner, returns empty string.
 	// [[X, X, X],         [[X, O, X],       [[X, O, X],       [[X, O, X],
 	//  [O, O, X],  = X     [O, O, ],  = O    [O, , ],  = ""    [O, X, ],  = "X"
 	//  [X, O, O]]          [X, O, X]]        [X, O, X]]        [O, O, X]]
-	private String threeEqual(String a, String b, String c) {
+	private static String threeEqual(String a, String b, String c) {
 		if (a.equals(b) && b.equals(c)) {
 			return a;
 		} else {
 			return "";
 		}
 	}
-	public String ticTacToeWinner(String[][] board) {
+	public static String ticTacToeWinner(String[][] board) {
 		// rows
 		for (int i = 0; i < board.length; i++) {
 			String result = threeEqual(board[i][0], board[i][1], board[i][2]);
