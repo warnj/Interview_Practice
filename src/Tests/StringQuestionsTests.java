@@ -2,9 +2,21 @@ package Tests;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
+import java.util.*;
 import General_Questions.*;
 
 public class StringQuestionsTests {
+
+	@Test
+	public void testWordBreak() {
+		assertTrue(StringQuestions.wordBreak("leetcode", Arrays.asList("leet", "code")));
+		assertTrue(StringQuestions.wordBreak("applepenapple", Arrays.asList("apple", "pen")));
+		assertFalse(StringQuestions.wordBreak("catsandog", Arrays.asList("cats", "dog", "sand", "and", "cat")));
+
+		assertTrue(StringQuestions.wordBreakPartitioning("leetcode", Arrays.asList("leet", "code")));
+		assertTrue(StringQuestions.wordBreakPartitioning("applepenapple", Arrays.asList("apple", "pen")));
+		assertFalse(StringQuestions.wordBreakPartitioning("catsandog", Arrays.asList("cats", "dog", "sand", "and", "cat")));
+	}
 
 	@Test
 	public void testLengthOfLongestSubstring() {

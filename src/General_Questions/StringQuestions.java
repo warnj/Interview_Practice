@@ -5,7 +5,7 @@ import java.util.*;
 public class StringQuestions {
 
 	public static void main(String[] args) {
-
+		wordBreak("leetcode", Arrays.asList("leet", "code"));
 	}
 	
 //	// https://leetcode.com/problems/zigzag-conversion/
@@ -42,6 +42,55 @@ public class StringQuestions {
 //		}
 //        return result;
 //    }
+
+	// Given a non-empty string s and a dictionary wordDict containing a list of non-empty words, determine if s can be segmented into a space-separated sequence of one or more dictionary words.
+	// The same word in the dictionary may be reused multiple times in the segmentation.
+	// https://leetcode.com/problems/word-break/
+	// Runtime without noMatch: 2^n: https://stackoverflow.com/questions/31370674/time-complexity-of-the-word-break-recursive-solution
+	public static boolean wordBreak(String s, List<String> wordDict) {
+		return wordBreak(s, wordDict, new HashSet<>());
+	}
+	private static boolean wordBreak(String s, List<String> dict, Set<String> noMatch) {
+		if (s.length() < 1) {
+			return true;
+		}
+		if (noMatch.contains(s)) {
+			return false;
+		}
+
+		for (int i = 0; i < dict.size(); i++) {
+			String word = dict.get(i);
+			if (s.startsWith(word) && wordBreak(s.substring(word.length()), dict, noMatch)) {
+				return true;
+			}
+		}
+		noMatch.add(s);
+		return false;
+	}
+	// Runtime:
+	public static boolean wordBreakPartitioning(String s, List<String> wordDict) {
+		return wordBreakPartitioning(s, new HashSet<>(wordDict), new HashSet<>());
+	}
+	private static boolean wordBreakPartitioning(String s, Set<String> dict, Set<String> noMatch) {
+		if (s.length() < 1 || dict.contains(s)) {
+			return true;
+		}
+		if (noMatch.contains(s)) {
+			return false;
+		}
+
+		for (int i = 1; i < s.length(); i++) {
+			String b = s.substring(0, i);
+			String e = s.substring(i);
+			if (dict.contains(b)) {
+				if (dict.contains(e) || wordBreakPartitioning(e, dict, noMatch)) {
+					return true;
+				}
+			}
+		}
+		noMatch.add(s);
+		return false;
+	}
 
 	// Given an input string (s) and a pattern (p), implement wildcard pattern matching with support for '?' and '*'.
 	// '?' Matches any single character.
