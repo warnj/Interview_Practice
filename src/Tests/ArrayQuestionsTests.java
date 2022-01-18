@@ -2,9 +2,72 @@ package Tests;
 
 import General_Questions.ArrayQuestions;
 import org.junit.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class ArrayQuestionsTests {
+
+	@Test
+	public void testUniqueNumber() {
+		assertEquals(ArrayQuestions.uniqueNumber(new int[]{1,7,1,1,1}), 7);
+		assertEquals(ArrayQuestions.uniqueNumber(new int[]{5,3,3,3,3,3}), 5);
+		assertEquals(ArrayQuestions.uniqueNumber(new int[]{-99,-5,-99}), -5);
+		assertEquals(ArrayQuestions.uniqueNumber(new int[]{10000,10000,10000,10000,10000,999}), 999);
+
+		assertEquals(ArrayQuestions.uniqueNumber2(new int[]{1,1,2,2,3,3,4}), 4);
+		assertEquals(ArrayQuestions.uniqueNumber2(new int[]{2,2,1,3,1,3,4}), 4);
+
+		assertEquals(ArrayQuestions.uniqueNumber3(new int[]{1,1,2,2,3,3,4}), 4);
+		assertEquals(ArrayQuestions.uniqueNumber3(new int[]{2,2,1,3,1,3,4}), 4);
+	}
+
+	@Test
+	public void testMinSumLengths() {
+		assertEquals(ArrayQuestions.minSumOfLengths(new int[]{3,2,2,4,3}, 3), 2);
+		assertEquals(ArrayQuestions.minSumOfLengths(new int[]{7,3,4,7}, 7), 2);
+		assertEquals(ArrayQuestions.minSumOfLengths(new int[]{7,3,4,1}, 7), 3);
+		assertEquals(ArrayQuestions.minSumOfLengths(new int[]{3,3,2,2,7}, 7), 4);
+		assertEquals(ArrayQuestions.minSumOfLengths(new int[]{3,4,3}, 7), -1);
+		assertEquals(ArrayQuestions.minSumOfLengths(new int[]{4,3,2,6,2,3,4}, 6), -1);
+		assertEquals(ArrayQuestions.minSumOfLengths(new int[]{5,5,4,4,5}, 3), -1);
+	}
+
+	@Test
+	public void testShiftGrid() {
+		int[][] g = {{1,2,3},{4,5,6}};
+		List<List<Integer>> result = new ArrayList<>();
+		result.add(Arrays.asList(5,6,1));
+		result.add(Arrays.asList(2,3,4));
+		assertEquals(ArrayQuestions.shiftGrid(g, 2), result);
+		int[][] g2 = {{3,8,1,9},{19,7,2,5},{4,6,11,10},{12,0,21,13}};
+		result = new ArrayList<>();
+		result.add(Arrays.asList(12,0,21,13));
+		result.add(Arrays.asList(3,8,1,9));
+		result.add(Arrays.asList(19,7,2,5));
+		result.add(Arrays.asList(4,6,11,10));
+		assertEquals(ArrayQuestions.shiftGrid(g2, 4), result);
+		int[][] g3 = {{1,2},{4,5}};
+		result = new ArrayList<>();
+		result.add(Arrays.asList(1,2));
+		result.add(Arrays.asList(4,5));
+		assertEquals(ArrayQuestions.shiftGrid(g3, 4), result);
+		assertEquals(ArrayQuestions.shiftGrid(g3, 8), result);
+		result = new ArrayList<>();
+		result.add(Arrays.asList(4,5));
+		result.add(Arrays.asList(1,2));
+		assertEquals(ArrayQuestions.shiftGrid(g3, 6), result);
+	}
+
+	@Test
+	public void testSumLargest() {
+		assertEquals(ArrayQuestions.sumLargest(new int[]{1,2,3}, 2), 5);
+		assertEquals(ArrayQuestions.sumLargest(new int[]{2,8,1,3,7,1}, 3), 18);
+		assertEquals(ArrayQuestions.sumLargest(new int[]{2,1}, 3), -1);
+	}
 
 	@Test
 	public void testAddOne() {

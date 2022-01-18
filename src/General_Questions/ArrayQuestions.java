@@ -1,12 +1,269 @@
 package General_Questions;
 
+import java.awt.*;
 import java.math.*;
 import java.util.*;
+import java.util.List;
 
 public class ArrayQuestions {
 
 	public static void main(String[] args) {
 
+	}
+
+	// given an array with any number of int, there are only two different values, one number only occurs once, find
+	// this number that occurs once without using any data structure provided by the language
+	public static int uniqueNumber(int[] a) { // a.length >= 3
+		// thoughts:
+		// 		bucket sort - would need some sort of hash for larger ints - could maybe use mod, but collisions
+		// 		save different values and compute array avg, one is closer to avg than the other (only for positive)
+		//		save most recent 3 values, when one number doesn't match previous do 3-way compare
+		int previousTwo = a[0];
+		int previous = a[1];
+		if (previous != previousTwo) {
+			return threeWayCompare(a[0], a[1], a[2]);
+		}
+		for (int i = 2; i < a.length; i++) {
+			int current = a[i];
+			if (current != previous) {
+				return threeWayCompare(current, previous, previousTwo);
+			}
+			previousTwo = previous;
+			previous = current;
+		}
+		return -1;
+	}
+	private static int threeWayCompare(int a, int b, int c) {
+		if (a == b) {
+			return c;
+		} else if (a == c) {
+			return b;
+		} else { // b == c
+			return a;
+		}
+	}
+	// follow up: array with any number of int, every number occurs twice, except one number that occurs once, find the unique number
+	// if the inverviewee come up with nested loop solution ( which is o(n^2) ) ask can they solve it in o(nlogn), can you solve it in o(n) ( with hash map )
+	// if the interviewee come up with solution use hashmap, ask can you solve it in constant space, possible answer with with n^2 or nlogn time complexity
+	public static int uniqueNumber2(int[] a) { // a.length >= 3
+		// sort and traverse = O(nlogn) space and time
+		// hashmap counts, traverse array twice
+		// nested loop = O(n^2) time and constant space
+		Map<Integer, Integer> counts = new HashMap<>();
+		for (int i = 0; i < a.length; i++) {
+			Integer count = counts.get(a[i]);
+			if (count == null) {
+				counts.put(a[i], 1);
+			} else {
+				counts.put(a[i], ++count);
+			}
+		}
+		for (int i = 0; i < a.length; i++) {
+			if (counts.get(a[i]) != 2) {
+				return a[i];
+			}
+		}
+		return -1;
+	}
+	// follow up: can you solve it in constant space plus o(n) time?
+	// 		Yes if input range is limited (i.e. ints 0-9) and use bucket sort or input known to be sorted.
+	//		can this be done generally? - yes with XOR: XOR of a number with itself is 0 and with 0 is itself
+	public static int uniqueNumber3(int[] a) {
+		int r = a[0];
+		for (int i = 1; i < a.length; i++) {
+			r = r ^ a[i];
+		}
+		return r;
+	}
+	// follow up: what if every number occurs three times, except one number (is constant space and o(n) here possible)
+	//		Hashmap counts still works, bitwise operators would not since there is an odd number of common occurrences
+	//		There is a complicated bitwise solution: https://www.geeksforgeeks.org/find-the-element-that-appears-once/
+	// follow up: what if every number occurs k times, except one number (can we generalize this solution)
+
+	// https://leetcode.com/problems/find-two-non-overlapping-sub-arrays-each-with-target-sum/
+	// non-overlapping makes this tricky, used hints, O(n) runtime to make pre, suf, and get result, O(n) space
+	// pre: a.length > 0, no zeros in a, elements of a <= 1000
+	public static int minSumOfLengths(int[] a, int target) {
+		int[] prefix = new int[a.length]; // prefix[i] is the min length of sub-array ends before i that = target
+		int[] suffix = new int[a.length+1]; // suffix[i] is the min length of sub-array starting at or after i that = target
+
+		prefix[0] = Integer.MAX_VALUE; // prefix[0] never used
+		int curSum = a[0]; // current sum of sub array
+		int curPos = 0; // starting position of current sub array
+		for (int i = 1; i < a.length; i++) {
+			if (curSum == target) {
+				int length = i-curPos;
+				prefix[i] = Math.min(prefix[i-1], length);
+				// start summing a new subarray
+				curSum -= a[curPos];
+				curPos++;
+			} else if (curSum > target) { // start summing a new subarray
+				prefix[i] = prefix[i-1];
+				while (curSum >= target) { // find a new starting position for subarray where sum < target
+					curSum -= a[curPos];
+					curPos++;
+					if (curSum == target) {
+						prefix[i] = Math.min(prefix[i-1], i-curPos);
+					}
+				}
+			} else { // curSum < target, continue summing a subarray
+				prefix[i] = prefix[i-1];
+			}
+			curSum += a[i];
+		}
+
+		suffix[suffix.length-1] = Integer.MAX_VALUE; // last suffix position never used
+		curSum = 0;
+		curPos = a.length-1;
+		for (int i = a.length-1; i >= 0; i--) {
+			curSum += a[i]; // subarray from i to curPos inclusive of both
+			if (curSum == target) {
+				suffix[i] = Math.min(suffix[i+1], curPos-i+1);
+				curSum -= a[curPos];
+				curPos--;
+			} else if (curSum > target) {
+				suffix[i] = suffix[i+1];
+				while (curSum >= target) {
+					curSum -= a[curPos];
+					curPos--;
+					if (curSum == target) {
+						suffix[i] = Math.min(suffix[i+1], curPos-i+1);
+					}
+				}
+			} else {
+				suffix[i] = suffix[i+1];
+			}
+		}
+
+		long result = Integer.MAX_VALUE;
+		for (int i = 0; i < prefix.length; i++) {
+			result = Math.min(result, (long) prefix[i] + (long) suffix[i]);
+		}
+		return (int) (result == Integer.MAX_VALUE ? -1 : result);
+	}
+	public static int minSumOfLengthsBruteFailed(int[] a, int target) {
+		SortedMap<Integer, Point> subs = new TreeMap<>();
+		for (int i = 0; i < a.length; i++) {
+			int sum = a[i];
+			int j = i+1;
+			while (sum < target && j < a.length) {
+				sum += a[j];
+				j++;
+			}
+			// sum >= target, ignore case where sum exceeded target
+			if (sum == target) {
+				subs.put(j-i, new Point(i,j)); // save possible subarray, length -> [start,end)
+			}
+		}
+		// sort out the best non-overlapping options
+		if (subs.size() < 2) {
+			return -1;
+		} else {
+			Map.Entry<Integer, Point> prev = null;
+			for (Map.Entry<Integer, Point> e : subs.entrySet()) {
+				if (prev != null && overlaps(prev.getValue(), e.getValue())) {
+
+				}
+				prev = e;
+			}
+		}
+		return -1;
+	}
+	private static boolean overlaps(Point a, Point b) {
+		return a.y > b.x;
+	}
+	public static int minSumOfLengthsGreedyFailed(int[] arr, int target) {
+		int[] results = new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE};
+		int[] sub1 = new int[2]; // start, end of the subarray that sums to results[0]
+		int[] sub2 = new int[2]; // start, end of the subarray that sums to results[1]
+
+		int curSum = 0; // current sum of sub array
+		int curPos = -1; // 1 before current starting position of sub array
+		for (int i = 0; i < arr.length; i++) {
+			curSum += arr[i];
+			if (curSum == target) {
+				// save length of sub array
+				int len = i-curPos;
+				if (len < results[0]) {
+					results[0] = len;
+				} else if (len < results[1]) {
+					results[1] = len;
+				}
+				// start over
+				curSum = 0;
+				curPos = i;
+			} else if (curSum > target) {
+				// start over
+//				curSum -= ;
+//				curPos++;
+//				i = i - X;
+			} else {
+				// continue
+			}
+		}
+		return -1;
+	}
+
+	// https://leetcode.com/problems/shift-2d-grid/
+	//  [[1,2,3],                  [[5,6,1],
+	//   [4,5,6]]   shift 2   ->    [2,3,4]]
+	public static List<List<Integer>> shiftGrid(int[][] grid, int k) {
+		// thoughts: add all to single array/list, shift and rebuild
+		// I want to do this in place
+
+		int m = grid[0].length; // width, grid is m x n 	// 3
+		int n = grid.length; // height 						// 2
+		List<List<Integer>> result = new ArrayList<>(n);
+		List<Integer> row = new ArrayList<>(m);
+
+		int size = n*m; // 6
+		k = k % size; // 2
+		int start = size-k; // 4 (zero-based starting location)
+
+		for (int i = 0; i < size; i++) {
+			// starting location with first position being 1 and last position being size
+			int pos = (i + start) % size; // 4,5,0,1,2,3
+
+			int x = pos % m; // horizontal position
+			int y = pos / m; // vertical position
+			// (x,y) should be (1,1) > (2,1) > (0,0) > (1,0) > (2,0) > (0,1)
+			row.add(grid[y][x]);
+			if (row.size() == m) {
+				result.add(row);
+				if (result.size() < n) {
+					row = new ArrayList<>(m);
+				}
+			}
+		}
+		return result;
+	}
+
+	// Given array a (values between 0 and 9) and number n, return the sum of the n largest elements in a
+	//  examples: Input:a={1,2,3} n=2 Output:5    Input:a={2,8,1,3,7,1} n=3 Output:18
+	//  Solutions
+	//   Use a max heap. Add all elements to heap (log(n)), then pop off N and sum them. n*log(n) runtime, n space.
+	//   Sort, then add the N largest. n*log(n) runtime, n space
+	//   Bucket sort - use hashmap or array for buckets. O(n) runtime and constant space.
+	public static int sumLargest(int[] a, int n) {
+		if (n > a.length) return -1;
+
+		int[] buckets = new int[10];
+		for (int i = 0; i < a.length; i++) {
+			if (a[i] > 9 || a[i] < 0) return -1;
+			buckets[a[i]]++;
+		}
+
+		int sum = 0;
+		for (int i = 9;  i > 0; --i) {
+			if (buckets[i] < n) {
+				sum += buckets[i] * i;
+				n -= buckets[i];
+			} else {
+				sum += n * i;
+				return sum;
+			}
+		}
+		return -1; // should not happen
 	}
 
 	// Given a non-empty array of digits representing a non-negative integer, plus one to the integer.
