@@ -12,6 +12,59 @@ import static org.junit.Assert.*;
 public class ArrayQuestionsTests {
 
 	@Test
+	public void testThirdMax() {
+		assertEquals(1, ArrayQuestions.thirdMax(new int[]{1,2,3}));
+		assertEquals(1, ArrayQuestions.thirdMax(new int[]{3,2,1}));
+		assertEquals(1, ArrayQuestions.thirdMax(new int[]{2,2,3,1}));
+		assertEquals(1, ArrayQuestions.thirdMax(new int[]{3,3,3,2,1}));
+		assertEquals(2, ArrayQuestions.thirdMax(new int[]{1,2}));
+		assertEquals(-2147483648, ArrayQuestions.thirdMax(new int[]{1,2,-2147483648}));
+		assertEquals(-2147483648, ArrayQuestions.thirdMax(new int[]{1,-2147483648,2}));
+		assertEquals(1, ArrayQuestions.thirdMax(new int[]{-2147483648,1,-2147483648}));
+		assertEquals(2, ArrayQuestions.thirdMax(new int[]{1,2,2,5,3,5}));
+	}
+
+	@Test
+	public void testMaxProfit() {
+		assertEquals(5, ArrayQuestions.maxProfit(new int[]{7,1,5,3,6,4}));
+		assertEquals(0, ArrayQuestions.maxProfit(new int[]{7,6,4,3,1}));
+	}
+
+	@Test
+	public void testNextPermutation() {
+		// start from back
+		//      if last number > 2nd to last, swap the 2 and return
+		//      when find a current number smaller than previous, swap them. swap again if previous previous is < previous
+		//			^ initial thought too simplistic, need to swap with next larger number to the right
+		//		corner case when ending subarray is descending: 4,7,3,1 -> 7,1,3,4 -> swap from opposite ends until ending is sorted
+		permutationArrayEquals(new int[]{1,2,3}, new int[]{1,3,2});
+		permutationArrayEquals(new int[]{2,3,1}, new int[]{3,1,2});
+		permutationArrayEquals(new int[]{3,2,1}, new int[]{1,2,3});
+		permutationArrayEquals(new int[]{1,1,5}, new int[]{1,5,1});
+		permutationArrayEquals(new int[]{1,7,3,4,2}, new int[]{1,7,4,2,3});
+		permutationArrayEquals(new int[]{2,4,7,3,1}, new int[]{2,7,1,3,4});
+		permutationArrayEquals(new int[]{2,7,4,3,1}, new int[]{3,1,2,4,7});
+		permutationArrayEquals(new int[]{4,7,3,2,1}, new int[]{7,1,2,3,4});
+		permutationArrayEquals(new int[]{4,7,4,4}, new int[]{7,4,4,4});
+		permutationArrayEquals(new int[]{2,3,1,3,3}, new int[]{2,3,3,1,3});
+	}
+	public void permutationArrayEquals(int[] start, int[] expected) {
+		ArrayQuestions.nextPermutation(start);
+		assertArrayEquals(expected, start);
+	}
+
+	@Test
+	public void testSearchInsert() {
+		assertEquals(2, ArrayQuestions.searchInsert(new int[]{1,3,5,6}, 5));
+		assertEquals(1, ArrayQuestions.searchInsert(new int[]{1,3,5,6}, 3));
+		assertEquals(4, ArrayQuestions.searchInsert(new int[]{1,3,5,6}, 7));
+		assertEquals(1, ArrayQuestions.searchInsert(new int[]{1,3,5,6}, 2));
+		assertEquals(2, ArrayQuestions.searchInsert(new int[]{1,3,5,6}, 4));
+		assertEquals(1, ArrayQuestions.searchInsert(new int[]{1,3,5}, 2));
+		assertEquals(2, ArrayQuestions.searchInsert(new int[]{1,3,5}, 4));
+	}
+
+	@Test
 	public void testUniqueNumber() {
 		assertEquals(ArrayQuestions.uniqueNumber(new int[]{1,7,1,1,1}), 7);
 		assertEquals(ArrayQuestions.uniqueNumber(new int[]{5,3,3,3,3,3}), 5);

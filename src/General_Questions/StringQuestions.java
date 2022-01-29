@@ -5,7 +5,86 @@ import java.util.*;
 public class StringQuestions {
 
 	public static void main(String[] args) {
-		wordBreak("leetcode", Arrays.asList("leet", "code"));
+//		wordBreak("leetcode", Arrays.asList("leet", "code"));
+	}
+
+	// https://leetcode.com/problems/valid-palindrome/
+	public static boolean isPalindrome(String s) {
+		s = s.toLowerCase();
+		int lo = 0;
+		int hi = s.length()-1;
+		while (lo <= hi) {
+			while (lo < s.length() && !Character.isLetterOrDigit(s.charAt(lo))) lo++;
+			while (hi >= 0 && !Character.isLetterOrDigit(s.charAt(hi))) hi--;
+			if (lo <= hi && s.charAt(lo) != s.charAt(hi)) return false;
+			lo++;
+			hi--;
+		}
+		return true;
+	}
+
+	// https://leetcode.com/problems/string-to-integer-atoi/
+	public static int myAtoi(String s) {
+		// get start and end of number
+		int j = 0;
+		while (j < s.length() && s.charAt(j) == ' ') { j++; } // skip leading whitespace
+		if (j >= s.length()) return 0; // all whitespace
+		while (j < s.length() && s.charAt(j) == '0') { j++; } // skip leading 0s
+		if (j >= s.length()) return 0; // all 0s
+		if (!Character.isDigit(s.charAt(j)) && s.charAt(j) != '-' && s.charAt(j) != '+') return 0;
+		if (j-1 >= 0 && s.charAt(j-1) == '0' && !Character.isDigit(s.charAt(j))) return 0; // leading 0s and then + or -
+
+		int start = j++; // charAt(j) = digit or - or +
+		while (j < s.length() && Character.isDigit(s.charAt(j))) { j++;	}
+		int end = j-1;
+		if (start == end && !Character.isDigit(s.charAt(end))) return 0; // no digits after "-" or "+"
+
+		int result = s.charAt(end--) - '0';
+		int pow = 10;
+		boolean overflow = false;
+		while (end >= start && Character.isDigit(s.charAt(end))) {
+			int digit = s.charAt(end)-'0';
+			int addition = digit * pow;
+			if ((long) result + addition > Integer.MAX_VALUE || (long) pow * 10 > Integer.MAX_VALUE) {
+				overflow = true;
+			}
+			result += addition;
+			pow *= 10;
+			end--;
+		}
+		if (end >= start && s.charAt(start) == '-') {
+			if (overflow) return Integer.MIN_VALUE;
+			result = -result;
+		} else if (overflow) {
+			return Integer.MAX_VALUE;
+		}
+		return result;
+	}
+	public static int myAtoiOriginal(String s) {
+		int i = s.length()-1; // easiest to work back to front
+		while (i >= 0 && !Character.isDigit(s.charAt(i))) {
+			i--;
+		}
+		if (i == -1) return 0; // no digits
+
+		int result = s.charAt(i--) - '0';
+		int pow = 10;
+		boolean overflow = false;
+		while (i >= 0 && Character.isDigit(s.charAt(i))) {
+			if (result + ((s.charAt(i)-'0') * pow) < result) { // overflow
+				overflow = true;
+			}
+			result += (s.charAt(i)-'0') * pow;
+			pow *= 10;
+			i--;
+		}
+		if (i >= 0 && s.charAt(i) == '-') {
+			if (overflow) return Integer.MIN_VALUE;
+			result = -result;
+		} else if (overflow) {
+			return Integer.MAX_VALUE;
+		}
+		return result;
 	}
 	
 //	// https://leetcode.com/problems/zigzag-conversion/

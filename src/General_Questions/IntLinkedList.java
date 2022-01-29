@@ -145,6 +145,7 @@ public class IntLinkedList {
 
 	/*********************** My added Methods ***********************************************************************************/
 
+
 	public void reverse() {
 		ListNode prev = null;
 		ListNode cur = head;
@@ -434,8 +435,10 @@ public class IntLinkedList {
 		head = less;
 	}
 
+	// O(n) time, O(n/2) space
+	// can do in constant space if able to reverse the last half and then compare
 	public boolean isPalindrome() {
-		Stack<Integer> s = new Stack<Integer>();
+		Stack<Integer> s = new Stack<>();
 		ListNode slow = head;
 		ListNode fast = head;
 		while (fast != null && fast.next != null) {
@@ -444,7 +447,7 @@ public class IntLinkedList {
 			fast = fast.next.next;
 		}
 		if (fast != null) slow = slow.next; // odd length, then middle element won't equal the top of stack
-		while (slow != null) {
+		while (slow != null) { // slow will traverse last half of list
 			if (s.pop() != slow.val) {
 				return false;
 			}
@@ -502,6 +505,51 @@ public class IntLinkedList {
 		return new IntLinkedList(result);
 	}
 
+	public static ListNode getIntersectionNode(IntLinkedList a, IntLinkedList b) {
+		// O(n+m) time and O(1) space; align the lists since any intersection point must be in both lists
+		int aSize = a.size();
+		int bSize = b.size();
+		ListNode aCur = a.head;
+		ListNode bCur = b.head;
+		while (aSize > bSize) {
+			aCur = aCur.next;
+			aSize--;
+		}
+		while (bSize > aSize) {
+			bCur = bCur.next;
+			bSize--;
+		}
+		while (aCur != null && bCur != null) {
+			if (aCur == bCur) return aCur;
+			aCur = aCur.next;
+			bCur = bCur.next;
+		}
+		return null;
+	}
+	public static ListNode getIntersectionNodeSave(IntLinkedList a, IntLinkedList b) {
+		// easy O(n+m) time and O(n) space with pass through each list and hashmap saving pointers from 1st list
+		HashSet<ListNode> aSet = new HashSet<>();
+		for (ListNode aCur = a.head; aCur != null; aCur = aCur.next) {
+			aSet.add(aCur);
+		}
+		for (ListNode bCur = b.head; bCur != null; bCur = bCur.next) {
+			if (aSet.contains(bCur)) return bCur;
+		}
+		return null;
+	}
+	public static ListNode getIntersectionNodeSlow(IntLinkedList a, IntLinkedList b) {
+		// easy O(n*m) time and O(1) space with double loop
+		ListNode aCur = a.head;
+		while (aCur != null) {
+			ListNode bCur = b.head;
+			while (bCur != null) {
+				if (aCur == bCur) return aCur;
+				bCur = bCur.next;
+			}
+			aCur = aCur.next;
+		}
+		return null;
+	}
 
 
 	/*********************** Practice-It Methods **********************************************************************************************/

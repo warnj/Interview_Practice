@@ -5,7 +5,7 @@
 // methods are O(1).  Methods like get and set will be O(n) for values in the
 // middle of the list.
 
-package Specific_Questions;
+package General_Questions;
 import java.util.*;
 
 public class IntDoublyLinkedList implements Iterable<Integer> {

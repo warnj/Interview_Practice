@@ -8,7 +8,96 @@ import java.util.List;
 public class ArrayQuestions {
 
 	public static void main(String[] args) {
+	}
 
+	// https://leetcode.com/problems/third-maximum-number
+	public static int thirdMax(int[] nums) {
+		long max = nums[0];
+		long max2 = Long.MIN_VALUE; // corner cases are ridiculous if you don't use long
+		long max3 = Long.MIN_VALUE;
+		for (int i = 1; i < nums.length; i++) {
+			if (nums[i] > max) {
+				max3 = max2;
+				max2 = max;
+				max = nums[i];
+			} else if (nums[i] > max2 && nums[i] < max) { // distinct values requires 2nd condition check to avoid when nums[i] = max
+				max3 = max2;
+				max2 = nums[i];
+			} else if (nums[i] > max3 && nums[i] < max2) {
+				max3 = nums[i];
+			}
+		}
+		return max3 == Long.MIN_VALUE ? (int)max : (int)max3;
+	}
+
+	// https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
+	// greedy algo, single pass
+	public static int maxProfit(int[] prices) {
+		int profit = 0;
+		int buy = prices[0];
+		for (int i = 1; i < prices.length; i++) {
+			if (prices[i] > buy) { // up in value
+				profit = Math.max(profit, prices[i] - buy); // if sold today would make a profit
+			} else if (prices[i] < buy) { // down in value, could have bought today
+				buy = prices[i];
+			}
+		}
+		return profit;
+	}
+
+	// https://leetcode.com/problems/next-permutation/
+	public static void nextPermutation(int[] n) {
+		if (n.length <= 1) return;
+		if (n.length == 2) {
+			swap(n,0,1);
+			return;
+		}
+		int i = n.length - 1;
+		for (; i > 0 && n[i-1] >= n[i]; i--);
+		if (i == 0) { // n in decreasing order, sort it
+			Arrays.sort(n);
+		} else { // n[i-1] < n[i] - found the first place to swap
+			// replace n[i-1] with the next number greater than itself lying to its right
+			int nextGreater = i;
+			for (int j = i+1; j < n.length; j++) {
+				if (n[j] < n[nextGreater] && n[j] > n[i-1]) nextGreater = j;
+			}
+			swap(n, i-1, nextGreater);
+			// numbers from end in decreasing order, swap above does not change this, need them in increasing order so reverse them
+			for (int j = 0; i+j < n.length-1-j; j++) {
+				swap(n, i+j, n.length-1-j);
+			}
+		}
+	}
+	private static void swap(int[] n, int a, int b) {
+		if (a != b) {
+			int temp = n[b];
+			n[b] = n[a];
+			n[a] = temp;
+		}
+	}
+
+	// https://leetcode.com/problems/search-insert-position/
+	public static int searchInsert(int[] a, int target) {
+		int low = 0;
+		int high = a.length-1;
+		int mid = 0;
+		if (target > a[high]) return a.length;
+		if (target < a[low]) return 0;
+
+		while (low <= high) {
+			mid = (low + high) / 2; // not appropriate for int overflow
+			if (a[mid] == target) {
+				return mid;
+			} else if (target > a[mid]) {
+				if (mid+1 > high) return mid+1; // terminates next iteration, a stays sorted, so add above mid
+				low = mid+1;
+			} else { // target < a[mid]
+				if (mid-1 < low) return mid; // search terminates next iteration, insert in current spot, so larger values shift to right
+				high = mid-1;
+			}
+		}
+		return mid;
 	}
 
 	// given an array with any number of int, there are only two different values, one number only occurs once, find
