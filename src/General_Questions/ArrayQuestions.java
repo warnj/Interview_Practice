@@ -293,40 +293,6 @@ public class ArrayQuestions {
 		return -1;
 	}
 
-	// https://leetcode.com/problems/shift-2d-grid/
-	//  [[1,2,3],                  [[5,6,1],
-	//   [4,5,6]]   shift 2   ->    [2,3,4]]
-	public static List<List<Integer>> shiftGrid(int[][] grid, int k) {
-		// thoughts: add all to single array/list, shift and rebuild
-		// I want to do this in place
-
-		int m = grid[0].length; // width, grid is m x n 	// 3
-		int n = grid.length; // height 						// 2
-		List<List<Integer>> result = new ArrayList<>(n);
-		List<Integer> row = new ArrayList<>(m);
-
-		int size = n*m; // 6
-		k = k % size; // 2
-		int start = size-k; // 4 (zero-based starting location)
-
-		for (int i = 0; i < size; i++) {
-			// starting location with first position being 1 and last position being size
-			int pos = (i + start) % size; // 4,5,0,1,2,3
-
-			int x = pos % m; // horizontal position
-			int y = pos / m; // vertical position
-			// (x,y) should be (1,1) > (2,1) > (0,0) > (1,0) > (2,0) > (0,1)
-			row.add(grid[y][x]);
-			if (row.size() == m) {
-				result.add(row);
-				if (result.size() < n) {
-					row = new ArrayList<>(m);
-				}
-			}
-		}
-		return result;
-	}
-
 	// Given array a (values between 0 and 9) and number n, return the sum of the n largest elements in a
 	//  examples: Input:a={1,2,3} n=2 Output:5    Input:a={2,8,1,3,7,1} n=3 Output:18
 	//  Solutions
@@ -378,31 +344,6 @@ public class ArrayQuestions {
 		System.arraycopy(nums, 0, result, 1, nums.length);
 		return result;
 	}
-
-	// Given 2D array contains rows that are sorted and cols that are sorted. Duplicates may occur.
-	// worstcase runtime O(n+m)
-	public static boolean contains(int[][] arr, int target) {
-		//	Pick upper right number
-		//	If greater, go left
-		//	If less than, go down
-
-		// ensure arr not zero length
-		int x = arr[0].length-1; // col
-		int y = 0; // row
-
-		while (x >= 0 && y < arr.length) {
-			int mid = arr[y][x];
-
-			if (mid == target) {
-				return true;
-			} else if (mid > target) {
-				x--;
-			} else {
-				y++;
-			}
-		}
-		return false;
-	}
 	
 	// https://leetcode.com/problems/jump-game/submissions/
 	// Given an array of non-negative integers, you are initially positioned at the first index of the array.
@@ -452,111 +393,6 @@ public class ArrayQuestions {
         return false;
     }
 
-    // https://leetcode.com/problems/set-matrix-zeroes/
-	// Given a m x n matrix, if an element is 0, set its entire row and column to 0. Do it in-place.
-	public static void setZeroes(int[][] matrix) {
-		List<Integer> rows = new ArrayList<>();
-		List<Integer> cols = new ArrayList<>();
-		
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[0].length; j++) {
-				if (matrix[i][j] == 0) {
-					rows.add(i);
-					cols.add(j);
-				}
-			}
-		}
-		
-		for (int n = 0; n < rows.size(); n++) {
-			int i = rows.get(n);
-			int j = cols.get(n);
-			for (int k = 0; k < matrix.length; k++) {
-				matrix[k][j] = 0;
-			}
-			for (int k = 0; k < matrix[0].length; k++) {
-				matrix[i][k] = 0;
-			}
-		}
-    }
-//	public static void setZeroesEfficient(int[][] matrix) {
-//		// use first row and first col as flags indicating the row needs to be set to 0
-//		for (int i = 0; i < matrix.length; i++) {
-//			for (int j = 0; j < matrix[0].length; j++) {
-//				if (matrix[i][j] == 0) {
-//					matrix[i][0] = 0;
-//					matrix[0][j] = 0;
-//				}
-//			}
-//		}
-//
-//		for (int i = 0; i < matrix.length; i++) {
-//			for (int j = 0; j < matrix[0].length; j++) {
-//				if (matrix[i][0] == 0 || matrix[0][j] == 0) {
-//					matrix[i][j] = 0;
-//				}
-//			}
-//		}
-		
-		// zero the rows
-//		for (int i = 0; i < matrix.length; i++) {
-//			if (matrix[i][0] == 0) {
-//				for (int k = 0; k < matrix[i].length; k++) {
-//					matrix[i][k] = 0;
-//				}
-//			}
-//		}
-//		
-//		// zero the cols
-//		for (int i = 0; i < matrix[0].length; i++) {
-//			if (matrix[0][i] == 0) {
-//				for (int k = 0; k < matrix.length; k++) {
-//					matrix[k][i] = 0;
-//				}
-//			}
-//		}
-//    }
-
-	// returns the winner of the given tic tac toe board. Board is 3x3. If no winner, returns empty string.
-	// [[X, X, X],         [[X, O, X],       [[X, O, X],       [[X, O, X],
-	//  [O, O, X],  = X     [O, O, ],  = O    [O, , ],  = ""    [O, X, ],  = "X"
-	//  [X, O, O]]          [X, O, X]]        [X, O, X]]        [O, O, X]]
-	private static String threeEqual(String a, String b, String c) {
-		if (a.equals(b) && b.equals(c)) {
-			return a;
-		} else {
-			return "";
-		}
-	}
-	public static String ticTacToeWinner(String[][] board) {
-		// rows
-		for (int i = 0; i < board.length; i++) {
-			String result = threeEqual(board[i][0], board[i][1], board[i][2]);
-			if (!result.equals("")) {
-				return result;
-			}
-		}
-
-		// columns
-		for (int i = 0; i < board[0].length; i++) {
-			String result = threeEqual(board[0][i], board[1][i], board[2][i]);
-			if (!result.equals("")) {
-				return result;
-			}
-		}
-
-		// diagonals
-		String result = threeEqual(board[0][0], board[1][1], board[2][2]);
-		if (!result.equals("")) {
-			return result;
-		}
-		result = threeEqual(board[0][2], board[1][1], board[2][0]);
-		if (!result.equals("")) {
-			return result;
-		}
-
-		return "";
-	}
-
 	/* Kth Largest Element in array:
 	 * https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/
 	 * 1. Sort, then take kth index in array. O(N lg N) running time + O(1) memory
@@ -575,6 +411,33 @@ public class ArrayQuestions {
 		int n = nums.length;
 		Arrays.sort(nums);
 		return nums[n - k];
+	}
+
+	// https://leetcode.com/problems/rotate-array/ - O(n) time O(1) space
+	public static void rotate(int[] a, int k) {
+		k = k % a.length;
+		reverse(a, a.length-k, a.length-1); // reverse last section
+		reverse(a, 0, a.length-k-1); // reverse first section
+		reverse(a, 0, a.length-1); // reverse entire array
+	}
+	private static void reverse(int[] a, int start, int end) {
+		while (start < end) {
+			int temp = a[start];
+			a[start] = a[end];
+			a[end] = temp;
+			start++;
+			end--;
+		}
+	}
+	public static void rotateSimple(int[] a, int k) { // O(n) time and space
+		k = k % a.length;
+		int[] newA = new int[a.length];
+		// index at new starting location and iterate from front of array moving things here
+		for (int i = 0; i < a.length; i++) {
+			int og = (i+a.length-k) % a.length;
+			newA[i] = a[og];
+		}
+		System.arraycopy(newA, 0, a, 0, a.length);
 	}
 
 	// finds the target value in arr in O(lg(n)) time where arr is sorted array w/o duplicates that has been rotated (e.g. 45123)
@@ -672,7 +535,6 @@ public class ArrayQuestions {
 		//			
 		//			return new int[] {missingNumSum, missingNumProduct, x1};
 
-
 		int Sum = 0;
 		int SumN = 0;
 		BigInteger P = new BigInteger("1");
@@ -728,7 +590,6 @@ public class ArrayQuestions {
 		}
 		return null;
 	}
-
 	public static int[] threeSumN2(int[] nums, int target) { // requires nums to be sorted
 		for (int i = 0; i < nums.length - 2; i++) {
 			int l = i + 1; // index of the first element in the remaining elements
@@ -745,7 +606,7 @@ public class ArrayQuestions {
 		return null;
 	}
 
-	// Fisher�Yates shuffle: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+	// Fisher Yates shuffle: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 	public static void shuffle(int[] arr) {
 		Random r = new Random();
 		for (int i = arr.length-1; i >= 1; i--) {
@@ -776,5 +637,4 @@ public class ArrayQuestions {
         }
         return sum;
     }
-
 }
