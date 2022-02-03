@@ -1,5 +1,4 @@
 package Specific_Questions;
-import java.util.*;
 
 // rotates a matrix
 public class RotatePicture {

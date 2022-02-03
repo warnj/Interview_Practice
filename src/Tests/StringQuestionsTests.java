@@ -1,9 +1,11 @@
 package Tests;
 
-import static org.junit.Assert.*;
+import General_Questions.StringQuestions;
 import org.junit.Test;
-import java.util.*;
-import General_Questions.*;
+
+import java.util.Arrays;
+
+import static org.junit.Assert.*;
 
 public class StringQuestionsTests {
 

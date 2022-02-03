@@ -1,5 +1,6 @@
 package Specific_Questions;
-import java.util.*;
+
+import java.util.Arrays;
 
 public class Quicksort {
 	

@@ -11,7 +11,7 @@ package General_Questions;
  * Parallel edges are not allowed
  * Self loops are allowed
  */
-import java.io.*;
+
 import java.util.*;
 
 public class GraphDirected {

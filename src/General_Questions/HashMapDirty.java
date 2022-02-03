@@ -1,5 +1,6 @@
 package General_Questions;
-import java.util.*;
+
+import java.util.HashMap;
 
 public class HashMapDirty<K,V> {
     private Entry[] entries;

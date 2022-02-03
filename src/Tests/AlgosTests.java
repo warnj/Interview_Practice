@@ -1,12 +1,9 @@
 package Tests;
 
-import static org.junit.Assert.*;
-
-import java.util.HashSet;
-import java.util.Set;
-
+import General_Questions.Algos;
 import org.junit.Test;
-import General_Questions.*;
+
+import static org.junit.Assert.assertEquals;
 
 public class AlgosTests {
 

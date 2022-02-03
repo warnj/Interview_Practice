@@ -1,9 +1,8 @@
 package General_Questions;
 
 import java.awt.*;
-import java.math.*;
+import java.math.BigInteger;
 import java.util.*;
-import java.util.List;
 
 public class ArrayQuestions {
 

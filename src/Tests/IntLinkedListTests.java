@@ -1,10 +1,12 @@
 package Tests;
 
-import static org.junit.Assert.*;
-
-import java.util.*;
+import General_Questions.IntLinkedList;
 import org.junit.Test;
-import General_Questions.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class IntLinkedListTests {
 

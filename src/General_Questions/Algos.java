@@ -1,8 +1,6 @@
 package General_Questions;
+
 import java.util.*;
-import java.util.List;
-import java.math.*;
-import java.awt.*;
 
 public class Algos {
 	public static void main(String[] args) {

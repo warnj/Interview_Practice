@@ -5,8 +5,8 @@ package General_Questions;
 // Binary heap (this) with first element at index 1: 
 //		for node at index i: parent = i/2, leftChild = 2i, rightChild = 2i + 1
 // k-ary heap: 
-//		for node at index i: parent = (k + i – 2) / k, jth child = ki – (k–2) + j
-import java.util.*;
+//		for node at index i: parent = (k + i ï¿½ 2) / k, jth child = ki ï¿½ (kï¿½2) + j
+
 // TODO: test increase/decrease key and make the heap use array index 0
 public class Heap<T extends Comparable<T>> {
 	private static final int CAPACITY = 3;

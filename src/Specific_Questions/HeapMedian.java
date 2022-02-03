@@ -1,10 +1,9 @@
 package Specific_Questions;
 
-import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.math.*;
-import java.util.regex.*;
+import java.util.Collections;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Scanner;
 
 public class HeapMedian {
 	private static Queue<Integer> lower = new PriorityQueue<Integer>(10, Collections.reverseOrder());

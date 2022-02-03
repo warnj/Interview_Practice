@@ -1,12 +1,14 @@
 package Tests;
 
-import static org.junit.Assert.*;
-
-import java.util.*;
-
+import General_Questions.AlgosBacktracing;
 import org.junit.Test;
 
-import General_Questions.AlgosBacktracing;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
 
 public class AlgosBacktracingTests {
 

@@ -1,9 +1,13 @@
 package Tests;
 
-import static org.junit.Assert.*;
-import java.util.*;
-import org.junit.Test;
 import General_Questions.Heap;
+import org.junit.Test;
+
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Random;
+
+import static org.junit.Assert.assertTrue;
 
 public class HeapTests {
 	private Heap<Integer> h;

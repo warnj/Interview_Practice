@@ -1,10 +1,9 @@
 package Tests;
 
-import static org.junit.Assert.*;
-
-import java.util.*;
-import General_Questions.*;
+import General_Questions.LeetCodeMisc;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class LeetCodeMiscTests {
 

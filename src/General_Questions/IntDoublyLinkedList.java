@@ -6,7 +6,9 @@
 // middle of the list.
 
 package General_Questions;
-import java.util.*;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class IntDoublyLinkedList implements Iterable<Integer> {
 	private ListNode front;  // first value in the list

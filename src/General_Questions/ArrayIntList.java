@@ -2,7 +2,9 @@ package General_Questions;
 // Class ArrayIntList can be used to store a list of integers.  This version
 // has no fixed capacity.  It dynamically increases in size when necessary.
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class ArrayIntList {
     private int[] elementData; // list of integers

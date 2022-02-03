@@ -1,8 +1,7 @@
 package General_Questions;
+
 import java.util.EmptyStackException;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 

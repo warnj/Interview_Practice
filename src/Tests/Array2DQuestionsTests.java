@@ -1,8 +1,6 @@
 package Tests;
 
 import General_Questions.Array2DQuestions;
-import General_Questions.Array2DQuestions;
-import General_Questions.Array2DQuestions;
 import org.junit.Test;
 
 import java.util.ArrayList;

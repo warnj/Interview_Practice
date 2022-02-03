@@ -2,44 +2,78 @@ package Specific_Questions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Sudoku {
 
 	// https://leetcode.com/problems/sudoku-solver/
+	// Same as solveSudokuBacktracing below but with a pruning row, col, and box check before recursion.
+	// runtime on hard board drop from 85-100ms to 16-18ms, technically big O runtime unchanged
+	public static void solveSudokuBacktracingEfficient(char[][] b) {
+		sudokuBacktracingEfficient(b, 0);
+	}
+	private static boolean sudokuBacktracingEfficient(char[][] b, int start) {
+		for (int i = start; i < 81; i++) {
+			int x = i % 9;
+			int y = i / 9;
+			if (b[y][x] != '.') continue;
+
+			boolean[] choices = new boolean[9];
+			validate(b, y, x, choices);
+			for (int n = 1; n <= 9; n++) {
+				// only make choices that will result in a valid board state
+				if (choices[n-1]) {
+					b[y][x] = (char) (n + '0');
+					if (sudokuBacktracingEfficient(b, start + 1)) {
+						return true;
+					}
+				}
+			}
+			b[y][x] = '.';
+			return false;
+		}
+		return true;
+	}
+	// this impl taken from Leetcode solution
+	private static void validate(char[][] board, int i, int j, boolean[] flag) {
+		Arrays.fill(flag,true); // flag[n-1]=true indicates n is a valid choice at (j, i) location
+		for (int k=0; k<9; k++) {
+			if (board[i][k]!='.') flag[board[i][k]-'1']=false; // row
+			if (board[k][j]!='.') flag[board[k][j]-'1']=false; // col
+			int r=i/3*3+k/3;
+			int c=j/3*3+k%3;
+			if (board[r][c]!='.') flag[board[r][c]-'1']=false; // 3x3 box
+		}
+	}
+
+
+	// use recursive backtracing to place a number, if board is invalid, then backtrack
 	public static void solveSudokuBacktracing(char[][] b) {
-		// use recursive backtracing to place a number, if board is invalid, then backtrack
-		System.out.println(Arrays.deepToString(b).replace("], ", "]\n"));
+//		System.out.println(Arrays.deepToString(b).replace("], ", "]\n"));
 		sudokuBacktracing(b, 0);
 //		System.out.println(Arrays.deepToString(b).replace("], ", "]\n"));
 	}
+	// Begins at given start position [0-80] in 9x9 board b, finds next empty box and tries to fill it, recursively
+	// explores following boxes until a solution is identified.
+	// Runtime is 9^m where m is number of spaces to fill
 	private static boolean sudokuBacktracing(char[][] b, int start) {
 		// iterate across board to find next empty box
 		for (int i = start; i < 81; i++) {
 			int x = i % 9;
 			int y = i / 9;
-			System.out.printf("looking at (%d,%d), start %d\n", x, y, start);
 			if (b[y][x] != '.') continue;
 
-			boolean solved = false;
-			boolean valid = false;
 			for (int n = 1; n <= 9; n++) {
-				// place number
+				// place number - could increase efficiency significantly by doing basic row, col, box check before choosing
 				b[y][x] = (char)(n + '0');
-				System.out.printf("Placing %d at (%d,%d), start %d\n", n, x, y, start);
-				solved = false;
-				valid = isValidSudoku(b);
-				if (valid) {
+//				System.out.printf("Placing %d at (%d,%d), start %d\n", n, x, y, start);
+				if (isValidSudoku(b)) {
 					// explore
-					System.out.printf("Exploring, start %d\n", start);
-					solved = sudokuBacktracing(b, start+1);
-					if (solved) return true; // stop trying, don't mess with board contents
+					if (sudokuBacktracing(b, start+1)) {
+						return true; // stop trying, don't mess with board contents
+					}
 				}
 			}
-			System.out.printf("Done with (%d,%d), solved=%b, valid=%b, start=%d\n", x, y, solved, valid, start);
-			System.out.println(Arrays.deepToString(b).replace("], ", "]\n"));
 			// nothing worked in this square, remove number and exit
 			b[y][x] = '.';
 			return false;
@@ -49,8 +83,9 @@ public class Sudoku {
 	}
 
 
+	// Use process of elimination on row, col, and box just like a human would do.
+	// Works for easy/medium boards, but when cannot narrow down a spot to a single choice will fail on hard boards
 	public static void solveSudoku(char[][] b) {
-		// use process of elimination on row, col, and box just like a human would do
 		// int[][] rows, cols, boxes
 		// 		rows[0-8] = array of number counts (length 9)
 		// 		cols[0-8] = array of number counts (length 9)
@@ -230,20 +265,6 @@ public class Sudoku {
 		System.out.printf("options for (%d,%d): %s\n", x, y, result);
 		return result;
 	}
-	// returns the single guessable number (1-9) in the given array of options, otherwise -1
-//	private static int getOption(boolean[] options) {
-//		int option = -1;
-//		for (int i = 0; i < 9; i++) {
-//			if (options[i]) {
-//				if (option != -1) {
-//					// multiple options, return error
-//					return -1;
-//				}
-//				option = i+1;
-//			}
-//		}
-//		return option;
-//	}
 
 
 	// runtime is technically constant since board size fixed

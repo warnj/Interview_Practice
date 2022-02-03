@@ -1,9 +1,11 @@
 package Tests;
 
-import static org.junit.Assert.*;
-import General_Questions.*;
+import General_Questions.IntTree;
 import org.junit.Test;
-import java.util.*;
+
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 public class IntTreeTests {
 	Random r = new Random(); 

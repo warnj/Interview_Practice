@@ -1,6 +1,7 @@
 // used to hash integers within intervals of 10 together; 0-9, 10-19, 20-29...........
 package Specific_Questions;
-import General_Questions.*;
+
+import General_Questions.HashTableQuadraticProbing;
 
 public class IntegerRange {
 	public int value;
