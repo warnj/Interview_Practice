@@ -3,10 +3,183 @@ package General_Questions;
 import java.awt.*;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.List;
 
 public class ArrayQuestions {
 
 	public static void main(String[] args) {
+	}
+
+	// https://leetcode.com/problems/top-k-frequent-elements/
+	public static int[] topKFrequent(int[] nums, int k) {
+		// bucket sort, O(N) time and space
+		Map<Integer, Integer> counts = new HashMap<>();
+		for (int n : nums) {
+			counts.merge(n, 1, Integer::sum);
+		}
+		// array of lists, index is frequency, frequencies are not unique, so must have a list at each index
+		List<Integer>[] buckets = new List[nums.length];
+		for (Map.Entry<Integer, Integer> e : counts.entrySet()) {
+			int freq = e.getValue(); // possible range from 1 to nums.length
+			int num = e.getKey();
+			List<Integer> otherFreqs = buckets[freq-1];
+			if (otherFreqs != null) {
+				otherFreqs.add(num);
+			} else {
+				buckets[freq-1] = new ArrayList<>();
+				buckets[freq-1].add(num);
+			}
+		}
+		// buckets has the nums with largest frequency at the end
+		int[] output = new int[k];
+		int j = 0;
+		for (int i = nums.length-1; i >= 0; i--) {
+			List<Integer> numsSameFreq = buckets[i];
+			if (numsSameFreq != null) { // there will likely be many nulls
+				for (int nI = 0; nI < numsSameFreq.size(); nI++) {
+					output[j++] = numsSameFreq.get(nI); // fill output with contents of numsSameFreq
+					if (j == k) return output;
+				}
+			}
+		}
+		return output;
+	}
+	public static int[] topKFrequent2(int[] nums, int k) {
+		// hashmap of values -> counts, list of tuples (values,counts), reverse sort it by count, then take top k
+		// O(N + n log n + k) runtime, O(n+k) space, where N is nums.length and n is the number of unique values in nums
+		Map<Integer, Integer> counts = new HashMap<>();
+		for (int n : nums) {
+			counts.merge(n, 1, Integer::sum);
+		}
+		// instead of sorting list, can use heap of size k, elements being keys, sorted by vals, trick is getting comparator right:
+		//		new PriorityQueue<>((n1, n2) -> count.get(n1) - count.get(n2));
+		List<Tuple> sortedCounts = new ArrayList<>(counts.size());
+		for (Map.Entry<Integer, Integer> e : counts.entrySet()) {
+			sortedCounts.add(new Tuple(e.getKey(), e.getValue()));
+		}
+		Collections.sort(sortedCounts); // kinda cheating
+		int[] output = new int[k];
+		for (int i = 0; i < k; i++) {
+			output[i] = sortedCounts.get(i).key;
+		}
+		return output;
+	}
+	static class Tuple implements Comparable<Tuple> {
+		int key, val;
+		public Tuple(int k, int v) {
+			key = k;
+			val = v;
+		}
+		@Override
+		public int compareTo(Tuple other) {
+			return other.val - val; // backwards since want most frequent
+		}
+	}
+
+	// https://leetcode.com/problems/subarray-sum-equals-k/
+	// no simple two pointer solution since both + and - numbers allowed
+	// solution below taken from LeetCode, O(n) time and space
+	// assume (D+E+3=k), sum =A+B+C+D+E+3, preSum = A+B+C, so sum-presum=k  -> algebra ->  -presum=k-sum  ->  presum=-k+sum=sum-k
+	// don't care about how a presum was formed or how long it is, only care about how many particular presums exist
+	public static int subarraySum(int[] nums, int k) {
+		int sum = 0, result = 0;
+		Map<Integer, Integer> preSum = new HashMap<>(); // map presums to their counts
+		for (int i = 0; i < nums.length; i++) {
+			sum += nums[i]; // sum [0,i]
+			if (sum == k) result++; // special case, valid subarray but wouldn't be caught by presum, can also initialize preSum with a (0 -> 1) mapping
+			// sum-k = the presum that will get counts of previous ranges that with current sum will equal target, see algebra above
+			if (preSum.containsKey(sum - k)) {
+				result += preSum.get(sum - k);
+			}
+			preSum.put(sum, preSum.getOrDefault(sum, 0) + 1);
+		}
+		return result;
+	}
+	// reduce the duplicate summing by saving sums for each subarray starting position: O(n^2) runtime, O(n) space
+	public static int subarraySum2(int[] nums, int target) {
+		int result = 0;
+		int[] sums = new int[nums.length]; // sums[k] = sum from current subarray starting position (i) to k
+		for (int i = 0; i < nums.length; i++) { // starting places
+			// could likely optimize a bit further by skipping zeros and doubling next additions to result
+			for (int j = i; j < nums.length; j++) { // ending places
+				int sum = nums[j]; // will become the sum from [i,j]
+				if (j != i) { // not the first time summing from this subarray starting position
+					sum += sums[j-1]; // add the sum of numbers that come before for current subarray starting position
+					sums[j-1] -= nums[i]; // subtract current starting position from sum since next time starting locations will be 1 greater
+				}
+				sums[j] = sum;
+				if (sum == target) result++;
+			}
+		}
+		return result;
+	}
+	// brute force of finding all continuous subarrays and then sum: O(n^3) runtime, O(1) space
+	public static int subarraySumBrute(int[] nums, int target) {
+		int result = 0;
+		for (int i = 0; i < nums.length; i++) { // starting places
+			for (int j = i; j < nums.length; j++) { // ending places
+				int sum = 0; // sum from [i,j]
+				for (int k = i; k <= j; k++) {
+					sum += nums[k];
+				}
+				if (sum == target) result++;
+			}
+		}
+		return result;
+	}
+
+	// https://leetcode.com/problems/find-peak-element/
+	// worst case O(log n) since no duplicates near each other
+	// If num[i-1] < num[i] > num[i+1], then num[i] is peak
+	// If num[i-1] < num[i] < num[i+1], then num[i+1...n-1] must contains a peak
+	// If num[i-1] > num[i] > num[i+1], then num[0...i-1] must contains a peak
+	// If num[i-1] > num[i] < num[i+1], then both sides have peak
+	public static int findPeakElement(int[] nums) {
+		int lo = 0;
+		int hi = nums.length-1;
+		while (lo < hi) {
+			int mid = lo+((hi-lo)/2);
+			if (nums[mid] < nums[mid+1]) {
+				lo = mid+1; // go uphill to the right
+			} else {
+				hi = mid; // go uphill to the left, don't need -1 since int division rounds down
+			}
+		}
+		return lo;
+	}
+	// worst case O(n), still passes tests
+	public static int findPeakElementSlow(int[] nums) {
+		if (nums.length == 1) return 0;
+		int lo = 0;
+		int hi = nums.length-1;
+		// starts at the ends and works to middle since off the ends counts as negative infinity
+		while (lo <= hi) {
+			if (nums[lo + 1] < nums[lo]) return lo;
+			if (nums[hi - 1] < nums[hi]) return hi;
+			lo++;
+			hi--;
+		}
+		return -1;
+	}
+
+	// https://leetcode.com/problems/container-with-most-water/
+	// O(n) time, O(1) space
+	public static int maxArea(int[] height) {
+		int result = 0;
+		int lo = 0; // two pointers at opposite ends
+		int hi = height.length-1;
+		while (lo < hi) {
+			int dist = hi-lo;
+			int area = Math.min(height[lo], height[hi]) * dist;
+			if (area > result) result = area; // saves max area
+
+			if (height[lo] > height[hi]) { // move smaller number pointer closer to middle, may find a larger value
+				hi--;
+			} else {
+				lo++;
+			}
+		}
+		return result;
 	}
 
 	// https://leetcode.com/problems/third-maximum-number
@@ -27,6 +200,30 @@ public class ArrayQuestions {
 			}
 		}
 		return max3 == Long.MIN_VALUE ? (int)max : (int)max3;
+	}
+
+	// https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/
+	public static int maxProfitFee(int[] prices, int fee) {
+		int profit = 0;
+
+		return profit;
+	}
+
+	// https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/
+	// greedy algo, single pass
+	public static int maxProfit2(int[] prices) {
+		int profit = 0;
+		int buy = prices[0];
+
+		for (int i = 1; i < prices.length; i++) {
+			if (prices[i] < buy) {
+				buy = prices[i]; // rebuy at lower price
+			} else { // price increased
+				profit += prices[i] - buy; // sell at higher price
+				buy = prices[i]; // rebuy, may continue rising
+			}
+		}
+		return profit;
 	}
 
 	// https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
@@ -392,13 +589,65 @@ public class ArrayQuestions {
         return false;
     }
 
-	/* Kth Largest Element in array:
-	 * https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/
+	/* Kth Largest Element in array (also useful for finding median)
+	 * https://leetcode.com/problems/kth-largest-element-in-an-array/
 	 * 1. Sort, then take kth index in array. O(N lg N) running time + O(1) memory
 	 * 2. Priority queue (min queue containing the k largest elements). O(N lg K) running time + O(K) memory
-	 * 3. Selection Algo: https://en.wikipedia.org/wiki/Selection_algorithm. O(N) running time if input not sorted + O(1) space
+	 * 3. Selection Algo (Quickselect): https://en.wikipedia.org/wiki/Selection_algorithm. O(N) running time if input not sorted + O(1) space
 	 */
-	public int findKthLargest(int[] nums, int k) {
+	// quick select algorithm - O(n) normal runtime, O(n^2) worst case if input is sorted (can overcome by shuffling)
+	public static int findKthLargest(int[] nums, int k) {
+		int lo = 0;
+		int hi = nums.length-1;
+		int n = partition(nums, lo, hi);
+		while (n != nums.length - k) {
+			if (n < nums.length - k) { // kth smallest is on the right side
+				lo = n + 1;
+			} else { // kth smallest is on the left side
+				hi = n - 1;
+			}
+			n = partition(nums, lo, hi);
+		}
+		return nums[n];
+	}
+	// picks a pivot value and performs swaps in nums (between lo and hi inclusive) such that numbers < pivot are on
+	// left and numbers >= pivot are on the right, right side begins with numbers = pivot, returns the first index of right side
+	private static int partition(int[] nums, int lo, int hi) {
+		int pivot = nums[lo];
+		System.out.printf("Pivot: %d, Lo: %d, Hi: %d\n", pivot, lo, hi);
+		int i = lo; // move pivot into position at the end, start at lo+1
+		int j = hi+1; // start at hi
+		while (true) {
+			while (i < hi && nums[++i] < pivot); // i incremented always
+			while (j > lo && pivot < nums[--j]); // j decremented always
+			// nums[i] = hi or is >= pivot,  nums[j] = lo or <= pivot
+			if (i >= j)	break; // only swap if counters were on appropriate left and right sides of array
+			System.out.printf("Nums: %s, swapping %d and %d\n", Arrays.toString(nums), nums[i], nums[j]);
+			swap(nums, i, j);
+		}
+		System.out.printf("Nums: %s, swapping pivot %d and %d\n", Arrays.toString(nums), nums[lo], nums[j]);
+		swap(nums, lo, j);
+		System.out.println("Nums after partition: " + Arrays.toString(nums));
+		System.out.println("Partition Index: " + j);
+		return j; // j is smallest now and any values = pivot are on right side, so return j
+	}
+	// alternative implementation of partition
+	private static int partitionAlt(int[] nums, int lo, int hi) {
+		int i = lo;
+		for (int j = lo + 1; j <= hi; j++) {
+			if (nums[j] < nums[lo]) {
+				i++;
+				System.out.printf("Nums: %s, swapping %d and %d\n", Arrays.toString(nums), i, j);
+				swap(nums, i, j);
+			}
+		}
+		System.out.printf("Nums: %s, swapping pivot %d and %d\n", Arrays.toString(nums), lo, i);
+		swap(nums, lo, i); // move pivot into place at the end
+		System.out.println("Nums after partition: " + Arrays.toString(nums));
+		System.out.println("Partition Index: " + i);
+		return i;
+	}
+	public static int findKthLargestHeap(int[] nums, int k) {
 		PriorityQueue<Integer> pq = new PriorityQueue<>();
 		for (int val : nums) {
 			pq.add(val);
@@ -406,10 +655,9 @@ public class ArrayQuestions {
 		}
 		return pq.peek();
 	}
-	public int findKthLargestUsingSorting(int[] nums, int k) { 
-		int n = nums.length;
+	public static int findKthLargestUsingSorting(int[] nums, int k) {
 		Arrays.sort(nums);
-		return nums[n - k];
+		return nums[nums.length - k];
 	}
 
 	// https://leetcode.com/problems/rotate-array/ - O(n) time O(1) space
@@ -603,6 +851,48 @@ public class ArrayQuestions {
 			}
 		}
 		return null;
+	}
+
+	// https://leetcode.com/problems/4sum-ii/
+	public static int fourSumCount(int[] nums1, int[] nums2, int[] nums3, int[] nums4) {
+		// O(n^2) time and space by saving all possible sums of arrays 1 and 2, then 3 and 4
+		int n = nums1.length;
+		Map<Integer, Integer> counts1and2 = new HashMap<>();
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				counts1and2.merge(nums1[i] + nums2[j], 1, Integer::sum);
+			}
+		}
+		int result = 0;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				int sum = nums3[i] + nums4[j];
+				Integer k = counts1and2.get(-sum); // -sum is what it takes to add to zero
+				if (k != null) result += k;
+			}
+		}
+		return result;
+	}
+	public static int fourSumCountSlow(int[] nums1, int[] nums2, int[] nums3, int[] nums4) {
+		// obvious n^4 nested loops, O(1) space
+		// also n^3 with nested loops + hashmap, O(n) space, as is implemented here
+		int result = 0;
+		Map<Integer, Integer> counts = new HashMap<>(nums4.length);
+		for (int n : nums4) {
+			counts.merge(n, 1, Integer::sum);
+		}
+		for (int a : nums1) {
+			for (int b : nums2) {
+				for (int c : nums3) {
+					int sum = a + b + c;
+					Integer count = counts.get(-sum);
+					if (count != null) {
+						result += count;
+					}
+				}
+			}
+		}
+		return result;
 	}
 
 	// Fisher Yates shuffle: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle

@@ -10,6 +10,13 @@ import static org.junit.Assert.*;
 public class StringQuestionsTests {
 
 	@Test
+	public void testFindTheDifference() {
+		assertEquals('e', StringQuestions.findTheDifference("abcd", "abcde"));
+		assertEquals('y', StringQuestions.findTheDifference("", "y"));
+		assertEquals('b', StringQuestions.findTheDifference("zyxw", "wyxbz"));
+	}
+
+	@Test
 	public void testPalindrome() {
 		assertTrue(StringQuestions.isPalindrome("A man, a plan, a canal: Panama"));
 		assertFalse(StringQuestions.isPalindrome("race a car"));

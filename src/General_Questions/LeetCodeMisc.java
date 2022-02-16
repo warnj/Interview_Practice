@@ -8,6 +8,20 @@ public class LeetCodeMisc {
 
 	}
 
+	// https://leetcode.com/problems/add-digits/
+	// O(n) solution, clever O(1) solution that uses "% 9"
+	public static int addDigits(int num) {
+		while (num > 9) {
+			int sum = 0; // sum of digits
+			for (int n = num; n > 0; n /= 10) {
+				int digit = n % 10;
+				sum += digit;
+			}
+			num = sum; // next loop starting value is the sum of digits
+		}
+		return num;
+	}
+
 	// https://leetcode.com/problems/power-of-four
 	public static boolean isPowerOfFour(int n) {
 		if (n < 1) return false;

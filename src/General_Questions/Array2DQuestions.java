@@ -1,15 +1,89 @@
 package General_Questions;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class Array2DQuestions {
 
 	public static void main(String[] args) {
-		boolean[][] explored = new boolean[5][3];
-		System.out.println(explored.length);
+	}
+
+
+	// https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/
+	// binary search solution, O(n * log(max-min))
+	public static int kthSmallest(int[][] matrix, int k) {
+		int n = matrix.length;
+		int lo = matrix[0][0], hi = matrix[n - 1][n - 1];
+		while (lo <= hi) {
+			int mid = lo + (hi - lo) / 2; // mid is not an index, it is the middle value, need to search for it
+			int count = getLessEqual(matrix, mid);
+			if (count < k) lo = mid + 1; // target is in upper half of elements between lo and hi
+			else hi = mid - 1;
+		}
+		return lo;
+	}
+	// returns count of numbers in sorted matrix <= mid, O(n) runtime where n is matrix.length
+	private static int getLessEqual(int[][] matrix, int target) {
+		int res = 0;
+		int n = matrix.length, x = n - 1, y = 0; // start upper right, move toward left bottom
+		while (x >= 0 && y < n) {
+			if (matrix[y][x] > target) // move left
+				x--;
+			else { // move down
+				res += x + 1;
+				y++;
+			}
+		}
+		return res;
+	}
+	// O(min(n,k)+klog(min(n,k))) runtime, O(n) space - k could be n^2 worst case
+	public static int kthSmallest2(int[][] matrix, int k) {
+		int n = matrix.length;
+		PriorityQueue<Tuple> pq = new PriorityQueue<>();
+		for (int j = 0; j <= n-1; j++) pq.offer(new Tuple(j, 0, matrix[0][j])); // add top of columns to queue to start
+		for (int i = 0; i < k-1; i++) {
+			Tuple t = pq.poll(); // remove from queue
+			if (t.y == n-1) continue; // finished with current column
+			pq.offer(new Tuple(t.x, t.y+1, matrix[t.y+1][t.x])); // move down, insert number below into queue
+		}
+		return pq.poll().val;
+	}
+	static class Tuple implements Comparable<Tuple> {
+		int x, y, val;
+		public Tuple (int x, int y, int val) {
+			this.x = x;
+			this.y = y;
+			this.val = val;
+		}
+		@Override
+		public int compareTo (Tuple that) {
+			return this.val - that.val;
+		}
+	}
+	// O(n^2) runtime, O(n) space
+	public static int kthSmallestSlow(int[][] matrix, int k) {
+		int n = matrix.length;
+		if (k > n*n) return -1;
+		int[] cols = new int[n]; // how far down each column we have explored
+		int count = 1;
+		cols[0] = 1;
+		int min = matrix[0][0];
+		while (count < k) {
+			// can move down in any of the columns, find the next min in the columns
+			min = Integer.MAX_VALUE;
+			int minI = -1;
+			for (int i = 0; i < n; i++) {
+				int colY = cols[i];
+				if (colY >= n) continue; // already looked at all numbers in this col
+				if (matrix[colY][i] < min) {
+					min = matrix[colY][i];
+					minI = i;
+				}
+				if (colY == 0) break; // next cols are all larger, don't need to look at them
+			}
+			cols[minI]++;
+			count++;
+		}
+		return min;
 	}
 
 	// https://leetcode.com/problems/number-of-islands/
@@ -92,9 +166,7 @@ public class Array2DQuestions {
 	// Given 2D array contains rows that are sorted and cols that are sorted. Duplicates may occur.
 	// worstcase runtime O(n+m)
 	public static boolean contains(int[][] arr, int target) {
-		//	Pick upper right number
-		//	If greater, go left
-		//	If less than, go down
+		//	Pick upper right number; if greater, go left, if less than, go down
 
 		// ensure arr not zero length
 		int x = arr[0].length-1; // col

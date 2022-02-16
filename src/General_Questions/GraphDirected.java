@@ -144,7 +144,7 @@ public class GraphDirected {
 	}
 
 	public List<String> topoSort() {
-		List<String> sort = new ArrayList<String>();
+		List<String> sort = new ArrayList<>();
 		Map<Vertex, Integer> inDegrees = new HashMap<>();
 
 		for (Map.Entry<Vertex, Map<Vertex, Double>> entry : adjList.entrySet()) {
@@ -153,7 +153,7 @@ public class GraphDirected {
 			}
 		}
 		
-		Queue<Vertex> worklist = new LinkedList<Vertex>();
+		Queue<Vertex> worklist = new LinkedList<>();
 		for (Map.Entry<Vertex, Map<Vertex, Double>> entry : adjList.entrySet()) {
 			if(!inDegrees.containsKey(entry.getKey())) {
 				worklist.add(entry.getKey());

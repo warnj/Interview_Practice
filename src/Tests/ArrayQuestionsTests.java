@@ -1,11 +1,46 @@
 package Tests;
 
 import General_Questions.ArrayQuestions;
+import com.sun.source.tree.AssertTree;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class ArrayQuestionsTests {
+
+	@Test
+	public void testTopKFrequent() {
+		// output doesn't have to be sorted, so arrayequals not good way to assert this
+		assertArrayEquals(new int[]{1,2}, ArrayQuestions.topKFrequent(new int[]{1,1,1,2,2,3}, 2));
+		assertArrayEquals(new int[]{1,2,3}, ArrayQuestions.topKFrequent(new int[]{1,1,1,2,2,3}, 3));
+		assertArrayEquals(new int[]{1}, ArrayQuestions.topKFrequent(new int[]{1,1,1,2,2,3}, 1));
+		assertArrayEquals(new int[]{1}, ArrayQuestions.topKFrequent(new int[]{1}, 1));
+	}
+
+	@Test
+	public void testSubarraySum() {
+		assertEquals(2, ArrayQuestions.subarraySum(new int[]{1,1,1}, 2));
+		assertEquals(2, ArrayQuestions.subarraySum(new int[]{1,2,3}, 3));
+		assertEquals(5, ArrayQuestions.subarraySum(new int[]{-1,3,0,-1,3}, 2));
+		assertEquals(7, ArrayQuestions.subarraySum(new int[]{1,2,3,3,2,1,2,1,1,1}, 3));
+	}
+
+	@Test
+	public void testFindPeak() {
+		int result = ArrayQuestions.findPeakElement(new int[]{1,2,1,3,5,6,4});
+		assertTrue(1 == result || 5 == result);
+		assertEquals(2, ArrayQuestions.findPeakElement(new int[]{1,2,3,1}));
+		assertEquals(2, ArrayQuestions.findPeakElement(new int[]{1,2,3}));
+		assertEquals(0, ArrayQuestions.findPeakElement(new int[]{1}));
+		assertEquals(1, ArrayQuestions.findPeakElement(new int[]{1,2,1}));
+	}
+
+	@Test
+	public void testMaxArea() {
+		assertEquals(49, ArrayQuestions.maxArea(new int[]{1,8,6,2,5,4,8,3,7}));
+		assertEquals(1, ArrayQuestions.maxArea(new int[]{1,1}));
+	}
 
 	@Test
 	public void testThirdMax() {
@@ -48,9 +83,23 @@ public class ArrayQuestionsTests {
 	}
 
 	@Test
+	public void testMaxProfitFee() {
+		assertEquals(8, ArrayQuestions.maxProfitFee(new int[]{1,3,2,8,4,9}, 2));
+		assertEquals(6, ArrayQuestions.maxProfitFee(new int[]{1,3,7,5,10,3}, 3));
+	}
+
+	@Test
+	public void testMaxProfit2() {
+		assertEquals(7, ArrayQuestions.maxProfit2(new int[]{7,1,5,3,6,4}));
+		assertEquals(4, ArrayQuestions.maxProfit2(new int[]{1,2,3,4,5}));
+		assertEquals(0, ArrayQuestions.maxProfit2(new int[]{7,6,4,3,1}));
+	}
+
+	@Test
 	public void testMaxProfit() {
 		assertEquals(5, ArrayQuestions.maxProfit(new int[]{7,1,5,3,6,4}));
 		assertEquals(0, ArrayQuestions.maxProfit(new int[]{7,6,4,3,1}));
+		assertEquals(4, ArrayQuestions.maxProfit(new int[]{1,2,3,4,5}));
 	}
 
 	@Test
@@ -144,4 +193,17 @@ public class ArrayQuestionsTests {
 		assertTrue(ArrayQuestions.canJumpNaive(new int[] {1,2}));
 	}
 
+	@Test
+	public void testFourSumCount() {
+		assertEquals(2, ArrayQuestions.fourSumCount(new int[] {1,2}, new int[]{-2,-1}, new int[]{-1,2}, new int[]{0,2}));
+		assertEquals(1, ArrayQuestions.fourSumCount(new int[] {0}, new int[]{0}, new int[]{0}, new int[]{0}));
+		assertEquals(17, ArrayQuestions.fourSumCount(new int[] {0,1,-1}, new int[]{-1,1,0}, new int[]{0,0,1}, new int[]{-1,1,1}));
+	}
+
+	@Test
+	public void testKthLargest() {
+		assertEquals(5, ArrayQuestions.findKthLargest(new int[]{3,2,1,5,6,4}, 2));
+		assertEquals(5, ArrayQuestions.findKthLargest(new int[]{1,2,3,4,5,6}, 2));
+		assertEquals(4, ArrayQuestions.findKthLargest(new int[]{3,2,3,1,2,4,5,5,6}, 4));
+	}
 }

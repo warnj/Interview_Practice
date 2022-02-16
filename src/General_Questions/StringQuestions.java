@@ -8,6 +8,35 @@ public class StringQuestions {
 //		wordBreak("leetcode", Arrays.asList("leet", "code"));
 	}
 
+	// https://leetcode.com/problems/find-the-difference/
+	// O(n) runtime, O(1) memory
+	public static char findTheDifference(String s, String t) {
+		int charCode = t.charAt(s.length());
+		for (int i = 0; i < s.length(); i++) {
+			charCode -= s.charAt(i);
+			charCode += t.charAt(i);
+		}
+		return (char)charCode;
+	}
+	// O(n) runtime, O(1) memory
+	public static char findTheDifferenceCounts(String s, String t) {
+		int[] counts = new int[26]; // input is lowercase letters
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			counts[c-'a']++;
+		}
+		for (int i = 0; i < t.length(); i++) {
+			char c = t.charAt(i);
+			counts[c-'a']--;
+		}
+		for (int i = 0; i < 26; i++) {
+			if (counts[i] != 0) {
+				return (char)(i+'a');
+			}
+		}
+		return 'X'; // error
+	}
+
 	// https://leetcode.com/problems/valid-palindrome/
 	public static boolean isPalindrome(String s) {
 		s = s.toLowerCase();

@@ -12,6 +12,28 @@ import static org.junit.Assert.*;
 public class Array2DQuestionsTests {
 
 	@Test
+	public void testKthSmallest() {
+		int[][] a = new int[][]{{1,3, 7},
+								{2,5, 9},
+								{4,11,12}};
+		assertEquals(5, Array2DQuestions.kthSmallest(a, 5));
+//		int[][] b = new int[][]{{5,5, 5},
+//						{5,5, 9},
+//						{5,11,12}};
+//		assertEquals(9, Array2DQuestions.kthSmallest(b, 7));
+//		int[][] c = new int[][]{{1, 5, 9},
+//						{10,11,13},
+//						{12,13,15}};
+//		assertEquals(13, Array2DQuestions.kthSmallest(c, 8));
+//		assertEquals(1, Array2DQuestions.kthSmallest(c, 1));
+//		assertEquals(9, Array2DQuestions.kthSmallest(c, 3));
+//		assertEquals(13, Array2DQuestions.kthSmallest(c, 7));
+//		assertEquals(12, Array2DQuestions.kthSmallest(c, 6));
+//		int[][] d = new int[][]{{-5}};
+//		assertEquals(-5, Array2DQuestions.kthSmallest(d, 1));
+	}
+
+	@Test
 	public void testNumIslands() {
 		char[][] g = new char[][]{
 			{'1', '1', '1', '1', '0'},

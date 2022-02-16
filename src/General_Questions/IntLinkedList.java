@@ -2,10 +2,7 @@ package General_Questions;
 
 import General_Questions.IntTree.TreeNode;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 public class IntLinkedList {
 	private ListNode head;
@@ -163,6 +160,29 @@ public class IntLinkedList {
 		head = prev;
 	}
 
+	// O(n log k) time, O(k) space, where n is the total number of nodes in all lists and k is the number of lists
+	// https://leetcode.com/problems/merge-k-sorted-lists
+	public static IntLinkedList mergeKLists(List<IntLinkedList> lists) {
+		PriorityQueue<ListNode> nodes = new PriorityQueue<>();
+		for (IntLinkedList list : lists) {
+			if (list != null) nodes.add(list.head);
+		}
+		if (nodes.isEmpty()) return null;
+		IntLinkedList result = new IntLinkedList();
+		ListNode cur = result.head;
+		while (nodes.size() > 0) {
+			ListNode n = nodes.poll();
+			if (cur == null) {
+				result.head = n;
+			} else {
+				cur.next = n;
+			}
+			cur = n;
+			if (n.next != null) nodes.add(n.next);
+		}
+		return result;
+	}
+
 	/**@requires all elements of lists are sorted
 	 * @return a new sorted list with the contents of all of the given lists
 	 * @modifies lists
@@ -189,6 +209,7 @@ public class IntLinkedList {
 	/**@requires all elements of lists are sorted
 	 * @return a new sorted list with the contents of all of the given lists
 	 * @modifies lists */
+	// O(k*n) time and O(1) space
 	public static IntLinkedList mergeSortedLists(List<IntLinkedList> lists) {
 		// pairs the given lists, merges them, and repeats until have 1 big list
 		// probably more efficient to pair and merge similarly sized lists, but not a big issue
@@ -199,7 +220,6 @@ public class IntLinkedList {
 		}
 		return lists.get(0);
 	}
-
 	// requires l1 and l2 are sorted, returns a new sorted list with the contents of l1 and l2
 	public static IntLinkedList mergeSortedLists(IntLinkedList l1, IntLinkedList l2) {
 		if (l1 == null) return l2;
@@ -762,7 +782,7 @@ public class IntLinkedList {
 
 
 
-	private static class ListNode {
+	private static class ListNode implements Comparable<ListNode> {
 		public int val;       // val stored in this node
 		public ListNode next;  // link to next node in the list
 
@@ -773,6 +793,11 @@ public class IntLinkedList {
 		public ListNode(int val, ListNode next) {
 			this.val = val;
 			this.next = next;
+		}
+
+		@Override
+		public int compareTo(ListNode other) {
+			return this.val - other.val;
 		}
 	}
 }

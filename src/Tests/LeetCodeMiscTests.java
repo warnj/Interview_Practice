@@ -8,6 +8,12 @@ import static org.junit.Assert.*;
 public class LeetCodeMiscTests {
 
     @Test
+    public void testAddDigits() {
+        assertEquals(2, LeetCodeMisc.addDigits(38));
+        assertEquals(0, LeetCodeMisc.addDigits(0));
+    }
+
+    @Test
     public void testConvertToTitle() {
         assertEquals("A", LeetCodeMisc.convertToTitle(1));
         assertEquals("Z", LeetCodeMisc.convertToTitle(26));

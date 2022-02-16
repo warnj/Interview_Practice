@@ -67,6 +67,18 @@ public class IntLinkedListTests {
 		s = IntLinkedList.mergeSortedListsRecursive(d);
 		assertTrue(isSorted(s));
 		assertEquals(11, s.size());
+
+		a = new IntLinkedList();
+		a.add(1); a.add(6);	a.add(6); a.add(7);	a.add(88);
+		b = new IntLinkedList();
+		b.add(3); b.add(8);	b.add(9);
+		c = new IntLinkedList();
+		c.add(-6); c.add(8); c.add(75);
+		d = new ArrayList<>();
+		d.add(a); d.add(b); d.add(c);
+		s = IntLinkedList.mergeKLists(d);
+		assertTrue(isSorted(s));
+		assertEquals(11, s.size());
 	}
 	private boolean isSorted(IntLinkedList l) {
 		for (int i = 0; i < l.size() - 1; i++) {
