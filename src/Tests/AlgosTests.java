@@ -16,16 +16,12 @@ public class AlgosTests {
 	}
 
 	@Test
-	public void testLetterCombinations() {
-		assertEquals(Algos.letterCombinations("23").toString(), "[ad, ae, af, bd, be, bf, cd, ce, cf]");
-	}
-
-	@Test
 	public void testCoinChange() {
-		assertEquals(Algos.coinChange(new int[]{1, 4, 5}, 12), 3);
-		assertEquals(Algos.coinChange(new int[]{1}, 1), 1);
-		assertEquals(Algos.coinChange(new int[]{2}, 1), -1);
-		assertEquals(Algos.coinChange(new int[]{2}, 3), -1);
+		assertEquals(3, Algos.coinChange(new int[]{1,2,5}, 11));
+		assertEquals(3, Algos.coinChange(new int[]{1, 4, 5}, 12));
+		assertEquals(1, Algos.coinChange(new int[]{1}, 1));
+		assertEquals(-1, Algos.coinChange(new int[]{2}, 1));
+		assertEquals(-1, Algos.coinChange(new int[]{2}, 3));
 	}
 
 }

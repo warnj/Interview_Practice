@@ -5,11 +5,213 @@ import java.util.*;
 // https://www.reddit.com/r/cscareerquestions/comments/chs1aq/dynamic_programming_cheatsheet/
 
 public class AlgosBacktracing {
-	public static void main(String[] args) {
-		System.out.println(combinations("1234", 2));
+
+	// https://leetcode.com/problems/letter-combinations-of-a-phone-number
+	public static List<String> letterCombinations(String digits) {
+		List<String> results = new ArrayList<>();
+		if (digits.isEmpty()) return results;
+		String[] lets = new String[]{"abc","def","ghi","jkl","mno","pqrs","tuv","wxyz"};
+		letterCombinations(results, new StringBuilder(), lets, digits, 0);
+		return results;
+	}
+	private static void letterCombinations(List<String> results, StringBuilder current, String[] letters, String digits, int n) {
+		if (n == digits.length()) {
+			results.add(current.toString());
+		} else {
+			int digit = digits.charAt(n) - '0';
+			String options = letters[digit-2];
+			for (int i = 0; i < options.length(); i++) {
+				current.append(options.charAt(i));
+				letterCombinations(results, current, letters, digits, n+1);
+				current.setLength(current.length() - 1);
+			}
+		}
+	}
+	// iterative method to solve the same problem as above
+	public static List<String> letterCombinationsItr(String digits) {
+		LinkedList<String> ans = new LinkedList<String>();
+		String[] mapping = new String[] {"abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+		ans.add("");
+		for(int i = 0; i<digits.length();i++){ // iterate over digits
+			int x = Character.getNumericValue(digits.charAt(i));
+			while(ans.peek().length()==i){ // while the strings in ans are shorter than digits.length, add a character to them
+				String t = ans.remove(); // remove the short string
+				for(char s : mapping[x-2].toCharArray())
+					ans.add(t+s); // add all combinations of the short string + each letter that corresponds to digits[x]
+			}
+		}
+		return ans;
 	}
 
-	// https://leetcode.com/problems/permutations/#/solutions
+	// https://leetcode.com/problems/word-search-ii
+	public static List<String> findWords(char[][] board, String[] words) {
+		List<String> found = new ArrayList<>();
+		int height = board.length, width = board[0].length;
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				for (int i = 0; i < words.length; i++) {
+					String word = words[i];
+					if (!word.isEmpty() && board[y][x] == word.charAt(0) && search(y, x, board, word, 0, new boolean[height][width])) { // found first letter
+						found.add(word);
+						words[i] = "";
+					}
+				}
+			}
+		}
+		return found;
+	}
+
+	// Given a 2D board and a word, find if the word exists in the grid. The word can be constructed from letters of sequentially adjacent cell,
+	// where "adjacent" cells are those horizontally or vertically neighboring. The same letter cell may not be used more than once.
+	// https://leetcode.com/problems/word-search
+	public static boolean exist(char[][] board, String word) {
+		if (board.length == 0 || board[0].length == 0) return false;
+		if (word.isEmpty()) return true;
+		int height = board.length, width = board[0].length;
+		boolean[][] visited = new boolean[height][width];
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (board[y][x] == word.charAt(0) && search(y, x, board, word, 0, visited)) { // found first letter
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	private static boolean search(int y, int x, char[][] board, String word, int index, boolean[][] visited) {
+		if (y >= 0 && y < board.length && x >= 0 && x < board[0].length && board[y][x] == word.charAt(index) && !visited[y][x]) {
+			if (index+1 == word.length()) return true; // found path to the end
+			visited[y][x] = true;
+			if (search(y, x+1, board, word, index+1, visited) || // continue searching
+					search(y, x-1, board, word, index+1, visited) ||
+					search(y+1, x, board, word, index+1, visited) ||
+					search(y-1, x, board, word, index+1, visited)) {
+				return true;
+			}
+			visited[y][x] = false;
+		}
+		return false;
+	}
+
+	// https://leetcode.com/problems/n-queens/
+	public static List<List<String>> solveNQueens(int n) {
+		List<List<String>> boards = new ArrayList<>();
+		solveNQueens(boards, createBoard(n), 0, 0, n, 0);
+		return boards;
+	}
+	private static List<String> createBoard(int n) {
+		List<String> board = new ArrayList<>();
+//		String row = ".".repeat(n); // roughly same runtime if constructing board or starting with full empty board
+		String row = "";
+		for (int i = 0; i < n; i++)	board.add(row);
+		return board;
+	}
+	// few optimizations added to avoid checking futures known to be incorrect, 0.3s runtime on board size 9
+	// could be improved by checking validBoard given new queen position and only exploring valid boards
+	private static void solveNQueens(List<List<String>> boards, List<String> board, int x, int y, int n, int placed) {
+		if (validBoard(board)) {
+			System.out.println("Exploring board: ");
+			System.out.println(board);
+			if (placed == n && y == n) {
+				List<String> result = new ArrayList<>(n);
+				for (int i = 0; i < n; i++) result.add(board.get(i));
+				boards.add(result);
+			} else if (y < n) {
+				String rowStr = board.get(y);
+				boolean containsQueen = rowStr.contains("Q");
+				if (!containsQueen && placed < n) {
+					board.set(y, rowStr + "Q");
+					if (x == n - 1) {
+						solveNQueens(boards, board, 0, y + 1, n, placed + 1);
+					} else {
+						solveNQueens(boards, board, x + 1, y, n, placed + 1);
+					}
+				}
+				board.set(y, rowStr + ".");
+				if (x == n - 1 && containsQueen) { // every row must contain a queen to be worth exploring
+					solveNQueens(boards, board, 0, y + 1, n, placed);
+				} else if (x < n - 1) {
+					solveNQueens(boards, board, x + 1, y, n, placed);
+				}
+				board.set(y, rowStr);
+			}
+		}
+	}
+	// returns true if no queens conflict in given board, even if board is not complete
+	public static boolean validBoard(List<String> board) {
+		int n = board.size();
+		// check rows
+		for (int y = 0; y < n; y++) {
+			String row = board.get(y);
+			int i = row.indexOf('Q');
+			// each row must have 1 and only 1 queen
+			if (i != row.lastIndexOf('Q')) return false;
+			if (i == -1) continue; // don't fail partial boards
+			// check the column this queen lies on
+			for (int j = 0; j < n; j++) {
+				if (j != y) {
+					String otherRow = board.get(j);
+					if (i < otherRow.length() && otherRow.charAt(i) == 'Q') return false;
+				}
+			}
+			// check the diagonals this queen lies on
+			int left = i - 1;
+			int right = i + 1;
+			for (int j = y - 1; j >= 0; j--, left--, right++) { // diagonals above the current queen
+				String otherRow = board.get(j);
+				if (left >= 0 && otherRow.charAt(left) == 'Q') return false;
+				if (right < otherRow.length() && otherRow.charAt(right) == 'Q') return false;
+			}
+			left = i - 1;
+			right = i + 1;
+			for (int j = y + 1; j < n; j++, left--, right++) { // diagonals below current queen
+				String otherRow = board.get(j);
+				if (left >= 0 && left < otherRow.length() && otherRow.charAt(left) == 'Q') return false;
+				if (right < otherRow.length() && otherRow.charAt(right) == 'Q') return false;
+			}
+		}
+		return true;
+	}
+	// original solution with no optimizations, 7 - 7.5 second runtime on board size 9
+	private static void solveNQueensSlow(List<List<String>> boards, List<String> board, int x, int y, int n, int placed) {
+		if (validBoard(board)) {
+//			System.out.println("Exploring board: ");
+//			System.out.println(board);
+			if (placed == n && y == n) {
+				// base case: board is complete and correct, add a copy of the correct elements
+				List<String> result = new ArrayList<>(n);
+				for (int i = 0; i < n; i++) result.add(board.get(i));
+				boards.add(result);
+			} else if (y < n) {
+				String rowStr = board.get(y);
+				if (placed < n) {
+					// place a queen at position x
+					// explore with queen in position
+					board.set(y, rowStr + "Q");
+					if (x == n - 1) {
+						// last position in the current row
+//							String newRow = rowStr.substring(0, x) + "Q";
+						solveNQueensSlow(boards, board, 0, y + 1, n, placed + 1);
+					} else {
+//							String newRow = rowStr.substring(0, x) + "Q" + rowStr.substring(x+1);
+						solveNQueensSlow(boards, board, x + 1, y, n, placed + 1);
+					}
+					// remove queen
+					board.set(y, rowStr);
+				}
+				// explore with no queen in position
+				board.set(y, rowStr + ".");
+				if (x == n - 1) {
+					solveNQueensSlow(boards, board, 0, y + 1, n, placed);
+				} else {
+					solveNQueensSlow(boards, board, x + 1, y, n, placed);
+				}
+				// undo exploring
+				board.set(y, rowStr);
+			}
+		}
+	}
+
 
 	// Given a string s, partition s such that every substring of the partition is a palindrome. "aab" returns [["aa","b"], ["a","a","b"]]
 	public static List<List<String>> partitionPalindrome(String s) {
@@ -40,6 +242,9 @@ public class AlgosBacktracing {
 	// Given a set of candidate numbers (C) and a target number (T), find all unique combinations in C where the candidate numbers sums to T.
 	// The same repeated number may be chosen from C unlimited number of times. The solution set must not contain duplicate combinations.
 	// candidates will not contain any duplicates & all numbers (target included) will be positive
+	// O(2^n) time - each number can be included or excluded so total number of combinations is 2^n
+	// O(n) space - for recursion stack and current combination
+	// https://leetcode.com/problems/combination-sum/
 	public static List<List<Integer>> combinationSum(int[] candidates, int target) {
 		List<List<Integer>> result = new ArrayList<>();
 		combinationSum(candidates, target, new ArrayList<>(), result, 0);
@@ -57,6 +262,7 @@ public class AlgosBacktracing {
 			}
 		}
 	}
+	// https://leetcode.com/problems/combination-sum-ii
 	// same as above, but numbers in candidates can only be used once
 	public static List<List<Integer>> combinationSumNoRepeat(int[] candidates, int target) {
 		Arrays.sort(candidates);
@@ -76,10 +282,61 @@ public class AlgosBacktracing {
 			}
 		}
 	}
+	// https://leetcode.com/problems/combination-sum-iii
+	public static List<List<Integer>> combinationSum3(int k, int n) {
+		List<List<Integer>> r = new ArrayList<>();
+		combSum3(r, new ArrayList<>(), 1, k, n);
+		return r;
+	}
+	private static void combSum3(List<List<Integer>> results, List<Integer> cur, int i, int k, int n) {
+		if (cur.size() == k) {
+			if (n == 0) results.add(new ArrayList<>(cur));
+		} else if (i <= 9) {
+			for (; i <= 9; i++) {
+				if (n-i < 0) break;
+				if (cur.size() == k-1 && n-i != 0) continue;
+				cur.add(i);
+				combSum3(results, cur, i+1, k, n-i);
+				cur.remove(cur.size()-1);
+			}
+		}
+	}
+	// https://leetcode.com/problems/combination-sum-iv
+	// permutation-based, not combination. Tricky dp solution - key is realizing comb[target] = sum(comb[target - nums[i]]) for all i
+	public static int combinationSum4(int[] nums, int target) {
+		int[] mem = new int[target+1]; // mem[i] is number of ways to sum to target i
+		mem[0] = 1; // base case; 1 way to sum to a zero target (with single 0)
+		for (int i = 1; i <= target; i++) {
+			for (int n : nums) {
+				if (i - n >= 0) {
+					mem[i] += mem[i - n];
+				}
+			}
+		}
+//		System.out.println(Arrays.toString(mem));
+		return mem[target];
+	}
+	public static int combinationSum4Brute(int[] nums, int target) {
+		sum = 0;
+		combSum4(nums, target);
+		return sum;
+	}
+	private static int sum;
+	private static void combSum4(int[] nums, int t) {
+		if (t == 0) {
+			sum++;
+		} else {
+			for (int i = 0; i < nums.length; i++) {
+				if (t - nums[i] < 0) continue;
+				combSum4(nums, t - nums[i]);
+			}
+		}
+	}
 
+	// https://leetcode.com/problems/permutations/
 	public static List<List<Integer>> permute(int[] nums) {// requires nums to not contain any duplicates
 		List<List<Integer>> result = new ArrayList<>();
-		permute(nums, new ArrayList<Integer>(), result);
+		permute(nums, new ArrayList<>(), result);
 		return result;
 	}
 	private static void permute(int[] nums, List<Integer> data, List<List<Integer>> result) {
@@ -140,13 +397,14 @@ public class AlgosBacktracing {
 		}
 	}
 
+	// https://leetcode.com/problems/subsets/submissions/
 	public static List<List<Integer>> subsets(int[] nums) {// requires nums to not contain any duplicates
 		List<List<Integer>> list = new ArrayList<>();
+		list.add(new ArrayList<>());
 		subsets(list, new ArrayList<>(), nums, 0);
 		return list;
 	}
 	private static void subsets(List<List<Integer>> list, List<Integer> tempList, int[] nums, int start) {
-		System.out.println(start + "\t" + tempList);
 		for (int i = start; i < nums.length; i++) { // only look at the values between start and end
 			tempList.add(nums[i]);
 			list.add(new ArrayList<>(tempList));

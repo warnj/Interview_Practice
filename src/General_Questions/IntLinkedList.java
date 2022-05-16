@@ -89,6 +89,7 @@ public class IntLinkedList {
 	}
 
 	// Returns a comma-separated String representation of this list.
+	@Override
 	public String toString() {
 		if (head == null) {
 			return "[]";
@@ -102,6 +103,23 @@ public class IntLinkedList {
 			result += "]";
 			return result;
 		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (obj.getClass() != this.getClass()) return false;
+		IntLinkedList other = (IntLinkedList) obj;
+		ListNode cur = this.head;
+		ListNode oCur = other.head;
+		if (cur == null) return oCur == null;
+		while (cur != null) {
+			if (oCur == null) return false;
+			if (oCur.val != cur.val) return false;
+			cur = cur.next;
+			oCur = oCur.next;
+		}
+		return true;
 	}
 
 	// Returns the size of this list (inefficient -- could use a size field).
@@ -146,7 +164,7 @@ public class IntLinkedList {
 
 	/*********************** My added Methods ***********************************************************************************/
 
-
+	// null -> 1 -> 2 -> 3   becomes   null <- 1 <- 2 <- 3
 	public void reverse() {
 		ListNode prev = null;
 		ListNode cur = head;
@@ -158,6 +176,34 @@ public class IntLinkedList {
 			cur = next;
 		}
 		head = prev;
+	}
+	// O(n) time and extra space
+	public void reverseStack() {
+		if (head != null && head.next != null) {
+			Stack<ListNode> s = new Stack<>();
+			ListNode cur = head;
+			while (cur.next != null) {
+				s.add(cur);
+				cur = cur.next;
+			}
+			head = cur;
+			while (!s.isEmpty()) {
+				cur.next = s.pop();
+				cur = cur.next;
+			}
+			cur.next = null; // terminate list
+		}
+	}
+	public void reverseRecursive() {
+		head = reverseRecursive(head);
+	}
+	private ListNode reverseRecursive(ListNode head) {
+		if (head == null || head.next == null) return head;
+		ListNode newHead = reverseRecursive(head.next);
+		// head is currently the "previous" node; head.next is "current" node
+		head.next.next = head; // set next node to be the previous node
+		head.next = null; // terminate the list
+		return newHead;
 	}
 
 	// O(n log k) time, O(k) space, where n is the total number of nodes in all lists and k is the number of lists
@@ -242,7 +288,7 @@ public class IntLinkedList {
 		}
 
 		if (p1 != null) p.next = p1;
-		else p.next = p2; // (p2!=null) 
+		else p.next = p2; // p2 may or may not be null
 
 		return new IntLinkedList(head.next);
 	}
@@ -311,6 +357,7 @@ public class IntLinkedList {
 		return last.val;
 	}
 
+	// https://leetcode.com/problems/remove-nth-node-from-end-of-list
 	public ListNode removeNthFromEnd(int n) {
 		ListNode start = new ListNode(0);
 		start.next = head;
@@ -325,6 +372,46 @@ public class IntLinkedList {
 		}
 		last.next = last.next.next;
 		return start.next; // the placeholder for the head of the list
+	}
+	public ListNode removeNthFromEnd2(int n) {
+		ListNode hi = head;
+		while (hi != null && n > 0) {
+			hi = hi.next;
+			n--;
+		}
+		if (n > 0) {
+			return null; // hi == null; error, list not long enough
+		}
+		if (n == 0 && hi == null) {
+			return head.next; // remove front of list
+		}
+		hi = hi.next; // want lo to point to the node before the node to remove
+		ListNode lo = head;
+		while (hi != null) {
+			hi = hi.next;
+			lo = lo.next;
+		}
+		lo.next = lo.next.next; // remove the node
+		return head;
+	}
+
+	// https://leetcode.com/problems/reorder-list/
+	public void reorderList() {
+		while (head != null && head.next != null) {
+			ListNode temp = head.next;
+			head.next = getAndRemoveLast(head);
+			head.next.next = temp;
+			head = temp;
+			System.out.println(this);
+		}
+	}
+	private ListNode getAndRemoveLast(ListNode n) {
+		while (n.next.next != null) {
+			n = n.next;
+		}
+		ListNode last = n.next;
+		n.next = null;
+		return last;
 	}
 
 	// returns null if there is no loop, otherwise returns the int at the point where the loop begins
@@ -575,6 +662,57 @@ public class IntLinkedList {
 		return null;
 	}
 
+	// https://leetcode.com/problems/sort-list/
+	// mergesort
+	public void sortList() {
+		if (this.size() > 1) head = sortList(head);
+	}
+	private ListNode sortList(ListNode head) {
+		if (head == null) return null;
+		if (head.next == null) return head;
+		// partition and recurse
+		ListNode mid = getMid(head);
+//		System.out.println("1st half: " + new IntLinkedList(head));
+//		System.out.println("2nd half: " + new IntLinkedList(mid));
+		ListNode a = sortList(head);
+		ListNode b = sortList(mid);
+		// merge sorted lists
+		return mergeSortedLists(a, b);
+	}
+	// divides given list in half and returns the first node of the second half
+	// second half is either same size as first (even length) or one smaller (odd length)
+	private ListNode getMid(ListNode head) {
+		if (head == null || head.next == null) return head;
+		ListNode slow = head;
+		ListNode fast = head;
+		while (fast.next != null && fast.next.next != null) {
+			fast = fast.next.next;
+			slow = slow.next;
+		}
+		// cut the list in half, return 2nd half
+		ListNode result = slow.next;
+		slow.next = null;
+		return result;
+	}
+	// heapsort - O(nlogn) time and O(n) space
+	public void heapSortList() {
+		if (head == null || this.size() == 1) return;
+//		PriorityQueue<ListNode> heap = new PriorityQueue<>((a,b) -> a.val-b.val);
+		PriorityQueue<ListNode> heap = new PriorityQueue<>(); // ListNode implements comparable
+		ListNode cur = head;
+		while (cur != null) {
+			heap.add(cur); // add all nodes to heap, let the heap handle sorting
+			cur = cur.next;
+		}
+		head = heap.remove(); // put nodes back together in sorted order
+		cur = head;
+		while (!heap.isEmpty()) {
+			cur.next = heap.remove();
+			cur = cur.next;
+		}
+		cur.next = null; // terminate the list
+	}
+
 
 	/*********************** Practice-It Methods **********************************************************************************************/
 
@@ -798,6 +936,16 @@ public class IntLinkedList {
 		@Override
 		public int compareTo(ListNode other) {
 			return this.val - other.val;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder(Integer.toString(val));
+			if (next != null) {
+				sb.append("->");
+				sb.append(next);
+			}
+			return sb.toString();
 		}
 	}
 }

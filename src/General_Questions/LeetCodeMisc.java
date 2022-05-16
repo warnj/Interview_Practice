@@ -4,8 +4,168 @@ import java.util.*;
 
 public class LeetCodeMisc {
 
-	public static void main(String[] args) {
+	// https://leetcode.com/problems/two-city-scheduling
+	// O(n*log(n)) time using sorting - put the ones that have greatest difference between 1st and 2nd cities on the corresponding far ends of the sorted array
+	public static int twoCitySchedCost(int[][] costs) {
+		Arrays.sort(costs, (a,b) -> (b[1]-b[0]) - (a[1]-a[0]));
+		int sum = 0;
+		for (int i = 0; i < costs.length/2; i++) sum += costs[i][0]; // city one is 1st half
+		for (int i = costs.length/2; i < costs.length; i++) sum += costs[i][1]; // city two is 2nd half
+		return sum;
+	}
 
+	// https://leetcode.com/problems/triangle/
+	// O(total # of ints) time, O(size of largest level) space
+	public static int minimumTotal(List<List<Integer>> triangle) {
+		// bottom up dp
+		// dp[i] = min sum from bottom to i-th number in current level
+		int[] dp = new int[triangle.get(triangle.size()-1).size() + 1]; // last val always 0, but j+1 will be valid
+		for (int i = triangle.size()-1; i >= 0; i--) { // levels from bottom to top
+			for (int j = 0; j < triangle.get(i).size(); j++) {
+				dp[j] = triangle.get(i).get(j) + Math.min(dp[j], dp[j+1]);
+			}
+		}
+		return dp[0];
+	}
+	// dfs traversing every path, not efficient since overlapping sub-problems in shared paths are summed multiple times
+	public static int minimumTotalBrute(List<List<Integer>> triangle) {
+		int min = Integer.MAX_VALUE;
+		Stack<Integer> levels = new Stack<>(); // y coord
+		levels.add(0);
+		Stack<Integer> horiz = new Stack<>(); // x coord
+		horiz.add(0);
+		Stack<Integer> sums = new Stack<>(); // sum of the path including current int
+		sums.add(triangle.get(0).get(0));
+		while (!sums.isEmpty()) {
+			int l = levels.pop();
+			int h = horiz.pop();
+			int s = sums.pop();
+
+			if (l == triangle.size()-1) {
+				min = Math.min(min, s);
+			} else {
+				sums.add(s + triangle.get(l+1).get(h));
+				levels.add(l+1);
+				horiz.add(h);
+
+				sums.add(s + triangle.get(l+1).get(h+1));
+				levels.add(l+1);
+				horiz.add(h+1);
+			}
+		}
+		return min;
+	}
+
+	// https://leetcode.com/problems/roman-to-integer/
+	public static int romanToInt(String s) {
+		if (s.isEmpty()) return 0;
+		int result = getValue(s.charAt(0));
+		int prev = result;
+		for (int i = 1; i < s.length(); i++) {
+			int val = getValue(s.charAt(i));
+			if ((val == 5 || val == 10) && prev == 1) {
+				result += val - prev - prev; // val was added in last iteration, must reverse that and add correct val
+			} else if ((val == 50 || val == 100) && prev == 10) {
+				result += val - prev - prev;
+			} else if ((val == 500 || val == 1000) && prev == 100) {
+				result += val - prev - prev;
+			} else {
+				result += val;
+			}
+			prev = val;
+		}
+		return result;
+	}
+	private static int getValue(char c) {
+		if (c == 'I') return 1;
+		if (c == 'V') return 5;
+		if (c == 'X') return 10;
+		if (c == 'L') return 50;
+		if (c == 'C') return 100;
+		if (c == 'D') return 500;
+		return 1000; // if (c == 'M')
+	}
+
+	// https://leetcode.com/problems/unique-paths-ii
+	// O(m*n) time and space
+	public static int uniquePathsWithObstacles(int[][] obstacleGrid) {
+		int y = obstacleGrid.length;
+		int x = obstacleGrid[0].length;
+		int[][] grid = new int[y][x]; // could use obstacleGrid for O(1) space if messing it up is allowed
+		for (int i = 0; i < y; i++) {
+			for (int j = 0; j < x; j++) {
+				if (obstacleGrid[i][j] == 1) {
+					grid[i][j] = 0;
+				} else if (i == 0) {
+					if (j-1 >= 0 && grid[0][j-1] == 0) grid[0][j] = 0; // may be blocked to the left
+					else grid[0][j] = 1;
+				} else if (j == 0) {
+					if (grid[i-1][0] == 0) grid[i][0] = 0; // may be blocked above
+					else grid[i][0] = 1;
+				} else {
+					int up = grid[i - 1][j];
+					int left = grid[i][j - 1];
+					grid[i][j] = up + left;
+				}
+			}
+		}
+		return grid[y - 1][x - 1];
+	}
+
+	// https://leetcode.com/problems/unique-paths/
+	// O(m*n) time and space, bottom-up solution with dp
+	public static int uniquePaths(int m, int n) {
+		int[][] grid = new int[n][m];
+		// filling in recursion base cases first, then iterating down progressively larger grid sizes
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				if (i == 0) grid[0][j] = 1;
+				else if (j == 0) grid[i][0] = 1;
+				else {
+					int up = grid[i - 1][j];
+					int left = grid[i][j - 1];
+					grid[i][j] = up + left;
+				}
+			}
+		}
+		return grid[n - 1][m - 1];
+	}
+	// O(m*n) time and space, top-down solution with memoization
+	static Map<String, Integer> cache; // map coordinate string to unique path count, could also use m x n matrix
+	public static int uniquePathsRecursive(int m, int n) {
+		if (cache == null) cache = new HashMap<>(); // could also use m x n array
+		if (m == 0 || n == 0) return 0;
+		if (m == 1 || n == 1) return 1;
+		// smallest value first in key since 2x3 has same answer as 3x2, key for both is "2,3"
+		// can't use product as key since 2x6 has different answer than 3x4
+		// could cache this solution (m,n) instead of both (m-1,n) and (n-1,m)
+		String keyDown = m-1 < n ? (m-1) + "," + n : n + "," + (m-1);
+		Integer down = cache.get(keyDown);
+		if (down == null) {
+			down = uniquePathsRecursive(m-1, n);
+			cache.put(keyDown, down);
+		}
+		String keyRight = m < n-1 ? m + "," + (n-1) : (n-1) + "," + m;
+		Integer right = cache.get(keyRight);
+		if (right == null) {
+			right = uniquePathsRecursive(m, n-1);
+			cache.put(keyRight, right);
+		}
+		return right + down;
+	}
+	// O(2^(m+n)) time, per leetcode: (branches ^ depth)
+	// O(m+n) space taken on stack since that is the depth (time to go from one corner in board to opposite)
+	public static int uniquePathsSlow(int m, int n) {
+		// each square has 2 future options: right or down
+		// wonder if there is a simple math function O(1) that results in this? take a look at sample inputs
+		// seems like a ripe question for recursion, that may have horrible runtime
+		if (m == 0 || n == 0) {
+			return 0;
+		} else if (m == 1 || n == 1) {
+			return 1;
+		} else {
+			return uniquePathsSlow(m-1, n) + uniquePathsSlow(m, n-1);
+		}
 	}
 
 	// https://leetcode.com/problems/add-digits/
@@ -38,7 +198,21 @@ public class LeetCodeMisc {
 		return false;
 	}
 
+	// https://leetcode.com/problems/excel-sheet-column-number/
+	// title to number
+	public static int titleToNumber(String columnTitle) {
+		int len = columnTitle.length();
+		if (len == 0) return 0;
+		int result = 0;
+		int n = 1;
+		for (int i = len-1; i >= 0; i--, n*=26) {
+			result += n * (columnTitle.charAt(i) - 'A' + 1);
+		}
+		return result;
+	}
+
 	// https://leetcode.com/problems/excel-sheet-column-title/
+	// number to title
 	public static String convertToTitle(int columnNumber) {
 		// converting base 10 number to base 26
 		String result = "";
@@ -70,6 +244,28 @@ public class LeetCodeMisc {
 			prev = cur;
 		}
 		return !increasing; // should be descending at the end
+	}
+
+	// https://leetcode.com/problems/house-robber-ii/
+	// quick and dirty modification of original house robber; try it two different ways: rob 1st & not last OR rob last & not 1st
+	public static int rob2(int[] nums) {
+		int rob = nums[0];
+		int noRob = 0;
+		for (int i = 1; i < nums.length; i++) {
+			int prevRob = rob;
+			if (i != nums.length-1) rob = noRob + nums[i];
+			noRob = Math.max(noRob, prevRob);
+		}
+		int robbingFirst = Math.max(rob, noRob);
+		rob = nums[nums.length-1];
+		noRob = 0;
+		for (int i = nums.length-2; i >= 0; i--) {
+			int prevRob = rob;
+			if (i != 0 ) rob = noRob + nums[i];
+			noRob = Math.max(noRob, prevRob);
+		}
+		int robbingLast = Math.max(rob, noRob);
+		return Math.max(robbingFirst, robbingLast);
 	}
 
 	// https://leetcode.com/problems/house-robber/
@@ -326,92 +522,6 @@ public class LeetCodeMisc {
 		return -1;
 	}
 
-	// Remove all duplicates that occur in the given sorted array, return the length of the new array
-	public static int removeDuplicates(int[] nums) {
-		int i = 0;
-		for (int n : nums) 
-			if (i < 1 || n > nums[i-1])
-				nums[i++] = n;
-		return i;
-	}
-
-	// https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/description/
-	// Remove all duplicates that occur more than twice in the given sorted array.
-	public static int removeMoreThanTwoDuplicates(int[] nums) {
-		int i = 0;
-	    for (int n : nums)
-	        if (i < 2 || n > nums[i-2])
-	            nums[i++] = n;
-	    return i;
-    }
-
-	// return all elements of the matrix in spiral order.
-	// https://leetcode.com/problems/spiral-matrix/description/
-	// [[ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ]] => [1,2,3,6,9,8,7,4,5]
-	public static List<Integer> spiralOrder(int[][] matrix) {
-		List<Integer> result = new ArrayList<>();
-		if (matrix == null || matrix.length == 0 || matrix[0].length == 0) return result;
-		int colStart = 0;
-		int colEnd = matrix[0].length-1;
-		int rowStart = 0;
-		int rowEnd = matrix.length-1;
-		while (rowStart <= rowEnd && colStart <= colEnd) {
-			for (int i = colStart; i <= colEnd; i++) { // across top
-				result.add(matrix[rowStart][i]);
-			}
-			rowStart++;
-			if (!(rowStart <= rowEnd && colStart <= colEnd)) break;
-			for (int i = rowStart; i <= rowEnd; i++) { // down right
-				result.add(matrix[i][colEnd]);
-			}
-			colEnd--;
-			if (!(rowStart <= rowEnd && colStart <= colEnd)) break;
-			for (int i = colEnd; i >= colStart; i--) { // across bottom
-				result.add(matrix[rowEnd][i]);
-			}
-			rowEnd--;
-			if (!(rowStart <= rowEnd && colStart <= colEnd)) break;
-			for (int i = rowEnd; i >= rowStart; i--) { // up left
-				result.add(matrix[i][colStart]);
-			}
-			colStart++;
-		}
-		return result;
-	}
-
-	// Given a 2D board and a word, find if the word exists in the grid. The word can be constructed from letters of sequentially adjacent cell, 
-	// where "adjacent" cells are those horizontally or vertically neighboring. The same letter cell may not be used more than once.
-	// https://leetcode.com/problems/word-search
-	public static boolean exist(char[][] board, String word) {
-		if (board.length == 0 || board[0].length == 0) return false;
-		if (word.isEmpty()) return true;
-		int height = board.length, width = board[0].length;
-		boolean[][] visited = new boolean[height][width];
-
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				if (board[y][x] == word.charAt(0) && search(y, x, board, word, 0, visited)) { // found first letter
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	private static boolean search (int y, int x, char[][] board, String word, int index, boolean[][] visited) {
-		if (y >= 0 && y < board.length && x >= 0 && x < board[0].length && board[y][x] == word.charAt(index) && !visited[y][x]) {
-			if (index+1 == word.length()) return true; // found path to the end
-			visited[y][x] = true;
-			if (search(y, x+1, board, word, index+1, visited) || // continue searching
-					search(y, x-1, board, word, index+1, visited) ||
-					search(y+1, x, board, word, index+1, visited) ||
-					search(y-1, x, board, word, index+1, visited)) {
-				return true;
-			}
-			visited[y][x] = false;
-		}
-		return false;
-	}
-
 	// https://leetcode.com/problems/maximum-product-subarray/discuss/
 	// Find the contiguous subarray within an array (containing at least one number) which has the largest product.
 	public static int maxProduct(int[] nums) { // ingenious O(n) time
@@ -448,7 +558,7 @@ public class LeetCodeMisc {
 		return prod;
 	}
 
-	// https://leetcode.com/problems/generate-parentheses/discuss/
+	// https://leetcode.com/problems/generate-parentheses
 	// n = 2 => [()(), (())]
 	// n = 3 => [((())), (()()), (())(), ()(()), ()()()]
 	public static List<String> generateParenthesis(int n) {
@@ -592,7 +702,7 @@ public class LeetCodeMisc {
 
 	// n = strs.length, m = avg length of string in strs. Generally m << n.  Runtime = O(n * m * log(m))  Space = O(n * m)
 	// https://leetcode.com/problems/group-anagrams/description/
-	public static List<List<String>> groupAnagrams(String[] strs) {
+	public static List<List<String>> groupAnagramsSort(String[] strs) {
 		Map<String, List<String>> map = new HashMap<>();
 		for (String s : strs) {
 			String sSorted = sortString(s);
@@ -608,26 +718,57 @@ public class LeetCodeMisc {
 		Arrays.sort(c);
 		return String.valueOf(c);
 	}
-	// INEFFICIENT BRUTE FORCE SOLUTION:
-	//  Runtime = O(n * n), Space = O(n * m)
-	//	public static List<List<String>> groupAnagrams(String[] strs) {
-	//		List<List<String>> result = new ArrayList<>();
-	//		for (String s : strs) {
-	//			boolean found = false;
-	//			for (List<String> anagrams : result) {
-	//				if (CCI_Random_Practice.isAnagramBetterVersion(s, anagrams.get(0))) {
-	//					found = true;
-	//					anagrams.add(s);
-	//				}
-	//			}
-	//			if (!found) {
-	//				List<String> newAnagram = new ArrayList<>();
-	//				newAnagram.add(s);
-	//				result.add(newAnagram);
-	//			}
-	//		}
-	//		return result;
-	//    } 
+	// improved version using counts instead of sorting, use hashcode instead of comparing count arrays, not 100%
+	// accurate since hashcode may collide with other non-equal arrays.
+	// O(n(w + 26)) = O(n*w) time, O(n) extra space for counts
+	public static List<List<String>> groupAnagrams(String[] strs) {
+		Map<Integer, List<String>> m = new HashMap<>(); // hashcode of char count array -> list of words
+		for (String word : strs){
+			int hash = Arrays.hashCode(getCounts(word));
+			List<String> anagrams = m.get(hash);
+			if (anagrams == null) {
+				anagrams = new ArrayList<>();
+				m.put(hash, anagrams);
+			}
+			anagrams.add(word);
+		}
+		return new ArrayList<>(m.values());
+	}
+	// slow version, barely passes
+	// O(n*w + n^2) time where n is len(strs) and w is total number of chars in strs
+	// O(n) space (since input limited to lowercase letters)
+	public static List<List<String>> groupAnagramsSlow(String[] strs) {
+		Map<String,int[]> m = new HashMap<>(); // map strings to letter counts
+		for (String s : strs) {
+			m.put(s, getCounts(s));
+		}
+		List<List<String>> result = new ArrayList<>();
+		boolean[] visited = new boolean[strs.length];
+		for (int i = 0; i < strs.length; i++) {
+			if (visited[i]) continue;
+			visited[i] = true;
+			List<String> anagrams = new ArrayList<>();
+			anagrams.add(strs[i]);
+			// technically O(n^2) even though we flag to never re-check once it's been looked at, better if we could do O(1) remove
+			for (int j = i+1; j < strs.length; j++) {
+				if (!visited[j] && Arrays.equals(m.get(strs[i]), m.get(strs[j]))) {
+					// anagrams
+					anagrams.add(strs[j]);
+					visited[j] = true;
+				}
+			}
+			result.add(anagrams);
+		}
+		return result;
+	}
+	private static int[] getCounts(String s) {
+		int[] counts = new int[26];
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			counts[c-'a']++;
+		}
+		return counts;
+	}
 
 
 

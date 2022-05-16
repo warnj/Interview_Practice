@@ -2,12 +2,88 @@ package Tests;
 
 import General_Questions.StringQuestions;
 import org.junit.Test;
-
 import java.util.Arrays;
-
 import static org.junit.Assert.*;
 
 public class StringQuestionsTests {
+
+	@Test
+	public void testFrequencySort() {
+		assertEquals("BBBAA", StringQuestions.frequencySort("ABABB"));
+		assertEquals("aaaabbbAA", StringQuestions.frequencySort("AAaaaabbb"));
+		assertEquals(".../", StringQuestions.frequencySort(".../"));
+		assertEquals("yyy11z", StringQuestions.frequencySort("1zyy1y"));
+		assertEquals("eeeeoollvtdc", StringQuestions.frequencySort("loveleetcode"));
+	}
+
+	@Test
+	public void testCharacterReplacement() {
+		assertEquals(4, StringQuestions.characterReplacement("ABAB", 2));
+		assertEquals(4, StringQuestions.characterReplacement("AABABBA", 1));
+		assertEquals(2, StringQuestions.characterReplacement("ABAA", 0));
+	}
+
+	@Test
+	public void testCountSubstrings() {
+		assertEquals(6, StringQuestions.countSubstrings("aaa"));
+		assertEquals(3, StringQuestions.countSubstrings("abc"));
+	}
+
+	@Test
+	public void testNumDecodings() {
+		assertEquals(3, StringQuestions.numDecodings("226"));
+		assertEquals(4, StringQuestions.numDecodings("2626"));
+		assertEquals(5, StringQuestions.numDecodings("2126"));
+		assertEquals(2, StringQuestions.numDecodings("12"));
+		assertEquals(0, StringQuestions.numDecodings("06"));
+		assertEquals(0, StringQuestions.numDecodings("60"));
+		assertEquals(1, StringQuestions.numDecodings("1010"));
+		assertEquals(2, StringQuestions.numDecodings("11106"));
+	}
+
+	@Test
+	public void testVersionStrings() {
+		assertEquals(0, StringQuestions.compareVersion("1.001", "1.01"));
+		assertEquals(0, StringQuestions.compareVersion("1.0", "1.0.0"));
+		assertEquals(-1, StringQuestions.compareVersion(".1", "1.1"));
+	}
+
+	@Test
+	public void testLongestSubstring() {
+		assertEquals(3, StringQuestions.longestSubstring("aaabb", 3));
+		assertEquals(5, StringQuestions.longestSubstring("ababbc", 2));
+		assertEquals(7, StringQuestions.longestSubstring("acbabbc", 2));
+		assertEquals(0, StringQuestions.longestSubstring("abcdefgh", 2));
+		assertEquals(0, StringQuestions.longestSubstring("ababacb", 3));
+		assertEquals(1, StringQuestions.longestSubstring("a", 1));
+		assertEquals(2, StringQuestions.longestSubstring("aa", 2));
+		assertEquals(3, StringQuestions.longestSubstring("bbaaacbd", 3));
+	}
+
+	// brute force n^k solution: k nested loops trying to each remove a number and saving the min
+	@Test
+	public void testRemoveKDigits() {
+		// want the smallest numbers at the front of resulting string
+		//  - so large numbers near end can stay there
+		//  - what if k is always 1, can we do it recursively?
+		assertEquals("1219", StringQuestions.removeKdigits("1432219", 3));
+		assertEquals("4193", StringQuestions.removeKdigits("8467193", 3)); // 1st remove 8, then 7, then 6.
+		// choose 7 over 9 because 9 isn't the next digit to the right, there is a smaller digit between them on right side of 7
+		// digit to remove can be chosen as the first digit that occurs with a smaller digit on it's right
+		assertEquals("123", StringQuestions.removeKdigits("123456", 3));
+		assertEquals("321", StringQuestions.removeKdigits("654321", 3));
+		assertEquals("11", StringQuestions.removeKdigits("112", 1));
+		// ^ remove largest k digits
+		assertEquals("200", StringQuestions.removeKdigits("10200", 1));
+		assertEquals("99", StringQuestions.removeKdigits("11099", 2));
+		assertEquals("9", StringQuestions.removeKdigits("10099", 2));
+		assertEquals("1034", StringQuestions.removeKdigits("12034", 1));
+		// ^ if there is a zero in first k+1 digits, it counts as a "* 10" so will always be the choice to remove, remove the digits before 1st 0
+		assertEquals("0", StringQuestions.removeKdigits("10", 2));
+		assertEquals("0", StringQuestions.removeKdigits("10", 1));
+		assertEquals("0", StringQuestions.removeKdigits("0", 1));
+		// ^ base case = "0"
+	}
 
 	@Test
 	public void testFindTheDifference() {

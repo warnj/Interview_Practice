@@ -7,29 +7,29 @@ public class Algos {
 	
 	}
 
-
-	// Write a function to compute the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1
-	// coins = [1, 2, 5], amount = 11	return 3 (11 = 5 + 5 + 1)
-	// coins = [2], amount = 3	return -1
+	// https://leetcode.com/problems/coin-change/
 	// O(n*c) runtime, O(n) space, where n = value of amount and c = # of coins
 	// to find exactly which coins to use - could keep backpointers in the table that tell which coin added at each step, then traverse back
 	public static int coinChange(int[] coins, int amount) {
 		if (amount == 0) return 0;
 		Arrays.sort(coins);
-		int[] table = new int[amount]; // index 0 = # coins for change w/ amount = 1, index 4 = # coins for change w/ amount = 5
-		for (int i = 0; i < table.length; i++) { // go over all possible coin values up to amount
+		int[] counts = new int[amount]; // counts[i] = # of coins to sum to amount i+1
+		for (int i = 0; i < counts.length; i++) {
+			// find the least number of coins to sum to amounts i+1 from 1 to amount
 			int min = Integer.MAX_VALUE;
-			for (int j = 0; j < coins.length; j++) { // go through the possible coins
-				if (i+1 == coins[j]) {
+			for (int j = 0; j < coins.length; j++) {
+				if (coins[j] == i+1) {
 					min = 1; // no way to do better than a single coin
-				} else if (i - coins[j] >= 0 && table[i-coins[j]] != 0) { // there is a way to sum to this value
-					min = Math.min(min, table[i-coins[j]] + 1); // check how many coins it took to get to the previous value without coins[j], then add 1
+					break;
+				} else {
+					int prevAmountIndex = i - coins[j];
+					if (prevAmountIndex >= 0 && counts[prevAmountIndex] > 0) // there is a way to sum to this value
+						min = Math.min(min, counts[prevAmountIndex] + 1);
 				}
 			}
-			if (min != Integer.MAX_VALUE) table[i] = min;
+			if (min != Integer.MAX_VALUE) counts[i] = min; // leave amounts with no way to sum to with value 0
 		}
-		//		System.out.println(Arrays.toString(table));
-		return table[amount-1] == 0 ? -1 : table[amount-1]; // the illegal values will have the initial value of 0, return -1 in this case
+		return counts[amount-1] == 0 ? -1 : counts[amount-1];
 	}
 
 	// Given an array of integers sorted in ascending order, find the starting and ending position of a given target value in O(lg(n))
@@ -44,54 +44,6 @@ public class Algos {
 			if (nums[nums.length - 1] != target) high--;
 			return new int[] {low, high};
 		}
-	}
-
-	// Given a phone number digit string, return all possible letter combinations that the number could represent.
-	public static List<String> letterCombinationsBacktracing(String digits) {
-		Map<Character, String> phoneLetters = new HashMap<>();
-		phoneLetters.put('2', "abc");
-		phoneLetters.put('3', "def");
-		phoneLetters.put('4', "ghi");
-		phoneLetters.put('5', "jkl");
-		phoneLetters.put('6', "mno");
-		phoneLetters.put('7', "pqrs");
-		phoneLetters.put('8', "tuv");
-		phoneLetters.put('9', "wxyz");
-
-		List<String> result = new ArrayList<>();
-		if (digits.isEmpty()) return result;
-		List<String> letters = new ArrayList<>();
-		for(int i = 0; i < digits.length(); i++) {
-			letters.add(phoneLetters.get(digits.charAt(i)));
-		}
-		// now find all combinations from the list of lists
-		letterCombinationsBacktracing(letters, result, "", 0, digits.length());
-		return result;
-	}
-	private static void letterCombinationsBacktracing(List<String> combs, List<String> result, String data, int index, int length) {
-		if (data.length() == length) {
-			result.add(data);
-		} else {
-			String s = combs.get(index);
-			for (int i = 0; i < s.length(); i++) {
-				letterCombinationsBacktracing(combs, result, data + s.charAt(i), index + 1, length);
-			}
-		}
-	}
-	// iterative method to solve the same problem as above
-	public static List<String> letterCombinations(String digits) {
-		LinkedList<String> ans = new LinkedList<String>();
-		String[] mapping = new String[] {"0", "1", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
-		ans.add("");
-		for(int i = 0; i<digits.length();i++){ // iterate over digits
-			int x = Character.getNumericValue(digits.charAt(i));
-			while(ans.peek().length()==i){ // while the strings in ans are shorter than digits.length, add a character to them
-				String t = ans.remove(); // remove the short string
-				for(char s : mapping[x].toCharArray())
-					ans.add(t+s); // add all combinations of the short string + each letter that corresponds to digits[x]
-			}
-		}
-		return ans;
 	}
 
 	// returns the int obtained by reversing the digits of x. Returns 0 when the reversed integer overflows.

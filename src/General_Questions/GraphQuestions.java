@@ -4,6 +4,94 @@ import java.util.*;
 
 public class GraphQuestions {
 
+    // https://leetcode.com/problems/clone-graph/
+    // easy way out: double pass - 1st create all new nodes, then create the connections between them
+    // O(V+E) time and O(2V) extra space for Map and bool[] (beyond the V+E required by definition for deep clone)
+    public static Node cloneGraphTwoPass(Node node) {
+        if (node == null) return null;
+        // take advantage of fact nodes have different increasing vals, create and save all the new nodes in a map
+        Map<Integer,Node> newNodes = new HashMap<>(); // val -> newNode
+        Stack<Node> workList = new Stack<>();
+        workList.add(node);
+        while (!workList.isEmpty()) {
+            Node oldNode = workList.pop();
+            newNodes.put(oldNode.val, new Node(oldNode.val));
+            for (Node n : oldNode.neighbors) {
+                if (!newNodes.containsKey(n.val)) {
+                    workList.add(n);
+                }
+            }
+        }
+        // take advantage that graph is connected and we have O(1) access to newNodes to put them together
+        workList.add(node);
+        boolean[] visited = new boolean[newNodes.size()]; // keep track of what we've visited in the old graph
+        visited[node.val-1] = true;
+        while (!workList.isEmpty()) {
+            Node oldNode = workList.pop();
+            for (Node n : oldNode.neighbors) {
+                Node newNode = newNodes.get(oldNode.val);
+                newNode.neighbors.add(newNodes.get(n.val));
+                if (!visited[n.val-1]) {
+                    visited[n.val-1] = true; // only go through the nodes once
+                    workList.add(n);
+                }
+            }
+        }
+        return newNodes.get(node.val);
+    }
+    // clone in a single pass BFS
+    public static Node cloneGraphBFS(Node node) {
+        if (node == null) return null;
+        Node newNode = new Node(node.val);
+        HashMap<Integer, Node> newNodes = new HashMap<>(); // val -> newNode
+        newNodes.put(newNode.val, newNode);
+        LinkedList<Node> workList = new LinkedList<>(); // original nodes
+        workList.add(node);
+        while (!workList.isEmpty()) {
+            Node oldNode = workList.pop();
+            for (Node neighbor : oldNode.neighbors) {
+                if (!newNodes.containsKey(neighbor.val)) { // create new Node and add to queue if not seen before
+                    newNodes.put(neighbor.val, new Node(neighbor.val));
+                    workList.add(neighbor);
+                }
+                newNodes.get(oldNode.val).neighbors.add(newNodes.get(neighbor.val)); // add neighbor to new node
+            }
+        }
+        return newNode;
+    }
+    // clone in a single pass DFS
+    private static HashMap<Node, Node> map = new HashMap<>(); // old node -> new node
+    public static Node cloneGraph(Node node) {
+        if (node == null) return null;
+        if (map.containsKey(node)) return map.get(node); // iterating over old nodes, returning new nodes
+        Node newNode = new Node(node.val);
+        map.put(node, newNode);
+        for (Node val : node.neighbors) {
+            newNode.neighbors.add(cloneGraph(val));
+        }
+        return newNode;
+    }
+    public static class Node {
+        public int val;
+        public List<Node> neighbors;
+        public Node() {
+            val = 0;
+            neighbors = new ArrayList<>();
+        }
+        public Node(int _val) {
+            val = _val;
+            neighbors = new ArrayList<>();
+        }
+        public Node(int _val, ArrayList<Node> _neighbors) {
+            val = _val;
+            neighbors = _neighbors;
+        }
+        public String toString() {
+//            return String.format("%d -> %s", val, neighbors.toString());
+            return ""+val;
+        }
+    }
+
     // https://leetcode.com/problems/minimum-height-trees/
     // This is a tree, so if V = n, then E = n-1
     // best memory representation, instead of a bool[][] with wasted space, used List<HashSet<Bool>>
@@ -159,6 +247,57 @@ public class GraphQuestions {
         return maxChild;
     }
 
+
+    // https://leetcode.com/problems/course-schedule-ii/
+    public static int[] findOrder(int numCourses, int[][] prerequisites) {
+        int[] result = new int[numCourses];
+        Map<Integer, List<Integer>> graph = new HashMap<>(); // map prerequisite classes to subsequent classes
+        Map<Integer, Integer> inDegree = new HashMap<>(); // map courses to number of prerequisites they have
+        for (int[] edge : prerequisites) {
+            int prereq = edge[1];
+            int course = edge[0];
+            inDegree.merge(course, 1, Integer::sum);
+            List<Integer> connections = graph.get(prereq);
+            if (connections == null) {
+                connections = new ArrayList<>();
+                connections.add(course);
+                graph.put(prereq, connections);
+            } else {
+                connections.add(course);
+            }
+        }
+        // traverse graph, starting from root nodes, remove them making more roots
+        // when working from root nodes, entire graph should be traversable (topological sort) with no cycles present
+        Queue<Integer> roots = new LinkedList<>();
+        for (Integer n : graph.keySet()) {
+            if (inDegree.get(n) == null) roots.add(n);
+        }
+        // add the courses that may not have prereqs or be prereqs since they won't be anywhere in graph
+        for (int i = 0; i < numCourses; i++) {
+            if (!graph.containsKey(i) && !inDegree.containsKey(i)) roots.add(i);
+        }
+
+        int visits = 0;
+        while (!roots.isEmpty()) {
+            Integer root = roots.remove();
+            result[visits++] = root;
+
+            List<Integer> laterCourses = graph.get(root);
+            if (laterCourses == null) continue; // finished the class sequence
+            for (Integer course : laterCourses) {
+                Integer prereqs = inDegree.get(course);
+                if (prereqs == 1) { // never null since this class had at least one prerequisite
+                    // the one prerequisite for course has been satisfied, now add to roots so we can take it
+                    inDegree.remove(course);
+                    roots.add(course);
+                } else {
+                    inDegree.put(course, prereqs - 1);
+                }
+            }
+        }
+        if (visits == numCourses) return result;
+        else return new int[0];
+    }
 
     // https://leetcode.com/problems/course-schedule
     // detect cycle in directed graph - use topological sort, Runtime = O(V+E), space = O(V+E)

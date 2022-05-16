@@ -5,7 +5,440 @@ import java.util.*;
 public class StringQuestions {
 
 	public static void main(String[] args) {
-//		wordBreak("leetcode", Arrays.asList("leet", "code"));
+		System.out.println();
+	}
+
+	// https://leetcode.com/problems/reorganize-string
+	// technically O(n) runtime, but have to go through all 26 options to find max with each character in s
+	public static String reorganizeString(String s) {
+		int[] buckets = new int[26];
+		for (int i = 0; i < s.length(); i++) {
+			buckets[s.charAt(i)-'a']++;
+		}
+		StringBuilder sb = new StringBuilder(s.length());
+		int prev = -1;
+		while (sb.length() < s.length()) {
+			// find max that isn't the same as the previous
+			int max = -1;
+			int maxVal = -1;
+			for (int j = 0; j < 26; j++) {
+				if (j == prev) continue;
+				if (buckets[j] > maxVal) {
+					max = j;
+					maxVal = buckets[j];
+				}
+			}
+			if (buckets[max] == 0) return "";
+			prev = max;
+			buckets[max]--;
+			sb.append((char)(max+'a'));
+		}
+		return sb.toString();
+	}
+
+	// very similar to: https://leetcode.com/problems/decode-ways
+	// getRepresentations("123") -> [MD, BX, BCD]
+	public static List<String> getRepresentations(String s) {
+		List<String> result = new ArrayList<>();
+		if (s == null) return result;
+		getRepresentations(result, s, 0, new StringBuilder());
+		return result;
+	}
+	private static void getRepresentations(List<String> result, String s, int n, StringBuilder sb) {
+		if (n < s.length()) {
+			char c = s.charAt(n);
+			// if number 2 digits, explore that case
+			if ((c == '1' || c == '2') && n < s.length()-1) {
+				StringBuilder newSb = new StringBuilder(sb);
+				int temp = Integer.parseInt(s.substring(n, n+2));
+				newSb.append((char)(temp+'A'));
+				getRepresentations(result, s, n+2, newSb);
+			}
+			// todo: check if non-number
+			sb.append((char)(c-'0'+'A')); // 0->A, 1->B ... 25->Z
+			// explore single digit case
+			getRepresentations(result, s, n+1, sb);
+		} else {
+			result.add(sb.toString());
+		}
+	}
+
+	public boolean isIsomorphic(String s, String t) {
+		// note: maps could be int[26] since lowercase chars
+		if (s == null || t == null || s.length() != t.length()) return false;
+		Map<Character,Integer> sCounts = getCounts(s);
+		Map<Character,Integer> tCounts = getCounts(t);
+		Map<Character,Character> map = new HashMap<>();
+
+		for (int i = 0; i < s.length(); i++) {
+			if (map.containsKey(s.charAt(i))) {
+				char expected = map.get(s.charAt(i));
+				if (expected != t.charAt(i)) return false;
+			} else {
+				int sCount = sCounts.get(s.charAt(i));
+				int tCount = tCounts.get(t.charAt(i));
+				if (sCount != tCount) return false;
+				map.put(s.charAt(i), t.charAt(i));
+			}
+		}
+		return true;
+	}
+
+	public String addBinary(String a, String b) {
+		int i = a.length()-1;
+		int j = b.length()-1;
+		String result = "";
+		boolean carry = false;
+		while (i >= 0 && j >= 0) {
+			if (a.charAt(i) == '1' && b.charAt(j) == '1') {
+				if (carry) {
+					result = "1" + result;
+				} else {
+					result = "0" + result;
+					carry = true;
+				}
+			} else if (a.charAt(i) == '0' && b.charAt(j) == '0') {
+				if (carry) result = "1" + result;
+				else result = "0" + result;
+				carry = false;
+			} else { // a 1 and a 0
+				if (carry) {
+					result = "0" + result;
+					// leave carry true
+				} else {
+					result = "1" + result;
+					// leave carry false
+				}
+			}
+			i--;
+			j--;
+		}
+		while (i >= 0) {
+			if (a.charAt(i) == '1') {
+				if (carry) {
+					result = "0" + result;
+				} else {
+					result = "1" + result;
+				}
+			} else {
+				if (carry) {
+					result = "1" + result;
+					carry = false;
+				} else {
+					result = "0" + result;
+				}
+			}
+			i--;
+		}
+		while (j >= 0) {
+			if (b.charAt(j) == '1') {
+				if (carry) {
+					result = "0" + result;
+				} else {
+					result = "1" + result;
+				}
+			} else {
+				if (carry) {
+					result = "1" + result;
+					carry = false;
+				} else {
+					result = "0" + result;
+				}
+			}
+			j--;
+		}
+		if (carry) result = "1" + result;
+		return result;
+	}
+
+	public static String frequencySort(String s) {
+		if (s == null) return null;
+		Map<Character,Integer> counts = getCounts(s);
+		// need Character, not char for comparator, can't use s.toCharArray() and then return new String(chararray)
+		Character[] charObj = new Character[s.length()];
+		for (int i = 0; i < s.length(); i++) {
+			charObj[i] = s.charAt(i);
+		}
+		// keep same chars together if they have same counts
+		Arrays.sort(charObj, (a,b) -> counts.get(b) != counts.get(a) ? counts.get(b) - counts.get(a) : b-a);
+		StringBuilder sb = new StringBuilder();
+		for (Character c : charObj) sb.append(c);
+		return sb.toString();
+	}
+	private static Map<Character,Integer> getCounts(String s) {
+		Map<Character,Integer> m = new HashMap<>();
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			m.put(c, 1 + m.getOrDefault(c, 0));
+		}
+		return m;
+	}
+
+	// https://leetcode.com/problems/longest-repeating-character-replacement/
+	// O(n) time and O(1) space
+	public static int characterReplacement(String s, int k) {
+		int n = s.length();
+		if (k-1 >= n) return n;
+		int result = k+1;
+		// sliding window
+		int lo = 0;
+		int hi = k+1; // look at substrings of len k+2 and greater
+		int[] counts = new int[26];
+		for (int i = lo; i <= hi; i++) { // initialize counts
+			counts[s.charAt(i) - 'A']++;
+		}
+		while (hi < n) {
+			int max = getMax(counts);
+			int len = hi-lo+1;
+			if (max + k >= len) {
+				// could be a valid replacement
+				result = Math.max(len, result);
+				hi++;
+				if (hi < n) counts[s.charAt(hi)-'A']++; // add the new count
+			} else {
+				counts[s.charAt(lo)-'A']--; // remove the old count
+				lo++;
+			}
+		}
+		return result;
+	}
+	private static int getMax(int[] a) {
+		int m = a[0];
+		for (int i = 1; i < a.length; i++) {
+			if (a[i] > m) m = a[i];
+		}
+		return m;
+	}
+	// same as below brute but optimized to O(n^2) by reducing duplicate calculations
+	public static int characterReplacementSlow(String s, int k) {
+		if (k >= s.length()) return s.length();
+		int n = s.length();
+		int result = k+1; // single char is always present in the string, so k+1 is guaranteed to be possible
+		int[] counts = new int[26];
+		// look at substrings of len k+2 and greater
+		for (int i = 0; i < n-k-1; i++) { // starting points
+			int max = 1;
+			for (int j = i; j < i+k+1; j++) {
+				if (++counts[s.charAt(j) - 'A'] > max) max = counts[s.charAt(j) - 'A'];
+			}
+			for (int j = i+k+1; j < n; j++) { // ending points inclusive
+				// largest count of a single char >= j-i
+				if (++counts[s.charAt(j) - 'A'] > max) max = counts[s.charAt(j) - 'A'];
+				int len = j-i+1;
+				if (max + k >= len) {
+					// could be a valid replacement
+					result = Math.max(len, result);
+				}
+			}
+			Arrays.fill(counts, 0);
+		}
+		return result;
+	}
+	// brute force O(n^3) time, O(1) space
+	public static int characterReplacementBrute(String s, int k) {
+		if (k >= s.length()) return s.length();
+		int n = s.length();
+		int result = k+1; // single char is always present in the string, so k+1 is guaranteed to be possible
+		int[] counts = new int[26];
+		// look at substrings of len k+2 and greater
+		for (int i = 0; i < n-k-1; i++) { // starting points
+			for (int j = i+k+1; j < n; j++) { // ending points inclusive
+				// largest count of a single char >= j-i
+				int mostRepeated = getMostRepeated(s, i, j, counts);
+				int len = j-i+1;
+				if (mostRepeated + k >= len) {
+					// could be a valid replacement
+					result = Math.max(len, result);
+				}
+			}
+		}
+		return result;
+	}
+	private static int getMostRepeated(String s, int lo, int hi, int[] counts) {
+		Arrays.fill(counts, 0);
+		int max = 1;
+		for (int i = lo; i <= hi; i++) {
+			if (++counts[s.charAt(i) - 'A'] > max) max = counts[s.charAt(i) - 'A'];
+		}
+		return max;
+	}
+
+	// https://leetcode.com/problems/palindromic-substrings/
+	// O(n^2) time, O(1) extra space
+	public static int countSubstrings(String s) {
+		int count = 0;
+		for (int i = 0; i < s.length(); i++) { // all palindrome middle points
+			count += palindromeCount(s, i, i); // odd length palindromes
+			count += palindromeCount(s, i, i+1); // even length palindromes
+		}
+		return count;
+	}
+	private static int palindromeCount(String s, int lo, int hi) {
+		int count = 0;
+		while (lo >= 0 && hi < s.length() && s.charAt(lo--) == s.charAt(hi++)) count++;
+		return count;
+	}
+	// O(n^3) time, O(1) extra space
+	public static int countSubstringsBrute(String s) {
+		char[] c = s.toCharArray();
+		int count = 0;
+		for (int i = 0; i < s.length(); i++) { // all starting points
+			for (int j = i; j < s.length(); j++) { // all ending points
+				if (isPalindrome(c, i, j)) count++;
+			}
+		}
+		return count;
+	}
+	private static boolean isPalindrome(char[] c, int lo, int hi) {
+		while (lo <= hi) {
+			if (c[lo] != c[hi]) return false;
+			lo++;
+			hi--;
+		}
+		return true;
+	}
+
+	// https://leetcode.com/problems/decode-ways/
+	// https://leetcode.com/problems/decode-ways/discuss/30451/Evolve-from-recursion-to-dp
+	// O(n) time and space with memoization, O(2^n) without! Can convert to dp solution.
+	public static int numDecodings(String s) {
+		Integer[] mem = new Integer[s.length()];
+		return numDecodings(s, 0, mem);
+	}
+	private static int numDecodings(String s, int p, Integer[] mem) {
+		int n = s.length();
+		if (p == n) return 1; // at the end, add a valid way to decode
+		if (s.charAt(p) == '0') return 0; // not a valid way to decode s, exit with no additional way
+		if (mem[p] != null) return mem[p];
+		int res = numDecodings(s, p+1, mem); // single letter ways to decode
+		if (p < n-1 && (s.charAt(p) == '1' || s.charAt(p) == '2' && s.charAt(p+1) < '7')) // can group pair and decode
+			res += numDecodings(s, p+2, mem); // add ways to decode after pairing
+		mem[p] = res;
+		return res;
+	}
+
+	// https://leetcode.com/problems/compare-version-numbers/
+	public static int compareVersion(String v1, String v2) {
+		String[] revs1 = v1.split("\\.");
+		String[] revs2 = v2.split("\\.");
+		int minLen = Math.min(revs1.length, revs2.length);
+		for (int i = 0; i < minLen; i++) {
+			if (!revs1[i].isEmpty() && !revs2[i].isEmpty()) {
+				int r1 = Integer.parseInt(revs1[i]);
+				int r2 = Integer.parseInt(revs2[i]);
+				if (r1 > r2) return 1;
+				if (r2 > r1) return -1;
+			} else if (revs1[i].isEmpty()) {
+				int r2 = Integer.parseInt(revs2[i]);
+				if (r2 != 0) return -1;
+			} else if (revs2[i].isEmpty()) {
+				int r1 = Integer.parseInt(revs1[i]);
+				if (r1 != 0) return 1;
+			}
+		}
+		// verify remaining revisions are 0
+		int maxLen = Math.max(revs1.length, revs2.length);
+		for (int i = minLen; i < maxLen; i++) {
+			String rev = revs1.length > revs2.length ? revs1[i] : revs2[i];
+			if (rev.isEmpty()) continue;
+			int r = Integer.parseInt(rev);
+			if (r != 0) return revs1.length > revs2.length ? 1 : -1;
+		}
+		return 0;
+	}
+
+	// https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/
+	// keep in mind: chars are perfect for bucket sort. There is a sliding window solution with better runtime
+	// O(n*(n+k)) time, O(1) space - maintain sum as each possible substring changes, find min count is constant since 26 letters max
+	public static int longestSubstring(String s, int k) {
+		if (k > s.length()) return 0;
+		int result = 0;
+		int[] counts = new int[26];
+		for (int z = 0; z < k-1; z++) {
+			counts[s.charAt(z)-'a']++;
+		}
+		for (int i = 0; i <= s.length()-k; i++) {
+			for (int j = i+k; j <= s.length(); j++) {
+				counts[s.charAt(j-1)-'a']++;
+//				System.out.printf("Considering substring of length %d from [%d,%d)\n", j-i, i, j);
+//				System.out.println("Substring: " + s.substring(i, j));
+//				for (int z = 0; z < 26; z++)
+//					if (counts[z] > 0) System.out.println(Character.toString(z+'a') + " count: " + counts[z]);
+				if (j-i <= result) continue;
+				int min = Integer.MAX_VALUE;
+				for (int z = 0; z < 26; z++)
+					if (counts[z] > 0) min = Math.min(min, counts[z]);
+//				System.out.printf("Min count found was %d, result is already %d\n", min, result);
+				if (min >= k) result = Math.max(result, j-i);
+			}
+			if (i < s.length()-k) { // reset counts for next starting location
+				counts = new int[26];
+				for (int z = i+1; z < i+k; z++) {
+					counts[s.charAt(z) - 'a']++;
+				}
+			}
+		}
+		return result;
+	}
+	// O(n^3) time, O(1) space - re-sum the substring between every start and end
+	public static int longestSubstringBrute(String s, int k) {
+		int result = 0;
+		for (int i = 0; i <= s.length()-k; i++) { // starting points
+			for (int j = i+k; j <= s.length(); j++) { // ending points (exclusive)
+				if (j-i <= result) continue; // if a long substring has already been found no need to examine small one
+				int[] counts = new int[26];
+				for (int z = i; z < j; z++) {
+					char c = s.charAt(z);
+					counts[c-'a']++;
+				}
+				int min = Integer.MAX_VALUE;
+				for (int z = 0; z < 26; z++) {
+					if (counts[z] > 0) min = Math.min(min, counts[z]);
+				}
+				if (min >= k) result = Math.max(result, j-i);
+			}
+		}
+		return result;
+	}
+
+	// https://leetcode.com/problems/remove-k-digits/
+	// more efficient O(n) time and space solution using a stack
+	// worst case runtime O(n * k) since we have a contains() call and while loop to find max, both run in O(n) time, space O(1)
+	// will do up to k recursions. k in worst case can be n-1. recursive equation is T(x)=T(x-1)+n
+	public static String removeKdigits(String num, int k) {
+		if (k >= num.length()) return "0";
+		if (k == 0) return num;
+
+		// if there is a 0 in first k+1 digits, it counts as a "* 10" so will always be the choice to remove, remove the digits before it
+		if (num.substring(0, k+1).contains("0")) {
+			int i = 0;
+			while (num.charAt(i) != '0') i++;
+			k -= i; // i = index of first 0, remove the number of leading non-zeros from k digits
+			while (i < num.length() && num.charAt(i) == '0') i++;
+			if (i == num.length()) return "0";
+			// removing leading 0s doesn't count as numbers lost from k
+			num = num.substring(i);
+			if (k > 0) return removeKdigits(num, k); // still have digits to remove, recurse
+			return num;
+		}
+		// remove 1 digit at a time with recursion:
+		// digit to remove can be chosen as the first digit that occurs with a smaller digit on it's right
+		char max = num.charAt(0);
+		int i = 1;
+		while (i < num.length() && num.charAt(i) >= max) { // comparing </> as ints/chars doesn't matter, larger nums still greater
+			max = (char) Math.max(max, num.charAt(i));
+			i++;
+		}
+		i--; // i is either at the first digit that decreased or end of array, move back to largest digit
+//		System.out.println("Comparing " + a + " and " + num.charAt(i));
+		// remove whichever is larger: char at 0 or i
+		if (num.charAt(0) >= num.charAt(i)) {
+			return removeKdigits(num.substring(1), k-1); // remove first digit
+		} else if (i == num.length() - 1) {
+			return removeKdigits(num.substring(0, i), k-1); // remove last digit
+		} else {
+			return removeKdigits(num.substring(0, i) + num.substring(i+1), k-1); // remove a middle digit
+		}
 	}
 
 	// https://leetcode.com/problems/find-the-difference/
@@ -296,6 +729,7 @@ public class StringQuestions {
 		}
 	}
 
+	// https://leetcode.com/problems/longest-palindromic-substring
 	// runtime = O(n^2) where n = s.length. Check n possible centers, checking for palindrome at
 	// each location could be O(n) worst case
 	public String longestPalindrome(String s) {
@@ -315,10 +749,8 @@ public class StringQuestions {
 	}
 	// returns the longest odd-length palindrome with a single center when c1=c2 or the longest even-length palindrome
 	// when c1 = c2-1.
-	public String expandAroundCenter(String s, int c1, int c2) {
-		int l = c1, r = c2;
-		int n = s.length();
-		while (l >= 0 && r < n && s.charAt(l) == s.charAt(r)) {
+	public String expandAroundCenter(String s, int l, int r) {
+		while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) {
 			l--;
 			r++;
 		}

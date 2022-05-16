@@ -6,24 +6,7 @@ import java.util.Queue;
 
 public class MergeSortedArrays {
 
-	// https://leetcode.com/problems/merge-sorted-array/
-	public static void merge(int[] nums1, int m, int[] nums2, int n) {
-		// simpler to start from ends of both arrays
-		System.arraycopy(nums2, 0, nums1, m, n);
-		int a = 0; // index in nums1
-		int b = m; // index in last section nums1 (where nums2 was copied)
-		while (a < b && b < nums1.length && nums1[a] <= nums1[b]) a++;
-		while (a < b && b < nums1.length) {
-			swap(nums1, a, b);
-			b++;
-			while (a < b && b < nums1.length && nums1[a] <= nums1[b]) a++;
-		}
-	}
-	private static void swap(int[] n, int a, int b) {
-		int temp = n[a];
-		n[a] = n[b];
-		n[b] = temp;
-	}
+
 
 	// requires all elements of a are non-null, not empty, and sorted in non-decreasing order
 	// O(nkLogk) time where k is the # of sorted arrays and n is the average length of the given arrays

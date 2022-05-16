@@ -80,6 +80,28 @@ public class IntLinkedListTests {
 		assertTrue(isSorted(s));
 		assertEquals(11, s.size());
 	}
+
+	@Test
+	public void testSortList() {
+		IntLinkedList list = create(new int[]{4,5,2,3,9});
+		list.sortList();
+		assertEquals(create(new int[]{2,3,4,5,9}), list);
+	}
+
+	@Test
+	public void testReorderList() {
+		IntLinkedList list = create(new int[]{1,2,3,4});
+		list.reorderList();
+		assertEquals(create(new int[]{1,4,2,3}), list);
+	}
+
+	@Test
+	public void testReverseList() {
+		IntLinkedList list = create(new int[]{1,2,3,4});
+		list.reverseRecursive();
+		assertEquals(create(new int[]{4,3,2,1}), list);
+	}
+
 	private boolean isSorted(IntLinkedList l) {
 		for (int i = 0; i < l.size() - 1; i++) {
 	        if (l.get(i) > l.get(i+1)) {

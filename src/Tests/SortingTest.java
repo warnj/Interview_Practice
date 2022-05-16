@@ -12,23 +12,6 @@ import static org.junit.Assert.*;
 
 public class SortingTest {
 
-    @Test
-    public void testMergeTwoSorted() {
-        int[] test = new int[]{1,2,3,0,0,0,0};
-        int[] test2 = new int[]{2,5,6,8};
-        MergeSortedArrays.merge(test, 3, test2, 4);
-        assertArrayEquals(new int[]{1,2,2,3,5,6,8}, test);
-
-        test = new int[]{1};
-        test2 = new int[]{};
-        MergeSortedArrays.merge(test, 1, test2, 0);
-        assertArrayEquals(new int[]{1}, test);
-
-        test = new int[]{0};
-        test2 = new int[]{1};
-        MergeSortedArrays.merge(test, 0, test2, 1);
-        assertArrayEquals(new int[]{1}, test);
-    }
 
     @Test
     public void testDutchSort() {

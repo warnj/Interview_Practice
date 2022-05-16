@@ -20,6 +20,9 @@ public class IntTree {
 	public IntTree(TreeNode root) {
 		overallRoot = root;
 	}
+	public IntTree(String repr) {
+		overallRoot = deserialize(repr);
+	}
 
 	// https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/description/
 	public IntTree(int[] pre, int[] in) {
@@ -48,7 +51,7 @@ public class IntTree {
 	}	
 	// Returns true if the value is in the tree starting at the specified root.
 	private boolean contains(TreeNode root, int value) {
-		if(root == null) {
+		if (root == null) {
 			return false;
 		} else if(root.val == value) {
 			return true;
@@ -67,22 +70,22 @@ public class IntTree {
 	// Adds the given value to the BST starting at the given root.
 	// Post: the tree is still a valid BST
 	private TreeNode add(TreeNode root, int value) {
-		if(root == null) {
+		if (root == null) {
 			root = new TreeNode(value);
-		} else if(root.val > value) {
+		} else if (root.val > value) {
 			root.left = add(root.left, value);
-		} else if(root.val < value) {
+		} else if (root.val < value) {
 			root.right = add(root.right, value);
 		}
 		return root;
 	}
 
 	public int getMin() {
-		if(overallRoot == null) throw new NoSuchElementException();
+		if (overallRoot == null) throw new NoSuchElementException();
 		return getMin(overallRoot);
 	}	
 	private int getMin(TreeNode root) {
-		if(root.left == null) {
+		if (root.left == null) {
 			return root.val;
 		} else {
 			return getMin(root.left);
@@ -95,7 +98,7 @@ public class IntTree {
 	}	
 	// Removes the node with the given value from the given tree.
 	private TreeNode remove(TreeNode root, int value) {
-		if(root == null) {
+		if (root == null) {
 			return null;
 		} else if (root.val < value) {
 			root.right = remove(root.right, value);
@@ -122,8 +125,8 @@ public class IntTree {
 		removeLeafs(overallRoot);
 	}	
 	private TreeNode removeLeafs(TreeNode root) {
-		if(root != null) {
-			if(root.left == null && root.right == null) return null;
+		if (root != null) {
+			if (root.left == null && root.right == null) return null;
 			else {
 				root.left = removeLeafs(root.left);
 				root.right = removeLeafs(root.right);
@@ -139,7 +142,7 @@ public class IntTree {
 	}	
 	// Prints a pre-order traversal of the tree starting at the specified root
 	private void printPreorder(TreeNode root) {
-		if(root != null) {
+		if (root != null) {
 			System.out.print(root.val + " ");
 			printPreorder(root.left);
 			printPreorder(root.right);
@@ -153,7 +156,7 @@ public class IntTree {
 	}	
 	// Prints an in-order traversal of the tree starting at the specified root
 	private void printInorder(TreeNode root) {
-		if(root != null) {
+		if (root != null) {
 			printInorder(root.left);
 			System.out.print(root.val + " ");
 			printInorder(root.right);
@@ -167,7 +170,7 @@ public class IntTree {
 	}	
 	// Prints a post-order traversal of the tree starting at the specified root
 	private void printPostorder(TreeNode root) {
-		if(root != null) {
+		if (root != null) {
 			printPostorder(root.left);
 			printPostorder(root.right);
 			System.out.print(root.val + " ");
@@ -179,39 +182,34 @@ public class IntTree {
 
 	// this is just DFS
 	public void printPreorderIterative() {
-		Stack<TreeNode> s = new Stack<TreeNode>();
+		if (overallRoot == null) {
+			System.out.println("null");
+			return;
+		}
+		Stack<TreeNode> s = new Stack<>();
 		s.push(overallRoot);
-
-		while(!s.isEmpty()) {
+		while (!s.isEmpty()) {
 			TreeNode cur = s.pop();
-			if(cur != null) { // overallRoot was null
-				System.out.print(cur.val + " ");
-				if(cur.right != null) {
-					s.push(cur.right);
-				}
-				if(cur.left != null) {
-					s.push(cur.left); // left child on top of stack 
-				}
-			}
+			System.out.print(cur.val + " ");
+			if (cur.right != null) s.push(cur.right);
+			if (cur.left != null) s.push(cur.left); // left child on top of stack
 		}
 		System.out.println();
 	}
 
 	public void printInorderIterative() {
-		Stack<TreeNode> s = new Stack<TreeNode>();
+		Stack<TreeNode> s = new Stack<>();
 		TreeNode start = overallRoot;
 		// start at bottom left
-		while(start != null){
+		while (start != null) {
 			s.push(start);
 			start = start.left;
 		}
-
-		while(!s.isEmpty()) {
+		while (!s.isEmpty()) {
 			TreeNode cur = s.pop();
-
 			System.out.print(cur.val + " ");
 			TreeNode temp = cur.right;
-			while(temp != null) {
+			while (temp != null) {
 				s.push(temp);
 				temp = temp.left;
 			}
@@ -220,7 +218,7 @@ public class IntTree {
 	}
 
 	public void printPostorderIterative() {
-		Stack<TreeNode> s = new Stack<TreeNode>();
+		Stack<TreeNode> s = new Stack<>();
 		s.push(overallRoot);
 		TreeNode temp = overallRoot; // the last node printed out,
 		// initialize with overallRoot since setting to null can trigger finishedSubtrees to be initially true when it shouldn't be
@@ -260,7 +258,7 @@ public class IntTree {
 	}
 
 	// returns list of the val at each level of the tree, top to bottom, left to right
-	// https://leetcode.com/problems/binary-tree-level-order-traversal/description/
+	// https://leetcode.com/problems/binary-tree-level-order-traversal
 	public List<List<Integer>> levelOrder() {
 		List<List<Integer>> allLevels = new LinkedList<>();
 		if (overallRoot == null) return allLevels;
@@ -281,15 +279,8 @@ public class IntTree {
 		return allLevels;
 	}
 
-	// https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/description/
-//	public List<List<Integer>> zigzagLevelOrder() {
-//		List<List<Integer>> allLevels = new LinkedList<>();
-//		if (overallRoot == null) return allLevels;
-//
-//	}
-	
 	// Given a binary tree, flatten it to a linked list in-place.
-	// https://leetcode.com/problems/flatten-binary-tree-to-linked-list/description/
+	// https://leetcode.com/problems/flatten-binary-tree-to-linked-list
 	public void flatten() {
 		flatten(overallRoot);
 	}
@@ -316,6 +307,26 @@ public class IntTree {
 			if (!s.isEmpty()) // connect end of list to next node 
 				cur.right = s.peek();
 			cur.left = null; // singly linked list
+		}
+	}
+	public void flattenEasy() {
+		List<TreeNode> pre = new ArrayList<>();
+		getPreorder(pre, overallRoot);
+		for (int i = 0; i < pre.size()-1; i++) {
+			TreeNode cur = pre.get(i);
+			TreeNode next = pre.get(i+1);
+			cur.left = null;
+			cur.right = next;
+			if (i == pre.size()-2) {
+				next.left = null;
+			}
+		}
+	}
+	private void getPreorder(List<TreeNode> nodes, TreeNode cur) {
+		if (cur != null) {
+			nodes.add(cur);
+			getPreorder(nodes, cur.left);
+			getPreorder(nodes, cur.right);
 		}
 	}
 
@@ -418,12 +429,32 @@ public class IntTree {
 		return sumNumbers(root.left, sum*10 + root.val) + sumNumbers(root.right, sum*10 + root.val);
 	}
 
+	// https://leetcode.com/problems/path-sum-ii/
+	public List<List<Integer>> pathSum(int targetSum) {
+		List<List<Integer>> paths = new ArrayList<>();
+		if (overallRoot == null) return paths;
+		pathSum(paths, new ArrayList<>(), overallRoot, overallRoot.val, targetSum);
+		return paths;
+	}
+	public void pathSum(List<List<Integer>> paths, List<Integer> path, TreeNode n, int sum, int targetSum) {
+		path.add(n.val);
+		if (n.left == null && n.right == null && sum == targetSum) { // is a leaf with target sum
+			paths.add(new ArrayList<>(path));
+		} else {
+			if (n.left != null) // check out left side if it may sum to targetSum
+				pathSum(paths, path, n.left, sum + n.left.val, targetSum);
+			if (n.right != null) // explore right side
+				pathSum(paths, path, n.right, sum + n.right.val, targetSum);
+		}
+		path.remove(path.size()-1);
+	}
+
 	// returns true if tree has a root to leaf path that adds to equal sum
 	public boolean hasPathSum(int sum) {
 		return hasPathSum(overallRoot, sum);
 	}
 	private boolean hasPathSum(TreeNode root, int sum) {
-		if(root != null) {
+		if (root != null) {
 			sum -= root.val;
 			if(sum == 0 && root.left == null && root.right == null) {
 				return true;
@@ -522,6 +553,267 @@ public class IntTree {
 		return Math.max(diameter(root.right), Math.max(diameter(root.left), heightLeft + heightRight));
 	}
 
+	// https://leetcode.com/problems/maximum-width-of-binary-tree/
+	// recursive solution tricky; sum of the widths of left and right don't work since they may have been on different levels
+	// level-order traversal / bfs seems best; tricky part is how to count any nulls in the middle
+	// want: left most node on each level, right most node on each level & distance between them
+	// use hashmap to save the corresponding position of each node if the tree was implemented as an array
+	// O(n) time and space where n is number of nodes in the tree
+	public int widthOfBinaryTree() {
+		if (this.overallRoot == null) return 0;
+		Map<TreeNode, Integer> positions = new HashMap<>();
+		Queue<TreeNode> workList = new LinkedList<>();
+		workList.add(overallRoot);
+		positions.put(overallRoot, 1);
+		int maxWidth = 1; // root non-null is width of 1
+		while (!workList.isEmpty()) {
+			int levelSize = workList.size();
+			// check nodes in current level
+			int startPosition = 0; // array representation index of first node in the row
+			for (int i = 0; i < levelSize; i++) {
+				TreeNode cur = workList.remove();
+				int curPosition = positions.get(cur);
+				if (i == 0) {
+					startPosition = curPosition;
+				}
+				if (cur.left != null) {
+					workList.add(cur.left);
+					positions.put(cur.left, 2*curPosition);
+				}
+				if (cur.right != null) {
+					workList.add(cur.right);
+					positions.put(cur.right, 2*curPosition+1);
+				}
+				if (i == levelSize-1) { // last node in the row, find the width of this level
+					int width = curPosition - startPosition + 1; // need +1 to also count the first node i.e. [1,2,3] -> 3-1 = 2 but there are 3 nodes
+					maxWidth = Math.max(maxWidth, width);
+				}
+			}
+		}
+		return maxWidth;
+	}
+
+	public boolean isSymmetric() {
+		if (overallRoot == null) return true;
+		Stack<TreeNode> left = new Stack<>(); // could also use queue, could also use single datastructure and push/pop two at a time
+		Stack<TreeNode> right = new Stack<>();
+		left.add(overallRoot.left);
+		right.add(overallRoot.right);
+		while (!left.isEmpty() && !right.isEmpty()) {
+			TreeNode l = left.pop();
+			TreeNode r = right.pop();
+			if (l == null && r == null) continue;
+			if (l == null || r == null || l.val != r.val) return false;
+			left.add(l.left); // from root node, compare the left child lefts with right child rights
+			right.add(r.right);
+			left.add(l.right);
+			right.add(r.left);
+		}
+		return right.isEmpty() && left.isEmpty();
+	}
+
+	// https://leetcode.com/problems/binary-tree-paths
+	public List<String> binaryTreePaths() {
+		List<String> result = new ArrayList<>();
+		if (overallRoot == null) return result;
+		if (overallRoot.left == null && overallRoot.right == null) {
+			result.add(String.valueOf(overallRoot.val));
+			return result;
+		}
+		StringBuilder sb = new StringBuilder(""+overallRoot.val);
+		if (overallRoot.left != null) findLeaf(overallRoot.left, result, sb);
+		if (overallRoot.right != null) findLeaf(overallRoot.right, result, sb);
+		return result;
+	}
+	private void findLeaf(TreeNode n, List<String> result, StringBuilder path) {
+		String s = "->" + n.val;
+		path.append(s);
+		if (n.left == null && n.right == null) {
+			result.add(path.toString());
+		} else {
+			if (n.left != null) findLeaf(n.left, result, path);
+			if (n.right != null) findLeaf(n.right, result, path);
+		}
+		path.delete(path.length()-s.length(), path.length());
+	}
+
+	// https://leetcode.com/problems/same-tree
+	public boolean isSameTree(TreeNode p, TreeNode q) {
+		if (p == null || q == null) return p == q;
+
+		// do iterative dfs on both at same time
+		Stack<TreeNode> s = new Stack<>();
+		s.add(p);
+		s.add(q);
+		while (!s.isEmpty()) {
+			TreeNode qN = s.pop();
+			TreeNode pN = s.pop();
+			if (pN.val != qN.val) {
+				return false;
+			}
+			if (pN.left != null) {
+				if (qN.left == null) return false;
+				s.add(pN.left);
+				s.add(qN.left);
+			} else {
+				if (qN.left != null) return false;
+			}
+			if (pN.right != null) {
+				if (qN.right == null) return false;
+				s.add(pN.right);
+				s.add(qN.right);
+			} else {
+				if (qN.right != null) return false;
+			}
+		}
+		return true;
+	}
+	public boolean isSameTreeR(TreeNode p, TreeNode q) {
+		if (p == null || q == null) return p == q;
+		if (p.val != q.val) return false;
+		return isSameTreeR(p.left, q.left) && isSameTreeR(p.right, q.right);
+	}
+
+	// https://leetcode.com/problems/invert-binary-tree
+	public TreeNode invertTree(TreeNode root) {
+		if (root != null) {
+			TreeNode temp = invertTree(root.left);
+			root.left = invertTree(root.right);
+			root.right = temp;
+		}
+		return root;
+	}
+
+	// https://leetcode.com/problems/serialize-and-deserialize-binary-tree/
+	// fails for large test cases with unbalanced tree (height > 32)!
+	// Encodes a tree to a single string.
+	public String serialize() {
+		if (overallRoot == null) return "null, null";
+		// convert tree to array representation
+		int height = height(overallRoot);
+		int size = 1 << height; // 2^height is 1 more than the number of elements in the tree
+//		System.out.println("Using size: " + size);
+		Integer[] a = new Integer[size]; // null = null node, 0 = node with val 0
+		// bfs traversal saving vals to corresponding index
+		Queue<TreeNode> q = new LinkedList<>();
+		Queue<Integer> indexes = new LinkedList<>();
+		q.add(overallRoot);
+		indexes.add(1);
+		while (!q.isEmpty()) {
+			TreeNode n = q.remove();
+			Integer index = indexes.remove();
+			a[index] = n.val;
+			if (n.left != null) {
+				q.add(n.left);
+				indexes.add(index * 2);
+			}
+			if (n.right != null) {
+				q.add(n.right);
+				indexes.add(index * 2 + 1);
+			}
+		}
+		String result = Arrays.toString(a);
+		return result.substring(1, result.length()-1);
+	}
+	// Decodes your encoded data to tree.
+	public TreeNode deserialize(String data) {
+		// convert data to array representation of tree
+		String[] nums = data.split(", ");
+		Integer[] a = new Integer[nums.length];
+		// String[] to Integer[]
+		for (int i = 0; i < nums.length; i++) {
+			if (!nums[i].equals("null")) {
+				a[i] = Integer.parseInt(nums[i]);
+			}
+		}
+		// convert array to tree
+		if (a[1] == null) return null;
+		TreeNode root = new TreeNode(a[1]);
+		Queue<TreeNode> q = new LinkedList<>();
+		Queue<Integer> indexes = new LinkedList<>();
+		q.add(root);
+		indexes.add(1);
+		while (!q.isEmpty()) {
+			TreeNode n = q.remove(); // parent node, is already part of the tree
+			int index = indexes.remove(); // parent index
+			int leftChild = 2*index;
+			if (leftChild < a.length && a[leftChild] != null) {
+				n.left = new TreeNode(a[leftChild]);
+				q.add(n.left);
+				indexes.add(leftChild);
+			}
+			int rightChild = 2*index+1;
+			if (rightChild < a.length && a[rightChild] != null) {
+				n.right = new TreeNode(a[rightChild]);
+				q.add(n.right);
+				indexes.add(rightChild);
+			}
+		}
+		return root;
+	}
+
+	// https://leetcode.com/problems/binary-tree-right-side-view
+	// level order traversal, add the ending of each level
+	// O(n) time and space - should be able to get this down to O(log(n)) with better solution
+	public List<Integer> rightSideView() {
+		List<Integer> result = new ArrayList<>();
+		Queue<TreeNode> worklist = new LinkedList<>();
+		worklist.add(overallRoot);
+		while (!worklist.isEmpty()) {
+			int levelSize = worklist.size();
+			for (int i = 0; i < levelSize; i++) {
+				TreeNode n = worklist.remove();
+				if (n.left != null) worklist.add(n.left);
+				if (n.right != null) worklist.add(n.right);
+				if (i == levelSize-1) {
+					result.add(n.val);
+				}
+			}
+		}
+		return result;
+	}
+	public List<Integer> rightSideViewRecursive() {
+		List<Integer> result = new ArrayList<>();
+		rightView(overallRoot, result, 0);
+		return result;
+	}
+	private void rightView(TreeNode cur, List<Integer> result, int depth) {
+		if (cur == null) return;
+		if (depth == result.size()) result.add(cur.val);
+		rightView(cur.right, result, depth + 1);
+		rightView(cur.left, result, depth + 1);
+	}
+
+	// https://leetcode.com/problems/count-complete-tree-nodes/
+	public int countNodes() {
+		return countNodes(overallRoot);
+	}
+	private int countNodes(TreeNode n) {
+		int leftDepth = leftDepth(n);
+		int rightDepth = rightDepth(n);
+		// one side will always be full, so runtime is O(log(n) * log(n))
+		if (leftDepth == rightDepth)
+			return (1 << leftDepth) - 1; // size of a full binary tree = 2^depth - 1
+		else
+			return 1 + countNodes(n.left) + countNodes(n.right);
+	}
+	private int rightDepth(TreeNode root) {
+		int dep = 0;
+		while (root != null) {
+			root = root.right;
+			dep++;
+		}
+		return dep;
+	}
+	private int leftDepth(TreeNode root) {
+		int dep = 0;
+		while (root != null) {
+			root = root.left;
+			dep++;
+		}
+		return dep;
+	}
+
 	/******** Practice-It Methods *****************************************************************************************************************/
 
 	// removes the nodes in the tree not between min and max inclusive. Tree must be a BST
@@ -571,6 +863,23 @@ public class IntTree {
 	private boolean isValidBST(TreeNode p, Integer low, Integer high) { // uses null case to avoid the Integer.MIN_VALUE and MAX_VALUE cases
 		if (p == null) return true;
 		return (low == null || p.val > low) && (high == null || p.val < high) && isValidBST(p.left, low, p.val) && isValidBST(p.right, p.val, high);
+	}
+	// iterative in-order traversal with check against prev node
+	public boolean isValidBSTIter(TreeNode root) {
+		if (root == null) return true;
+		Stack<TreeNode> stack = new Stack<>();
+		TreeNode pre = null;
+		while (root != null || !stack.isEmpty()) {
+			while (root != null) {
+				stack.push(root);
+				root = root.left;
+			}
+			root = stack.pop();
+			if(pre != null && root.val <= pre.val) return false;
+			pre = root;
+			root = root.right;
+		}
+		return true;
 	}
 
 	public boolean equals(IntTree other) {
