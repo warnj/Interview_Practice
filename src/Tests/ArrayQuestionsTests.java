@@ -14,6 +14,13 @@ import static org.junit.Assert.*;
 public class ArrayQuestionsTests {
 
 	@Test
+	public void testMaxSubarraySumCircular() {
+		assertEquals(3, ArrayQuestions.maxSubarraySumCircular(new int[]{1,-2,3,-2}));
+		assertEquals(10, ArrayQuestions.maxSubarraySumCircular(new int[]{5,-3,5}));
+		assertEquals(-2, ArrayQuestions.maxSubarraySumCircular(new int[]{-3,-2,-3}));
+	}
+
+	@Test
 	public void testFirstMissingPositive() {
 		assertEquals(3, ArrayQuestions.firstMissingPositive(new int[]{1,2,0}));
 		assertEquals(2, ArrayQuestions.firstMissingPositive(new int[]{3,4,-1,1}));

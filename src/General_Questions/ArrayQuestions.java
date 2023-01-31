@@ -10,6 +10,26 @@ public class ArrayQuestions {
     public static void main(String[] args) {
     }
 
+    // https://leetcode.com/problems/maximum-sum-circular-subarray
+    public static int maxSubarraySumCircular(int[] nums) {
+
+        return -1;
+    }
+    // O(n^2) solution
+    public static int maxSubarraySumCircularBrute(int[] nums) {
+        int max = Integer.MIN_VALUE;
+        int n = nums.length;
+        for (int i = 0; i < n; i++) { // start index
+            int sum = nums[i];
+            max = Math.max(max, sum);
+            for (int j = 1; j < n; j++) { // length of possible subarray
+                sum += nums[(i+j)%n];
+                max = Math.max(max, sum);
+            }
+        }
+        return max;
+    }
+
     // https://leetcode.com/problems/first-missing-positive/
     public static int firstMissingPositive(int[] nums) {
         // if !contains(1), return 1
@@ -316,6 +336,16 @@ public class ArrayQuestions {
                 nums[i] = nums[i - 1] + nums[i];
             }
             if (nums[i] > max) max = nums[i];
+        }
+        return max;
+    }
+    // maxSubArray of a non-circular array
+    public static int kadaneAlgo(int[] nums) {
+        int max = Integer.MIN_VALUE;
+        int localMax = 0;
+        for (int i = 0; i < nums.length; i++) {
+            localMax = Math.max(nums[i], localMax + nums[i]);
+            max = Math.max(localMax, max);
         }
         return max;
     }

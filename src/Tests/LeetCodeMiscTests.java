@@ -13,6 +13,45 @@ import static org.junit.Assert.*;
 public class LeetCodeMiscTests {
 
     @Test
+    public void testFindCheapestPrice() {
+        assertEquals(700, LeetCodeMisc.findCheapestPrice(4, new int[][]{{0,1,100},{1,2,100},{2,0,100},{1,3,600},{2,3,200}}, 0, 3, 1));
+        assertEquals(400, LeetCodeMisc.findCheapestPrice(4, new int[][]{{0,1,100},{1,2,100},{2,0,100},{1,3,600},{2,3,200}}, 0, 3, 2));
+        assertEquals(-1, LeetCodeMisc.findCheapestPrice(4, new int[][]{{0,1,100},{1,2,100},{2,0,100},{1,3,600},{2,3,200}}, 0, 3, 0));
+        assertEquals(200, LeetCodeMisc.findCheapestPrice(3, new int[][]{{0,1,100},{1,2,100},{0,2,500}}, 0, 2, 1));
+        assertEquals(500, LeetCodeMisc.findCheapestPrice(3, new int[][]{{0,1,100},{1,2,100},{0,2,500}}, 0, 2, 0));
+    }
+
+    @Test
+    public void testIsAdditiveNumber() {
+        assertTrue(LeetCodeMisc.isAdditiveNumber("112358"));
+        assertTrue(LeetCodeMisc.isAdditiveNumber("199100199"));
+        assertTrue(LeetCodeMisc.isAdditiveNumber("199910001999"));
+        assertTrue(LeetCodeMisc.isAdditiveNumber("123"));
+        assertTrue(LeetCodeMisc.isAdditiveNumber("101"));
+        assertTrue(LeetCodeMisc.isAdditiveNumber("12122436")); // 12+12=24, 12+24=36
+        assertTrue(LeetCodeMisc.isAdditiveNumber("198019823962"));
+        assertTrue(LeetCodeMisc.isAdditiveNumber("121474836472147483648"));
+        assertFalse(LeetCodeMisc.isAdditiveNumber("0235813"));
+        assertFalse(LeetCodeMisc.isAdditiveNumber("12"));
+        assertFalse(LeetCodeMisc.isAdditiveNumber("1203"));
+        assertFalse(LeetCodeMisc.isAdditiveNumber("1023"));
+        assertFalse(LeetCodeMisc.isAdditiveNumber("124"));
+        assertFalse(LeetCodeMisc.isAdditiveNumber("19991000199"));
+    }
+
+    @Test
+    public void testMinFlipsMonoIncr() {
+        assertEquals(1, LeetCodeMisc.minFlipsMonoIncr("00110"));
+        assertEquals(2, LeetCodeMisc.minFlipsMonoIncr("010110"));
+        assertEquals(2, LeetCodeMisc.minFlipsMonoIncr("00011000"));
+        assertEquals(1, LeetCodeMisc.minFlipsMonoIncr("01000000"));
+        assertEquals(3, LeetCodeMisc.minFlipsMonoIncr("01010101"));
+        assertEquals(2, LeetCodeMisc.minFlipsMonoIncr("110000001"));
+        assertEquals(2, LeetCodeMisc.minFlipsMonoIncr("110000000"));
+        assertEquals(2, LeetCodeMisc.minFlipsMonoIncr("10001110"));
+    }
+
+    @Test
     public void testTwoCitySchedule() {
         assertEquals(110, LeetCodeMisc.twoCitySchedCost(new int[][]{{10,20},{30,200},{400,50},{30,20}}));
     }

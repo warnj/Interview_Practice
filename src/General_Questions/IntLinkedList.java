@@ -373,6 +373,22 @@ public class IntLinkedList {
 		last.next = last.next.next;
 		return start.next; // the placeholder for the head of the list
 	}
+	public ListNode removeNthFromEnd(ListNode head, int n) {
+		ListNode end = head;
+		ListNode cur;
+		for (int i = 0; end != null && i < n; i++) {
+			end = end.next;
+		}
+		cur = null; // need to point to the element before the one to remove
+		while (end != null) {
+			end = end.next;
+			if (cur == null) cur = head;
+			else cur = cur.next;
+		}
+		if (cur == null) return head.next; // removing 1st element
+		cur.next = cur.next.next;
+		return head;
+	}
 	public ListNode removeNthFromEnd2(int n) {
 		ListNode hi = head;
 		while (hi != null && n > 0) {

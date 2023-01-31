@@ -4,6 +4,125 @@ import java.util.*;
 
 public class LeetCodeMisc {
 
+	// https://leetcode.com/problems/cheapest-flights-within-k-stops
+	// dijkstra's or bfs or bellman ford
+	public static int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
+		// build graph
+		Map<Integer, Map<Integer, Integer>> graph = new HashMap<>(); // city -> {dest -> price}
+		for (int[] flight : flights) {
+			Map<Integer,Integer> vals = graph.get(flight[0]);
+			if (vals == null) {
+				vals = new HashMap<>();
+				graph.put(flight[0], vals);
+			}
+			vals.put(flight[1], flight[2]);
+		}
+//		System.out.println(graph);
+		// traverse graph
+		int[] dist = new int[n];
+		Arrays.fill(dist, Integer.MAX_VALUE); // dist[dest] = cheapest price from src
+		Queue<int[]> worklist = new LinkedList<>();
+		worklist.add(new int[]{src, 0}); // key is to also keep track of current distance to current node
+		// bfs with max k stops between src and dest
+		for (int i = 0; !worklist.isEmpty() && i < k+1; i++) {
+			int size = worklist.size();
+			// expand search outward 1 stop
+			for (int j = 0; j < size; j++) {
+				int[] cur = worklist.remove(); // current leg starting point
+				Map<Integer, Integer> dests = graph.get(cur[0]);
+				if (dests != null) {
+					for (int dest : dests.keySet()) {
+						int price = dests.get(dest);
+						if (price + cur[1] >= dist[dest]) continue;
+						dist[dest] = price + cur[1];
+						worklist.add(new int[]{dest, dist[dest]});
+					}
+				}
+			}
+//			System.out.println(dist);
+		}
+		return dist[dst] == Integer.MAX_VALUE ? -1 : dist[dst];
+	}
+
+	// https://leetcode.com/problems/additive-number/
+	// find all combinations of starting number pairs and call helper to see if sum continues
+	// O(n^2) time
+	public static boolean isAdditiveNumber(String num) {
+		for (int hi = 2; hi < num.length(); hi++) {
+			for (int mid = 1; mid < hi; mid++) {
+				if (isAdditiveSeq(num, 0, mid, hi)) return true;
+			}
+		}
+		return false;
+	}
+	// returns true if the entire string is additive sequence starting with given two numbers ending at index i
+	private static boolean isAdditiveSeq(String num, int lo, int mid, int hi) {
+		boolean valid;
+		do {
+			if (mid - lo > 1 && num.charAt(lo) == '0') return false; // no leading 0s
+			if (hi - mid > 1 && num.charAt(mid) == '0') return false;
+			if (hi - mid > num.length() - hi || mid - lo > num.length() - hi) return false; // sum will not fit, not worth checking
+
+			long one = Long.parseLong(num.substring(lo, mid));
+			long two = Long.parseLong(num.substring(mid, hi));
+			String sum = String.valueOf(one + two);
+			System.out.println("checking " + one + " + " + two + " = " + sum);
+			int end = hi + sum.length();
+			if (end > num.length()) return false; // sum too long
+
+			valid = sum.equals(num.substring(hi, end)); // sum is part of string, still valid seq
+			if (valid) System.out.println("found " + one + " + " + two + " = " + sum);
+			if (valid && end == num.length()) return true; // at the end
+
+			lo = mid;
+			mid = hi;
+			hi = end;
+		} while (valid);
+		return false;
+	}
+	// initial ideas too complex: a couple sliding windows, work backwards from end, recursive divide and conquer
+	public static boolean isAdditiveNumberRecursiveWrong(String num) {
+		if (num.length() < 3) return false;
+		return isAdditiveNumWrong(num, 0, 1, 2);
+	}
+	private static boolean isAdditiveNumWrong(String num, int lo, int mid, int hi) {
+		if (lo == mid || mid == hi || hi == num.length()) return false;
+		if (mid - lo > 1 && num.charAt(lo) == '0') return false; // no leading 0s
+		if (hi - mid > 1 && num.charAt(mid) == '0') return false;
+
+		if (isAdditiveSeq(num, lo, mid, hi)) return true;
+
+		// explore other options
+		return isAdditiveNumWrong(num, lo, mid+1, hi) ||
+				isAdditiveNumWrong(num, lo, mid, hi+1);
+	}
+
+	// https://leetcode.com/problems/flip-string-to-monotone-increasing
+	public static int minFlipsMonoIncr(String s) {
+		// 2 cases: # of zeros after the first 1  OR  # of ones before last 0
+		// ^ misses the case where you can change 1 to 0 at front and 0 to 1 at end
+		// solution using all spots as pivot point, updating the # swaps, tracking the min
+
+		int sum = 0;
+		for (int i = 0; i < s.length(); i++) {
+			if (s.charAt(i) == '1') sum++;
+		}
+
+		int swaps = sum; // start here where all 1s become 0s
+		// all spots < i are 0 and >= i are 1
+		int oneOnLeft = 0;
+		int zeroOnRight = s.length() - sum;
+		for (int i = 0; i < s.length(); i++) {
+			swaps = Math.min(swaps, oneOnLeft + zeroOnRight);
+			if (s.charAt(i) == '1') {
+				oneOnLeft++;
+			} else {
+				zeroOnRight--;
+			}
+		}
+		return swaps;
+	}
+
 	// https://leetcode.com/problems/two-city-scheduling
 	// O(n*log(n)) time using sorting - put the ones that have greatest difference between 1st and 2nd cities on the corresponding far ends of the sorted array
 	public static int twoCitySchedCost(int[][] costs) {
@@ -717,6 +836,29 @@ public class LeetCodeMisc {
 		char[] c = s.toCharArray();
 		Arrays.sort(c);
 		return String.valueOf(c);
+	}
+	// DOES NOT WORK - map keys are not equal when int[] contents are, can't override hashmap equals/hashcode function, could make wrapper class for int[]
+	public List<List<String>> groupAnagramsMap(String[] strs) {
+		Map<int[], List<String>> anagrams = new HashMap<>();
+		for(String str : strs) {
+			int[] anagram = new int[26];
+			for (int i = 0; i < str.length(); i++) {
+				char c = str.charAt(i);
+				anagram[c-'a']++;
+			}
+			List<String> val = anagrams.get(anagram);
+			if (val == null) {
+				List<String> newVal = new ArrayList<>();
+				newVal.add(str);
+				anagrams.put(anagram, newVal);
+			} else {
+				val.add(str);
+				// don't need to re-put since this is just a reference to array already in the map
+			}
+		}
+		List<List<String>> result = new ArrayList<>();
+		result.addAll(anagrams.values());
+		return result;
 	}
 	// improved version using counts instead of sorting, use hashcode instead of comparing count arrays, not 100%
 	// accurate since hashcode may collide with other non-equal arrays.
