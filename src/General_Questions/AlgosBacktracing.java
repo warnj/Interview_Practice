@@ -264,6 +264,7 @@ public class AlgosBacktracing {
 	}
 	// https://leetcode.com/problems/combination-sum-ii
 	// same as above, but numbers in candidates can only be used once
+	// O(2^n * k) - if candidates are unique then there are O(2^n) subsequences & in base case you copy array of k avg seq length
 	public static List<List<Integer>> combinationSumNoRepeat(int[] candidates, int target) {
 		Arrays.sort(candidates);
 		List<List<Integer>> result = new ArrayList<>();
@@ -303,6 +304,7 @@ public class AlgosBacktracing {
 	}
 	// https://leetcode.com/problems/combination-sum-iv
 	// permutation-based, not combination. Tricky dp solution - key is realizing comb[target] = sum(comb[target - nums[i]]) for all i
+	// n = len(nums), t = target   time=O(t*n) space=O(t)
 	public static int combinationSum4(int[] nums, int target) {
 		int[] mem = new int[target+1]; // mem[i] is number of ways to sum to target i
 		mem[0] = 1; // base case; 1 way to sum to a zero target (with single 0)
@@ -316,6 +318,7 @@ public class AlgosBacktracing {
 //		System.out.println(Arrays.toString(mem));
 		return mem[target];
 	}
+	// runtime? space?
 	public static int combinationSum4Brute(int[] nums, int target) {
 		sum = 0;
 		combSum4(nums, target);
@@ -397,7 +400,7 @@ public class AlgosBacktracing {
 		}
 	}
 
-	// https://leetcode.com/problems/subsets/submissions/
+	// https://leetcode.com/problems/subsets
 	public static List<List<Integer>> subsets(int[] nums) {// requires nums to not contain any duplicates
 		List<List<Integer>> list = new ArrayList<>();
 		list.add(new ArrayList<>());

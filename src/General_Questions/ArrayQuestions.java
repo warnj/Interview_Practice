@@ -10,6 +10,26 @@ public class ArrayQuestions {
     public static void main(String[] args) {
     }
 
+    // https://leetcode.com/problems/fruit-into-baskets
+    // O(n) time and O(1) space - sliding window
+    public static int totalFruit(int[] fruits) {
+        int lo = 0, max = 1; // window [lo,hi) is valid fruit picking order
+        Map<Integer,Integer> s = new HashMap<>(); // int -> count(int), max size 2
+        for (int hi = 0; hi < fruits.length; ) {
+            if (s.size() < 2 || s.containsKey(fruits[hi])) { // expand window from right
+                s.put(fruits[hi], s.getOrDefault(fruits[hi], 0) + 1);
+                hi++;
+                max = Math.max(max, hi-lo);
+            } else { // shrink window from left
+                int count = s.get(fruits[lo]);
+                if (count == 1) s.remove(fruits[lo]);
+                else s.put(fruits[lo], count - 1);
+                lo++;
+            }
+        }
+        return max;
+    }
+
     // https://leetcode.com/problems/maximum-sum-circular-subarray
     public static int maxSubarraySumCircular(int[] nums) {
 
@@ -78,25 +98,41 @@ public class ArrayQuestions {
         return i;
     }
 
-    // https://leetcode.com/problems/longest-increasing-subsequence/discuss/1326308/C%2B%2BPython-DP-Binary-Search-BIT-Solutions-Picture-explain-O(NlogN)
+    // https://leetcode.com/problems/longest-increasing-subsequence
     public static int lengthOfLIS(int[] nums) {
-        List<Integer> subs = new ArrayList<>();
+        List<Integer> subs = new ArrayList<>(); // the actual LIS (sorted)
         for (int i = 0; i < nums.length; i++) {
             if (i == 0 || nums[i] > subs.get(subs.size() - 1)) { // expand the max subarray
                 subs.add(nums[i]);
-            } else { // replace within the subarray to make the numbers as tight as possible
+            } else { // replace within the subarray to make the numbers tight (ending numbers as large as possible)
                 int index = findEqualOrLarger(subs, nums[i]);
                 subs.set(index, nums[i]);
             }
         }
         return subs.size();
     }
-
-    // can do binary search here
+    // can do binary search here for nlogn total time
     private static int findEqualOrLarger(List<Integer> list, int target) {
         int i = 0;
         while (i < list.size() && list.get(i) < target) i++;
         return i;
+    }
+    // O(n^2) time, O(n) space
+    public static int lengthOfLISn2(int[] nums) {
+        int[] dp = new int[nums.length]; // dp[i] = len of longest increasing seq ending at i
+        dp[0] = 1;
+        for (int i = 1; i < nums.length; i++) {
+            int maxLesser = 1; // 1 + max of the saved LIS before i for nums less than current num (where num increases the LIS)
+            for (int j = 0; j < i; j++) {
+                if (nums[j] < nums[i])
+                    maxLesser = Math.max(maxLesser, dp[j] + 1);
+            }
+            dp[i] = maxLesser;
+        }
+        int max = dp[0]; // find the max, may not be at the end
+        for (int i = 1; i < dp.length; i++)
+            max = Math.max(max, dp[i]);
+        return max;
     }
 
     public void moveZeroes(int[] nums) {
@@ -161,7 +197,26 @@ public class ArrayQuestions {
         }
         return max;
     }
-
+    // O(nlogn) time, O(1) space, and modifies the given array
+    public static int longestConsecutiveSimple(int[] nums) {
+        if (nums.length == 0) return 0;
+        Arrays.sort(nums);
+        int max = 1; // longest seq length
+        int curMax = 1; // current seq length
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] == nums[i-1]) { // skip equal numbers, but prev seq is still valid
+                while (i < nums.length && nums[i] == nums[i-1]) i++;
+                if (i >= nums.length) return max;
+            }
+            if (nums[i] == nums[i-1] + 1) {
+                curMax++;
+                max = Math.max(max, curMax);
+            } else {
+                curMax = 1;
+            }
+        }
+        return max;
+    }
     // misses a few corner cases, passes 67 of 70 tests
     public static int longestConsecutiveWrong(int[] nums) {
         // treat it like an interval problem
@@ -486,7 +541,16 @@ public class ArrayQuestions {
         }
         return result;
     }
-
+    // https://leetcode.com/problems/majority-element
+     public static int majorityElementOneBest(int[] nums) {
+        int count = 0;
+        Integer candidate = null;
+        for (int num : nums) {
+            if (count == 0) candidate = num;
+            count += (num == candidate) ? 1 : -1;
+        }
+        return candidate;
+    }
     // O(n) time and space
     public static List<Integer> majorityElementOriginal(int[] nums) {
         Map<Integer, Integer> counts = new HashMap<>();
@@ -506,12 +570,12 @@ public class ArrayQuestions {
 
     // https://leetcode.com/problems/product-of-array-except-self/
     // 1st option to find product of entire array, then divide by nums[i] - division prohibited, /0 may cause issues and entire product may cause overflow
-    // O(n) time, O(1) space
+    // O(n) time, O(1) extra space
     public static int[] productExceptSelf(int[] nums) {
         int n = nums.length;
         if (n <= 1) return null;
         int[] result = new int[n];
-        result[n - 1] = 1;
+        result[n - 1] = 1; // holds product of the items to the right of i
         // avoid allocating a new suffix array by placing suffixes in the result array
         for (int i = n - 2; i >= 0; i--) {
             result[i] = result[i + 1] * nums[i + 1];
@@ -523,7 +587,6 @@ public class ArrayQuestions {
         }
         return result;
     }
-
     // O(n) time and space
     public static int[] productExceptSelfDP(int[] nums) {
         int n = nums.length;
@@ -1642,8 +1705,8 @@ public class ArrayQuestions {
 
     // returns first triplet of indexes in the given array that add up to the given target - O(n^3) time O(1) space
     public static int[] firstThreeSumN3(int[] nums, int target) {
-        for (int i = 0; i < nums.length; i++) {
-            for (int j = i + 1; j < nums.length; j++) {
+        for (int i = 0; i < nums.length-2; i++) {
+            for (int j = i + 1; j < nums.length-1; j++) {
                 for (int k = j + 1; k < nums.length; k++) {
                     if (nums[i] + nums[j] + nums[k] == target) {
                         return new int[]{i, j, k};
@@ -1653,7 +1716,6 @@ public class ArrayQuestions {
         }
         return null;
     }
-
     public static int[] firstThreeSumN2(int[] nums, int target) { // requires nums to be sorted
         for (int i = 0; i < nums.length - 2; i++) {
             int l = i + 1; // index of the first element in the remaining elements
@@ -1810,5 +1872,34 @@ public class ArrayQuestions {
             digits[i] = 0;
         }
         return digits;
+    }
+
+    // https://leetcode.com/problems/maximum-product-subarray/discuss/
+    // Find the contiguous subarray within an array (containing at least one number) which has the largest product.
+    public static int maxProduct(int[] nums) { // ingenious O(n) time
+        // keep track of the previous max (and min since product of 2 negatives = positive)
+        int max = nums[0];
+        int prevMax = nums[0];
+        int prevMin = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            int curMax = Math.max(nums[i], Math.max(prevMin * nums[i], prevMax * nums[i]));
+            int curMin = Math.min(nums[i], Math.min(prevMin * nums[i], prevMax * nums[i]));
+            max = Math.max(max, curMax);
+            prevMax = curMax;
+            prevMin = curMin;
+        }
+        return max;
+    }
+    public static int maxProductSlow(int[] nums) { // simple O(n^2) time
+        int max = nums[0];
+        for (int i = 0; i < nums.length; i++) { // possible subarray start points
+            max = Math.max(max, nums[i]); // single item could be max
+            int prod = nums[i];
+            for (int j = i+1; j < nums.length; j++) { // possible subarray end points
+                prod *= nums[j];
+                max = Math.max(max, prod);
+            }
+        }
+        return max;
     }
 }

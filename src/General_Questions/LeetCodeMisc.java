@@ -4,6 +4,272 @@ import java.util.*;
 
 public class LeetCodeMisc {
 
+	// https://leetcode.com/problems/evaluate-reverse-polish-notation/
+	public static int evalRPN(String[] tokens) {
+		Stack<Integer> s = new Stack<>();
+		for (String t : tokens) {
+			if (t.equals("+")) {
+				int cur = s.pop();
+				int prev = s.pop();
+				s.push(prev + cur);
+			} else if (t.equals("-")) {
+				int cur = s.pop();
+				int prev = s.pop();
+				s.push(prev - cur);
+			} else if (t.equals("*")) {
+				int cur = s.pop();
+				int prev = s.pop();
+				s.push(prev * cur);
+			} else if (t.equals("/")) {
+				int cur = s.pop();
+				int prev = s.pop();
+				s.push(prev / cur);
+			} else {
+				s.push(Integer.parseInt(t));
+			}
+		}
+		return s.peek();
+	}
+
+	public static int leastInterval(char[] tasks, int n) {
+		int[] counts = new int[26];
+		for (char c : tasks) counts[c-'A']++;
+		Arrays.sort(counts);
+		int max = counts[25]-1;
+		int spaces = max * n; // number of empty spaces in final sequence
+		for (int i = 24; i >= 0; i--)
+			spaces -= Math.min(max, counts[i]); // most frequent char may not be unique
+		spaces = Math.max(0, spaces); // spaces shouldn't be < 0
+		return tasks.length + spaces;
+	}
+	public static int leastIntervalOG(char[] tasks, int n) {
+		int[] c = new int[26];
+		for (char t : tasks) c[t - 'A']++;
+		Arrays.sort(c);
+		int i = 24; // 25-i = number of unique chars that share the max count
+		while (i >= 0 && c[i] == c[25]) i--;
+		// directly calculate the total length including chars and spaces
+		// if more chars than n share large counts, they can be interspaced such that this formula is valid
+		return Math.max(tasks.length, (c[25] - 1) * (n + 1) + 25 - i);
+	}
+
+	// https://leetcode.com/problems/count-odd-numbers-in-an-interval-range
+	public int countOdds(int low, int high) {
+		int result = (high - low + 1) / 2;
+		if (high % 2 == 1 && low % 2 == 1) result++;
+		return result;
+	}
+
+	// https://leetcode.com/problems/accounts-merge
+	// emails as nodes, edges indicate
+	private static HashSet<String> visited = new HashSet<>();
+	private static Map<String, List<String>> adjacent = new HashMap<>();
+
+	private static void DFS(List<String> mergedAccount, String email) {
+		visited.add(email);
+		// Add the email vector that contains the current component's emails
+		mergedAccount.add(email);
+		if (!adjacent.containsKey(email)) return;
+		for (String neighbor : adjacent.get(email))
+			if (!visited.contains(neighbor))
+				DFS(mergedAccount, neighbor);
+	}
+
+	public static List<List<String>> accountsMerge(List<List<String>> accountList) {
+		for (List<String> account : accountList) {
+			int accountSize = account.size();
+			// Building adjacency list
+			// Adding edge between first email to all other emails in the account
+			String accountFirstEmail = account.get(1);
+			for (int j = 2; j < accountSize; j++) {
+				String accountEmail = account.get(j);
+				if (!adjacent.containsKey(accountFirstEmail)) {
+					adjacent.put(accountFirstEmail, new ArrayList<>());
+				}
+				adjacent.get(accountFirstEmail).add(accountEmail);
+				if (!adjacent.containsKey(accountEmail)) {
+					adjacent.put(accountEmail, new ArrayList<>());
+				}
+				adjacent.get(accountEmail).add(accountFirstEmail);
+			}
+		}
+		// Traverse over all th accounts to store components
+		List<List<String>> mergedAccounts = new ArrayList<>();
+		for (List<String> account : accountList) {
+			String accountName = account.get(0);
+			String accountFirstEmail = account.get(1);
+			// If email is visited, then it's a part of different component
+			// Hence perform DFS only if email is not visited yet
+			if (!visited.contains(accountFirstEmail)) {
+				List<String> mergedAccount = new ArrayList<>();
+				// Adding account name at the 0th index
+				mergedAccount.add(accountName);
+				DFS(mergedAccount, accountFirstEmail);
+				Collections.sort(mergedAccount.subList(1, mergedAccount.size()));
+				mergedAccounts.add(mergedAccount);
+			}
+		}
+		return mergedAccounts;
+	}
+	// can't solve with hashset only approach, only works for very simple cases
+	public static List<List<String>> accountsMergeWrong(List<List<String>> accounts) {
+		Map<String,String> duplicates = new HashMap<>(); // map duplicate unique names to original unique names
+		Map<String,String> emails = new HashMap<>(); // map email -> unique name
+		Map<String,String> names = new HashMap<>(); // unique name -> name
+		// find the duplicate names
+		for (int i = 0; i < accounts.size(); i++) {
+			String uniqueName = accounts.get(i).get(0) + i;
+			names.put(uniqueName, accounts.get(i).get(0));
+			for (int j = 1; j < accounts.get(i).size(); j++) {
+				String email = accounts.get(i).get(j);
+				if (emails.containsKey(email)) {
+					String ogName = emails.get(email);
+					duplicates.put(uniqueName, ogName);
+					emails.put(email, ogName); // important that all emails map back to the 1st unique name
+				} else {
+					emails.put(email, uniqueName);
+				}
+			}
+		}
+		System.out.println(duplicates);
+		// duplicates need to map back to the 1st unique name
+		boolean mod = true;
+		while (mod) {
+			List<String> fix = new ArrayList<>(); // don't modify the map while iterating it
+			for (Map.Entry<String,String> d : duplicates.entrySet()) {
+				if (duplicates.containsKey(d.getValue())) {
+					fix.add(d.getKey());
+				}
+			}
+			mod = !fix.isEmpty();
+			for (String s : fix) {
+				duplicates.put(s, duplicates.get(duplicates.get(s)));
+			}
+		}
+		System.out.println(duplicates);
+		System.out.println(emails);
+		System.out.println(names);
+		// store all emails associated with a person by unique name (remove duplicates)
+		Map<String,Set<String>> r = new HashMap<>(); // unique name -> emails
+		for (int i = 0; i < accounts.size(); i++) {
+			String uniqueName = accounts.get(i).get(0) + i;
+			if (duplicates.containsKey(uniqueName)) {
+				uniqueName = duplicates.get(uniqueName);
+			}
+			Set<String> es = r.get(uniqueName);
+			if (es == null) {
+				es = new HashSet<>();
+				r.put(uniqueName, es);
+			}
+			for (int j = 1; j < accounts.get(i).size(); j++) {
+				String email = accounts.get(i).get(j);
+				es.add(email);
+			}
+		}
+		System.out.println(r);
+		// format output from map to list<list> and sorted
+		List<List<String>> results = new ArrayList<>();
+		for (Map.Entry<String, Set<String>> e : r.entrySet()) {
+			List<String> result = new ArrayList<>(e.getValue());
+			Collections.sort(result);
+			result.add(0, names.get(e.getKey()));
+			results.add(result);
+		}
+		return results;
+	}
+
+	// https://leetcode.com/problems/text-justification
+	// k = # words in s, n = len(s)     0(n+k+n) time roughly
+	public static List<String> textJustify(String[] words, int cols) {
+		List<String> lines = new ArrayList<>();
+		String removed = null;
+		for (int i = 0; i < words.length; ) {
+			List<String> line = new ArrayList<>();
+			int lineChars = 0;
+			if (removed != null) {
+				line.add(removed);
+				lineChars += removed.length() + 1;
+				removed = null;
+			}
+			// fill a line
+			while (i < words.length && lineChars < cols) {
+				String word = words[i];
+				line.add(word);
+				lineChars += word.length() + 1; // need at least 1 space between words
+				i++;
+			}
+			if (lineChars > cols + 1) { // gone over by one word
+				removed = line.remove(line.size() - 1);
+			}
+			if (i == words.length && removed == null) { // last line
+				String start = String.join(" ", line);
+				lines.add(start + " ".repeat(cols - start.length()));
+			} else {
+				lines.add(fillLine(line, cols));
+			}
+		}
+		if (removed != null) lines.add(removed + " ".repeat(cols - removed.length()));
+		return lines;
+	}
+	// returns the given list of words in a string of cols length with spaces allocated evenly between
+	private static String fillLine(List<String> words, int cols) {
+		if (words.size() == 1) return words.get(0) + " ".repeat(cols - words.get(0).length());
+		int wordsLen = 0;
+		for (String w : words) wordsLen += w.length();
+		int spaceSize = (cols - wordsLen) / (words.size() - 1); // total # spaces / # gaps between words
+		int spacesUsed = (words.size() - 1) * spaceSize; // after int division, multiply again to get # spaces to fill
+		int extra = cols - (wordsLen + spacesUsed); // remainder, allocate these 1 per gap until used up
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < words.size(); i++) {
+			String w = words.get(i);
+			sb.append(w);
+			if (i != words.size() - 1) {
+				for (int j = 0; j < spaceSize; j++) {
+					sb.append(" ");
+				}
+				if (extra > 0) { // allocate the extra 1-off spaces to the first gaps, 1 per gap
+					sb.append(" ");
+					extra--;
+				}
+			}
+		}
+		return sb.toString();
+	}
+
+	// https://leetcode.com/problems/best-team-with-no-conflicts/description/
+	public static int bestTeamScore(int[] scores, int[] ages) {
+		// O(n) extra space, O(n*logn + n^2) time
+		List<int[]> players = new ArrayList<>(scores.length);
+		for (int i = 0; i < scores.length; i++) {
+			players.add(new int[]{scores[i], ages[i]});
+		}
+		players.sort((o1, o2) -> {
+			int ageDiff = o1[1] - o2[1];
+			int scoreDiff = o1[0] - o2[0];
+			return ageDiff != 0 ? ageDiff : scoreDiff;
+		}); // sort by age (low to high), then by score (low to high)
+
+//		for (int[] p : players) System.out.println(Arrays.toString(p));
+
+		int[] maxes = new int[scores.length]; // maxes[i] = max sum for all sequences ending at i
+		maxes[0] = players.get(0)[0];
+		for (int hi = 1; hi < scores.length; hi++) { // ending sequence points
+			int max = players.get(hi)[0]; // seq of len 1
+			for (int lo = 0; lo < hi; lo++) { // starting points - seq not required to be consecutive
+				if (players.get(hi)[0] >= players.get(lo)[0]) {
+					// if the later player can be in a team with the starting player, consider team score
+					max = Math.max(max, maxes[lo] + players.get(hi)[0]);
+				}
+			}
+			maxes[hi] = max;
+		}
+//		System.out.println(Arrays.toString(maxes));
+		int max = maxes[0];
+		for (int i = 1; i < scores.length; i++) max = Math.max(max, maxes[i]);
+		return max;
+	}
+
 	// https://leetcode.com/problems/cheapest-flights-within-k-stops
 	// dijkstra's or bfs or bellman ford
 	public static int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
@@ -639,42 +905,6 @@ public class LeetCodeMisc {
 //			}
 //		}
 		return -1;
-	}
-
-	// https://leetcode.com/problems/maximum-product-subarray/discuss/
-	// Find the contiguous subarray within an array (containing at least one number) which has the largest product.
-	public static int maxProduct(int[] nums) { // ingenious O(n) time
-		int max = nums[0];
-		// keep track of the previous max (and min since product of 2 negatives = positive)
-		int maxherepre = nums[0];
-		int minherepre = nums[0];
-
-		for (int i = 1; i < nums.length; i++) {
-			int maxhere = Math.max(Math.max(maxherepre * nums[i], minherepre * nums[i]), nums[i]);
-			int minhere = Math.min(Math.min(maxherepre * nums[i], minherepre * nums[i]), nums[i]);
-			max = Math.max(maxhere, max);
-			maxherepre = maxhere;
-			minherepre = minhere;
-		}
-		return max;
-	}
-	public static int maxProductSlow(int[] nums) { // brute force O(n^2) time
-		int max = nums[0];
-		for (int i = 0; i < nums.length; i++) {
-			for (int j = i; j < nums.length; j++) {
-				//        		System.out.println(i+" "+j);
-				int p = product(nums, i, j); 
-				if (p > max) max = p;
-			}
-		}
-		return max;
-	}
-	private static int product(int[] a, int lo, int hi) {
-		int prod = 1;
-		for (int i = lo; i <= hi; i++) {
-			prod *= a[i];
-		}
-		return prod;
 	}
 
 	// https://leetcode.com/problems/generate-parentheses

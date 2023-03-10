@@ -4,6 +4,183 @@ import java.util.*;
 
 public class GraphQuestions {
 
+    static class ShortestPathBFS {
+        private int V; // number of vertices
+        private LinkedList<Integer>[] adj; // adjacency list
+
+        public ShortestPathBFS(int v) {
+            V = v;
+            adj = new LinkedList[v];
+            for (int i = 0; i < v; i++) {
+                adj[i] = new LinkedList<>();
+            }
+        }
+
+        public void addEdge(int u, int v) {
+            adj[u].add(v);
+            adj[v].add(u);
+        }
+
+        public List<Integer> shortestPath(int start, int end) {
+            boolean[] visited = new boolean[V];
+            Queue<Integer> queue = new LinkedList<>();
+            // create an array to store the shortest path & initialize parent array with -1
+            int[] parent = new int[V];
+            Arrays.fill(parent, -1);
+
+            visited[start] = true;
+            queue.add(start);
+
+            while (!queue.isEmpty()) {
+                int current = queue.poll();
+                if (current == end) {
+                    break;
+                }
+                for (int neighbor : adj[current]) {
+                    if (!visited[neighbor]) {
+                        visited[neighbor] = true;
+                        parent[neighbor] = current;
+                        queue.add(neighbor);
+                    }
+                }
+            }
+
+            List<Integer> path = new ArrayList<>();
+            int current = end;
+            while (current != -1) {
+                path.add(current);
+                current = parent[current];
+            }
+            Collections.reverse(path);
+            return path;
+        }
+
+        public static void main(String[] args) {
+            ShortestPathBFS graph = new ShortestPathBFS(5);
+            graph.addEdge(0, 1);
+            graph.addEdge(0, 4);
+            graph.addEdge(1, 2);
+            graph.addEdge(1, 3);
+            graph.addEdge(1, 4);
+            graph.addEdge(2, 3);
+            graph.addEdge(3, 4);
+
+            List<Integer> shortestPath = graph.shortestPath(0, 2);
+            System.out.println("Shortest path between 0 and 2: " + shortestPath);
+        }
+    }
+
+
+    // https://leetcode.com/problems/minimum-fuel-cost-to-report-to-the-capital/
+    public static long minimumFuelCost(int[][] roads, int seats) {
+        long result = 0;
+
+        return result;
+    }
+
+    // https://leetcode.com/problems/shortest-path-with-alternating-colors
+    public static int[] shortestAlternatingPathsSoln(int n, int[][] redEdges, int[][] blueEdges) {
+        Map<Integer, List<List<Integer>>> adj = new HashMap<>();
+        for (int[] redEdge : redEdges)
+            adj.computeIfAbsent(redEdge[0], k -> new ArrayList<>()).add(Arrays.asList(redEdge[1], 0));
+
+        for (int[] blueEdge : blueEdges)
+            adj.computeIfAbsent(blueEdge[0], k -> new ArrayList<>()).add(Arrays.asList(blueEdge[1], 1));
+
+        int[] answer = new int[n];
+        Arrays.fill(answer, -1);
+        boolean[][] visit = new boolean[n][2];
+        Queue<int[]> q = new LinkedList<>();
+
+        // Start with node 0, with number of steps as 0 and undefined color -1.
+        q.offer(new int[] { 0, 0, -1 });
+        answer[0] = 0;
+        visit[0][1] = visit[0][0] = true;
+
+        while (!q.isEmpty()) {
+            int[] element = q.poll();
+            int node = element[0], steps = element[1], prevColor = element[2];
+
+            if (!adj.containsKey(node)) continue;
+
+            for (List<Integer> nei : adj.get(node)) {
+                int neighbor = nei.get(0);
+                int color = nei.get(1);
+                if (!visit[neighbor][color] && color != prevColor) {
+                    if (answer[neighbor] == -1)
+                        answer[neighbor] = 1 + steps;
+                    visit[neighbor][color] = true;
+                    q.offer(new int[] { neighbor, 1 + steps, color });
+                }
+            }
+        }
+        return answer;
+    }
+    public static int[] shortestAlternatingPaths(int n, int[][] redEdges, int[][] blueEdges) {
+        Map<Integer,List<Integer>> red = new HashMap<>();
+        Map<Integer,List<Integer>> blue = new HashMap<>();
+        for (int[] e : redEdges) {
+            List<Integer> cs = red.getOrDefault(e[0], new ArrayList<>());
+            cs.add(e[1]);
+            red.put(e[0], cs);
+        }
+        for (int[] e : blueEdges) {
+            List<Integer> cs = blue.getOrDefault(e[0], new ArrayList<>());
+            cs.add(e[1]);
+            blue.put(e[0], cs);
+        }
+
+        int[] result = new int[n];
+        Arrays.fill(result, -1);
+        result[0] = 0;
+
+        Set<Integer> visited = new HashSet<>();
+        int[] steps = new int[n];
+        Map<Integer,Boolean> prevRed = new HashMap<>(); // node to prev color
+        Queue<Integer> wl = new LinkedList<>();
+
+        List<Integer> l = red.get(0);
+        if (l != null) {
+            wl.addAll(l);
+            for (int i : l) {
+                prevRed.put(i, true);
+                steps[i] = 1;
+            }
+        }
+
+        l = blue.get(0);
+        if (l != null) {
+            wl.addAll(l);
+            for (int i : l) {
+                prevRed.put(i, false);
+                steps[i] = 1;
+            }
+        }
+
+        while (!wl.isEmpty()) {
+            int node = wl.remove();
+            boolean prevR = prevRed.get(node);
+            result[node] = steps[node];
+            visited.add(node);
+            List<Integer> children;
+            if (prevR) {
+                children = blue.get(node);
+            } else {
+                children = red.get(node);
+            }
+            if (children != null) {
+                for (int child : children) {
+                    if (!visited.contains(child)) {
+                        wl.add(child);
+                        steps[child]++;
+                        prevRed.put(child, !prevR);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     // https://leetcode.com/problems/clone-graph/
     // easy way out: double pass - 1st create all new nodes, then create the connections between them
     // O(V+E) time and O(2V) extra space for Map and bool[] (beyond the V+E required by definition for deep clone)

@@ -330,6 +330,15 @@ public class IntTree {
 		}
 	}
 
+	// LCA of BST: https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree
+	public TreeNode lowestCommonAncestorBST(TreeNode root, TreeNode p, TreeNode q) {
+		int max = Math.max(p.val, q.val);
+		int min = Math.min(p.val, q.val);
+		if (root.val > max) return lowestCommonAncestor(root.left, p, q);
+		if (root.val < min) return lowestCommonAncestor(root.right, p, q);
+		return root;
+	}
+
 	// returns the least-valued common ancestor of the two given nodes. A node can be a descendant of itself.
 	public int lca(TreeNode root, int v1, int v2) {
 		TreeNode lca = getLca(root, v1, v2);
@@ -339,17 +348,52 @@ public class IntTree {
 			return Integer.MIN_VALUE;
 		}
 	}
+	// LCA for any tree recursive: https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree
 	private TreeNode getLca(TreeNode root, int v1, int v2) {
 		// look for the two target nodes (v1 and v2)
-		if(root == null) return null;
-		if(root.val == v1 || root.val == v2) return root; 
+		if (root == null) return null;
+		if (root.val == v1 || root.val == v2) return root;
 		TreeNode leftVal = getLca(root.left, v1, v2);
 		TreeNode rightVal = getLca(root.right, v1, v2);
 
-		if(leftVal != null && rightVal != null) return root; // this node is the ancestor
-
+		if (leftVal != null && rightVal != null) return root; // this node is the ancestor
 		if (leftVal != null) return leftVal; // the ancestor was found in the left subtree
 		else return rightVal; // the ancestor was found (or not found) in the right subtree
+	}
+	// iterative impl of the above. O(n + height(root)) time and space
+	public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+		Map<TreeNode,TreeNode> parents = new HashMap<>(); // parent pointers: node -> parent
+		// bfs to build the map
+		Queue<TreeNode> worklist = new LinkedList<>();
+		worklist.add(root);
+		while (!worklist.isEmpty()) {
+			TreeNode cur = worklist.remove();
+			if (cur.left != null) {
+				parents.put(cur.left, cur);
+				worklist.add(cur.left);
+			}
+			if (cur.right != null) {
+				parents.put(cur.right, cur);
+				worklist.add(cur.right);
+			}
+		}
+		// start at p & q and traverse up
+		Set<TreeNode> seen = new HashSet<>();
+		TreeNode cur = p;
+		seen.add(cur);
+		while (parents.containsKey(cur)) {
+			seen.add(parents.get(cur));
+			cur = parents.get(cur);
+		}
+		cur = q;
+		if (seen.contains(cur)) return cur;
+		while (parents.containsKey(cur)) {
+			if (seen.contains(parents.get(cur))) {
+				return parents.get(cur);
+			}
+			cur = parents.get(cur);
+		}
+		return root; // root not part of parents
 	}
 
 	public int size() {
@@ -360,6 +404,22 @@ public class IntTree {
 			return 1 + size(root.left) + size(root.right);
 		}
 		return 0;
+	}
+
+	// https://leetcode.com/problems/diameter-of-binary-tree
+	// O(n) time and O(H) space
+	private int maxDiam=0;
+	public int diameterOfBinaryTree(TreeNode root) {
+		heightDiam(root);
+		return maxDiam;
+	}
+	// return the height of given node and save max while doing it to avoid nested recursion and duplicate effort
+	private int heightDiam(TreeNode root) {
+		if (root==null) return 0;
+		int left = heightDiam(root.left);
+		int right = heightDiam(root.right);
+		maxDiam = Math.max(left+right, maxDiam);
+		return Math.max(left,right)+1;
 	}
 
 	// if k=1, then returns the min value, if k=2 returns the second smallest val....
@@ -472,20 +532,18 @@ public class IntTree {
 		return sum == 0;
 	}
 
-	//    public boolean isBalanced() { // O(n^2)
-	//    	return isBalanced(overallRoot);
-	//    }
-	//    private boolean isBalanced(TreeNode root) {
-	//    	if(root == null) return true;
-	//    	
-	//    	if (Math.abs(height(root.left) - height(root.right)) > 1) {
-	//    		return false;
-	//    	} else {
-	//    		return isBalanced(root.left) && isBalanced(root.right);
-	//    	}
-	//    }
-
-	// 0(N) time and 0(H) space, where H is the height of the tree
+	// https://leetcode.com/problems/balanced-binary-tree
+	// naive O(n^2) time and O(H) stack space
+	public boolean isBalanced(TreeNode root) {
+		if (root != null) {
+			int l = height(root.left);
+			int r = height(root.right);
+			if (Math.abs(l-r) > 1) return false;
+			return isBalanced(root.left) && isBalanced(root.right);
+		}
+		return true;
+	}
+	// best 0(N) time and 0(H) space, where H is the height of the tree
 	public boolean isBalanced() {
 		return checkHeight(overallRoot) != -1;
 	}
@@ -839,10 +897,8 @@ public class IntTree {
 		return height(overallRoot);
 	}	
 	private int height(TreeNode root) {
-		if(root == null) return 0;
-		else {
-			return 1 + Math.max(height(root.left), height(root.right));
-		}
+		if (root == null) return 0;
+		return 1 + Math.max(height(root.left), height(root.right));
 	}
 
 	public boolean isBST() {

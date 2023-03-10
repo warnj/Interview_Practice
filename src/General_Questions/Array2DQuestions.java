@@ -4,7 +4,248 @@ import java.util.*;
 
 public class Array2DQuestions {
 
-	public static void main(String[] args) {
+	// https://leetcode.com/problems/01-matrix
+
+	// doing bfs from every 0, max of (total size / 2) zeros and (total size / 2) connected ones = runtime O((n*m)^2)
+	public int[][] updateMatrixBad(int[][] mat) {
+		int[][] r = new int[mat.length][mat[0].length];
+		for (int[] a : r) {
+			Arrays.fill(a, Integer.MAX_VALUE);
+		}
+		for (int y = 0; y < mat.length; y++) {
+			for (int x = 0; x < mat[0].length; x++) {
+				if (mat[y][x] == 0) {
+					// run bfs
+					boolean[][] v = new boolean[mat.length][mat[0].length];
+					r[y][x] = 0;
+					v[y][x] = true;
+					Queue<int[]> q = new LinkedList<>();
+					q.add(new int[]{x, y, 0}); // x,y,distance from 0
+					bfs(mat, r, v, q);
+				}
+			}
+		}
+		return r;
+	}
+	private void bfs(int[][] mat, int[][] r, boolean[][] v, Queue<int[]> q) {
+		while (!q.isEmpty()) {
+			int[] triple = q.remove();
+			int x = triple[0];
+			int y = triple[1];
+			int d = triple[2];
+			v[y][x] = true;
+			r[y][x] = Math.min(r[y][x], d);
+
+			if (x-1 >= 0 && mat[y][x-1] != 0 && !v[y][x-1]) {
+				q.add(new int[]{x-1, y, d+1});
+			}
+			if (x+1 < r[0].length && mat[y][x+1] != 0 && !v[y][x+1]) {
+				q.add(new int[]{x+1, y, d+1});
+			}
+			if (y+1 < r.length && mat[y+1][x] != 0 && !v[y+1][x]) {
+				q.add(new int[]{x, y+1, d+1});
+			}
+			if (y-1 >= 0 && mat[y-1][x] != 0 && !v[y-1][x]) {
+				q.add(new int[]{x, y-1, d+1});
+			}
+		}
+	}
+
+	// https://leetcode.com/problems/as-far-from-land-as-possible
+	// bfs
+	public static int maxDistanceBFS(int[][] grid) {
+		int n = grid.length;
+		Queue<int[]> q = new LinkedList<>();
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				// start from all land coords
+				if (grid[i][j] == 1) q.add(new int[]{i, j});
+			}
+		}
+		if (q.isEmpty() || q.size() == n * n) return -1;
+		int res = -1;
+		int[][] dirs = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+		while (!q.isEmpty()) {
+			int size = q.size(); // expand out 1 cell from all land locations
+			res++;
+			while (size-- > 0) {
+				int[] cell = q.remove();
+				int x = cell[0], y = cell[1];
+				for (int[] dir : dirs) { // explore up/down/left/right
+					int i = x + dir[0];
+					int j = y + dir[1];
+					if (i >= 0 && i < n && j >= 0 && j < n && grid[i][j] == 0) {
+						grid[i][j] = 1; // expand into a water cell, marking it as visited
+						q.add(new int[]{i, j});
+					}
+				}
+			}
+		}
+		return res;
+	}
+	// 1st pass save the min distance from land in the water cells coming from top and left
+	// 2nd pass ave the min distance from land from the bottom and right
+	// return the max val
+	public static int maxDistance(int[][] grid) {
+		int yMax = grid.length;
+		int xMax = grid[0].length;
+		int maxDist = xMax + yMax;
+		for (int y = 0; y < yMax; y++) {
+			for (int x = 0; x < xMax; x++) {
+				if (grid[y][x] != 1) {
+					int top = maxDist; // furthest possible from land
+					int left = maxDist;
+					if (y-1 >= 0) top = grid[y-1][x]; // if cell above is land, dist should be 1, will be 2, subtract at end
+					if (x-1 >= 0) left = grid[y][x-1];
+					grid[y][x] = 1 + Math.min(top, left);
+				}
+			}
+		}
+		for (int y = yMax-1; y >= 0; y--) {
+			for (int x = xMax-1; x >= 0; x--) {
+				if (grid[y][x] != 1) {
+					int bottom = maxDist;
+					int right = maxDist;
+					if (y + 1 < yMax) bottom = grid[y + 1][x];
+					if (x + 1 < xMax) right = grid[y][x + 1];
+					grid[y][x] = Math.min(grid[y][x], 1 + Math.min(right, bottom));
+				}
+			}
+		}
+		int result = -1;
+		for (int y = 0; y < yMax; y++) {
+			for (int x = 0; x < xMax; x++) {
+				result = Math.max(result, grid[y][x]);
+			}
+		}
+		result--; // subtract the 1 from og land cell
+		return result == maxDist+1 || result <= 0 ? -1 : result;
+	}
+
+	// https://leetcode.com/problems/k-closest-points-to-origin
+	public static int[][] kClosest(int[][] points, int k) {
+		// use a max heap comparing by distance from (0,0)
+		// only add to it if the current distance is < the heap's max
+		PriorityQueue<int[]> pq = new PriorityQueue<>(k+1, new Comparator<int[]>() {
+			@Override
+			public int compare(int[] o1, int[] o2) {
+				int d1 = o1[0] * o1[0] + o1[1] * o1[1];
+				int d2 = o2[0] * o2[0] + o2[1] * o2[1];
+				return d2-d1;
+			}
+		});
+		// fill pq with k points; k <= points.length
+		for (int[] p : points) {
+			pq.offer(p);
+			if (pq.size() > k) pq.poll();
+		}
+		int[][] result = new int[k][];
+		for (int i = 0; i < k; i++) {
+			result[i] = pq.remove();
+		}
+		return result;
+	}
+
+	// https://leetcode.com/problems/rotting-oranges
+	// simplest possible solution, plenty of optimizations could be done
+	// runtime: O(n * m * max(m,n))  extra space O(n*m)
+	public static int orangesRotting(int[][] grid) {
+		int rows = grid.length;
+		int cols = grid[0].length;
+		boolean modified = true;
+		int steps = 0;
+		for (; modified; steps++) {
+			modified = false;
+			List<int[]> rotten = new ArrayList<>(); // save rotten spots, modify all together in 2nd traverse
+			for (int y = 0; y < rows; y++) {
+				for (int x = 0; x < cols; x++) {
+					if (grid[y][x] == 2) {
+						rotten.add(new int[]{x,y});
+					}
+				}
+			}
+			for (int[] coords : rotten) {
+				int x = coords[0];
+				int y = coords[1];
+				// make any fresh fruit around rotten
+				if (y-1 >= 0 && grid[y-1][x] == 1) {
+					grid[y-1][x] = 2;
+					modified = true;
+				}
+				if (x-1 >= 0 && grid[y][x-1] == 1) {
+					grid[y][x-1] = 2;
+					modified = true;
+				}
+				if (y+1 < rows && grid[y+1][x] == 1) {
+					grid[y+1][x] = 2;
+					modified = true;
+				}
+				if (x+1 < cols && grid[y][x+1] == 1) {
+					grid[y][x+1] = 2;
+					modified = true;
+				}
+			}
+		}
+		for (int y = 0; y < rows; y++) {
+			for (int x = 0; x < cols; x++) {
+				if (grid[y][x] == 1) {
+					return -1; // fresh fruit still present
+				}
+			}
+		}
+		return steps - 1;
+	}
+
+	// https://leetcode.com/problems/max-points-on-a-line
+	public static int maxPoints(int[][] points) {
+		return -1;
+	}
+
+	// https://leetcode.com/problems/snakes-and-ladders
+	// bfs to find shortest path
+	public static int snakesAndLadders(int[][] board) {
+		int n = board.length;
+		Queue<int[]> worklist = new LinkedList<>();
+		boolean[] visited = new boolean[n*n];
+		worklist.add(new int[]{1, 0}); // board position squareNum and num moves to get here
+		while (!worklist.isEmpty()) {
+			int[] pos = worklist.remove();
+			for (int i = pos[0]+1; i <= Math.min(pos[0]+6, n*n); i++) { // possible moves
+				int[] newCoords = getCoord(i, n);
+				int contents = board[newCoords[1]][newCoords[0]];
+				int newPos = i; // default to dice roll
+				if (contents != -1) {
+					newPos = contents; // slide on the snake/ladder to new spot
+				}
+				if (newPos == n*n) {
+					return pos[1] + 1;
+				}
+//				System.out.println("moving from " + pos[0] + " to " + newPos + " which is move " + (pos[1]+1));
+				if (!visited[newPos-1]) {
+					visited[newPos-1] = true;
+					worklist.add(new int[]{newPos, pos[1] + 1});
+				}
+			}
+		}
+		return -1; // should never happen
+	}
+	// returns (x,y) coord of position on nxn Boustrophedon style board for given squareNum
+	public static int[] getCoord(int squareNum, int n) {
+		int row = (squareNum-1) / n; // bottom up row number zero-based
+		int x;
+		if (row % 2 == 0) {
+			x = (squareNum-1) % n;
+		} else {
+			x = n - 1 - ((squareNum-1) % n);
+		}
+		return new int[]{x,n-1-row};
+	}
+	public static String deepStr(Queue<int[]> q) {
+		StringBuilder sb = new StringBuilder();
+		for (int[] a : q) {
+			sb.append(Arrays.toString(a) + ", ");
+		}
+		return sb.toString();
 	}
 
 	// https://leetcode.com/problems/surrounded-regions/

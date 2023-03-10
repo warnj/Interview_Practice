@@ -3,6 +3,9 @@ package General_Questions;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 // trie for lowercase english letters, mostly taken from
 // https://leetcode.com/problems/implement-trie-prefix-tree/solution
 public class Trie {
@@ -121,6 +124,10 @@ public class Trie {
         t.insert("abczx");
         t.insert("zqr");
         System.out.println(t);
-        System.out.println(t.getAllStartsWith("a"));
+        List<String> words = t.getAllStartsWith("a");
+        assertEquals(3, words.size());
+        assertTrue(words.contains("abcdef"));
+        assertTrue(words.contains("abc"));
+        assertTrue(words.contains("abczx"));
     }
 }

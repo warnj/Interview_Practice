@@ -1,16 +1,67 @@
 package Tests;
 
-import General_Questions.Array2DQuestions;
 import General_Questions.LeetCodeMisc;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class LeetCodeMiscTests {
+
+    @Test
+    public void testEvalRPN() {
+        assertEquals(9, LeetCodeMisc.evalRPN(new String[]{"2","1","+","3","*"}));
+        assertEquals(6, LeetCodeMisc.evalRPN(new String[]{"4","13","5","/","+"}));
+        assertEquals(22, LeetCodeMisc.evalRPN(new String[]{"10","6","9","3","+","-11","*","/","*","17","+","5","+"}));
+    }
+
+    @Test
+    public void testLeastInterval() {
+        assertEquals(12, LeetCodeMisc.leastInterval(new char[]{'A','A','A','B','B','B','C','C','C'}, 1));
+        assertEquals(8, LeetCodeMisc.leastInterval(new char[]{'A','A','A','B','B','B'}, 2));
+        assertEquals(10, LeetCodeMisc.leastInterval(new char[]{'A','A','A','B','B','B','B'}, 2));
+        assertEquals(6, LeetCodeMisc.leastInterval(new char[]{'A','A','A','B','B','B'}, 1));
+        assertEquals(6, LeetCodeMisc.leastInterval(new char[]{'A','A','A','B','B','B'}, 0));
+        assertEquals(16, LeetCodeMisc.leastInterval(new char[]{'A','A','A','A','A','A','B','C','D','E','F','G'}, 2));
+    }
+
+    @Test
+    public void testAccountsMerge() {
+        String[][] accounts = new String[][]{{"John","johnsmith@mail.com","john_newyork@mail.com"},{"John","johnsmith@mail.com","john00@mail.com"},{"Mary","mary@mail.com"},{"John","johnnybravo@mail.com"}};
+        List<List<String>> l = new ArrayList<>();
+        for (String[] a : accounts) l.add(Arrays.asList(a));
+        List<List<String>> merged = LeetCodeMisc.accountsMerge(l);
+        assertEquals(3, merged.size());
+
+        accounts = new String[][]{{"David","David0@m.co","David4@m.co","David3@m.co"},{"David","David5@m.co","David5@m.co","David0@m.co"},{"David","David1@m.co","David4@m.co","David0@m.co"},{"David","David0@m.co","David1@m.co","David3@m.co"},{"David","David4@m.co","David1@m.co","David3@m.co"}};
+        accounts = new String[][]{{"David","David0@m.co","David1@m.co"},{"David","David3@m.co","David4@m.co"},{"David","David4@m.co","David5@m.co"},{"David","David2@m.co","David3@m.co"},{"David","David1@m.co","David2@m.co"}};
+        l = new ArrayList<>();
+        for (String[] a : accounts) l.add(Arrays.asList(a));
+        merged = LeetCodeMisc.accountsMerge(l);
+        System.out.println(merged);
+        assertEquals(1, merged.size());
+    }
+
+    @Test
+    public void testTextJustify() {
+        List<String> lines = LeetCodeMisc.textJustify(new String[]{"This", "is", "an", "example", "of", "text", "justification."}, 16);
+        assertEquals(3, lines.size());
+        assertEquals("This    is    an", lines.get(0));
+        assertEquals("example  of text", lines.get(1));
+        assertEquals("justification.  ", lines.get(2));
+    }
+
+    @Test
+    public void testBestTeamScore() {
+        assertEquals(34, LeetCodeMisc.bestTeamScore(new int[]{1,3,5,10,15}, new int[]{1,2,3,4,5}));
+        assertEquals(16, LeetCodeMisc.bestTeamScore(new int[]{4,5,6,5}, new int[]{2,1,2,1}));
+        assertEquals(6, LeetCodeMisc.bestTeamScore(new int[]{1,2,3,5}, new int[]{8,9,10,1}));
+        assertEquals(7, LeetCodeMisc.bestTeamScore(new int[]{1,2,3,7}, new int[]{8,9,10,1}));
+        assertEquals(29, LeetCodeMisc.bestTeamScore(new int[]{1,3,7,3,2,4,10,7,5}, new int[]{4,5,2,1,1,2,4,1,4}));
+    }
 
     @Test
     public void testFindCheapestPrice() {

@@ -13,6 +13,31 @@ import static org.junit.Assert.*;
 public class Array2DQuestionsTests {
 
 	@Test
+	public void testMaxPoints() {
+		assertEquals(3, Array2DQuestions.maxPoints(new int[][]{{1,1},{2,2},{3,3}}));
+		assertEquals(4, Array2DQuestions.maxPoints(new int[][]{{1,1},{3,2},{5,3},{4,1,},{2,3},{4,1}}));
+	}
+
+	@Test
+	public void testSnakesAndLadders() {
+		int[][] b = new int[][]{{-1,-1,-1,-1,-1,-1},{-1,-1,-1,-1,-1,-1},{-1,-1,-1,-1,-1,-1},{-1,35,-1,-1,13,-1},{-1,-1,-1,-1,-1,-1},{-1,15,-1,-1,-1,-1}};
+		assertEquals(4, Array2DQuestions.snakesAndLadders(b));
+		b = new int[][]{{-1,-1},{-1,3}};
+		assertEquals(1, Array2DQuestions.snakesAndLadders(b));
+	}
+	@Test
+	public void testSnakesAndLaddersGetCoord() {
+		assertArrayEquals(new int[]{0,5}, Array2DQuestions.getCoord(1, 6));
+		assertArrayEquals(new int[]{1,5}, Array2DQuestions.getCoord(2, 6));
+		assertArrayEquals(new int[]{4,5}, Array2DQuestions.getCoord(5, 6));
+		assertArrayEquals(new int[]{5,5}, Array2DQuestions.getCoord(6, 6));
+		assertArrayEquals(new int[]{4,4}, Array2DQuestions.getCoord(8, 6));
+		assertArrayEquals(new int[]{1,4}, Array2DQuestions.getCoord(11, 6));
+		assertArrayEquals(new int[]{1,0}, Array2DQuestions.getCoord(35, 6));
+		assertArrayEquals(new int[]{0,0}, Array2DQuestions.getCoord(36, 6));
+	}
+
+	@Test
 	public void testSurroundedRegions() {
 		char[][] board = new char[][]{{'X','X','X','X'},{'X','O','O','X'},{'X','X','O','X'},{'X','O','X','X'}};
 		Array2DQuestions.solve(board);

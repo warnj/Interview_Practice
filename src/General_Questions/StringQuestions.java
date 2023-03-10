@@ -8,6 +8,150 @@ public class StringQuestions {
 		System.out.println();
 	}
 
+	// returns true if a permutation of s1 is in s2: https://leetcode.com/problems/permutation-in-string
+	// optimized sliding window - O(l1 + (l2-l1)) time and O(1) space
+	public static boolean checkInclusion(String s1, String s2) {
+		if (s1.length() > s2.length()) return false;
+		int[] s1map = new int[26]; // char counts in s1
+		int[] s2map = new int[26]; // char counts in s2 sliding window with length = len(s1)
+		for (int i = 0; i < s1.length(); i++) {
+			s1map[s1.charAt(i) - 'a']++;
+			s2map[s2.charAt(i) - 'a']++;
+		}
+
+		int count = 0; // count of matching char counts between s1map and s2map
+		for (int i = 0; i < 26; i++)
+			if (s1map[i] == s2map[i])
+				count++;
+
+		for (int i = 0; i < s2.length() - s1.length(); i++) {
+			int r = s2.charAt(i + s1.length()) - 'a';
+			int l = s2.charAt(i) - 'a';
+			if (count == 26) return true; // all char counts match
+			s2map[r]++; // move upper end of window right
+			if (s2map[r] == s1map[r]) {
+				count++; // previously char counts didn't match, now they do
+			} else if (s2map[r] == s1map[r] + 1) {
+				count--; // previously char counts were matching, now they aren't
+			}
+			s2map[l]--; // move lower end of window right to keep size of window = len(s1)
+			if (s2map[l] == s1map[l]) {
+				count++;
+			} else if (s2map[l] == s1map[l] - 1) {
+				count--;
+			}
+		}
+		return count == 26;
+	}
+	// O(l1 * (l2-l1)) time and O(26) = O(1) space
+	public static boolean checkInclusionSquared(String s1, String s2) {
+		int[] counts = getCountsArray(s1);
+		int[] countsTemp = counts.clone();
+		for (int i = 0; i < s2.length()-s1.length(); i++) {
+			char c = s2.charAt(i);
+			int j = i;
+			if (counts[c-'a'] > 0) { // char c is in s1, explore following chars to see if all from s1 are present
+				// fill countsTemp with contents of counts
+				System.arraycopy(counts, 0, countsTemp, 0, counts.length);
+				int start = j;
+				while (j < s2.length() && countsTemp[s2.charAt(j)-'a'] > 0) {
+					countsTemp[s2.charAt(j)-'a']--;
+					j++;
+				}
+				if (j - start == s1.length()) return true;
+				// consider possibly going from O(n^2) time to O(n) by now working up from start rather than starting over from i+1
+			}
+		}
+		return false;
+	}
+	// works for lowercase english letters only
+	private static int[] getCountsArray(String s) {
+		int[] result = new int[26];
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			result[c-'a']++;
+		}
+		return result;
+	}
+
+	// https://leetcode.com/problems/zigzag-conversion
+	// O(n) time where n = s.length, O(1) space
+	public static String convert(String s, int numRows) {
+		if (numRows == 1) return s;
+		StringBuilder result = new StringBuilder();
+		int start = 0;
+		int row = 1;
+		int interval1 = (numRows-1)*2; // intervals are same at row 1
+		int interval2 = (numRows-1)*2;
+		while (result.length() < s.length()) {
+			int i = start++;
+			while (i < s.length()) {
+				result.append(s.charAt(i));
+				i += interval1;
+				if (i < s.length()) {
+					result.append(s.charAt(i));
+					i += interval2;
+				}
+			}
+			row++;
+			if (row == numRows) { // at the end, need same interval as beginning
+				interval1 = (numRows-1)*2;
+				interval2 = (numRows-1)*2;
+			} else {
+				interval2 = row == 2 ? 2 : interval2 + 2; // start at 2 and increase
+				interval1 -= 2; // start at (numRows-1)*2 and decrease by 2 each row
+			}
+		}
+		return result.toString();
+	}
+
+	// https://leetcode.com/problems/verifying-an-alien-dictionary
+	public static boolean isAlienSorted(String[] words, String order) {
+		for (int i = 1; i < words.length; i++) {
+			int c = 0;
+			String prev = words[i-1];
+			String cur = words[i];
+			while (c < prev.length() && c < cur.length() && prev.charAt(c) == cur.charAt(c)) {
+				c++;
+			}
+			if (c == prev.length() && c == cur.length()) {
+				// they were the same word, do nothing as this is lexicographically sorted
+			} else if (c == prev.length()) {
+				// went off the end of the first word, do nothing as this is lexicographically sorted
+			} else if (c == cur.length()) {
+				// went off the end of the 2nd word, 2nd is a prefix of the 1st so return false
+				return false;
+			} else { // chars don't match, compare against alphabet
+				for (int j = 0; j < order.length(); j++) {
+					char a = order.charAt(j);
+					if (a == prev.charAt(c)) {
+						break; // expect the leading word's char to be found 1st, exit the inner loop and continue
+					} else if (a == cur.charAt(c)){
+						return false; // following word's char found 1st, not alphabetic
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
+	// https://leetcode.com/problems/greatest-common-divisor-of-strings
+	// doing things the hard way
+	public static String gcdOfStrings(String str1, String str2) {
+		String gcd = str2;
+		while (!gcd.isEmpty()) {
+			if (str1.replaceAll(gcd, "").isEmpty() && str2.replaceAll(gcd, "").isEmpty()) {
+				return gcd;
+			}
+			int i = 1;
+			while (gcd.length()-i > 0 && str2.length() % (gcd.length()-i) != 0 && str1.length() % (gcd.length()-i) != 0) {
+				i++;
+			}
+			gcd = gcd.substring(0, gcd.length()-i);
+		}
+		return "";
+	}
+
 	// https://leetcode.com/problems/reorganize-string
 	// technically O(n) runtime, but have to go through all 26 options to find max with each character in s
 	public static String reorganizeString(String s) {
@@ -174,9 +318,53 @@ public class StringQuestions {
 		return m;
 	}
 
-	// https://leetcode.com/problems/longest-repeating-character-replacement/
+	// https://leetcode.com/problems/longest-repeating-character-replacement
 	// O(n) time and O(1) space
 	public static int characterReplacement(String s, int k) {
+		int[] chars = new int[26];
+		int lo=0, maxRepeatingCh=0, max=0;
+		for (int hi=0; hi < s.length(); hi++){
+			maxRepeatingCh = Math.max(maxRepeatingCh, ++chars[s.charAt(hi)-'A']);
+			while (hi-lo+1-maxRepeatingCh > k){
+				chars[s.charAt(lo)-'A']--;
+				lo++;
+			}
+			max = Math.max(max, hi-lo+1);
+		}
+		return max;
+	}
+	public static int characterReplacement2(String s, int k) {
+		int lo = 0, hi = 0, max = 1;
+		int[] chars = new int[26];
+		int curRepl = 0; // number of current letters that would be replaced in the window
+		while (hi < s.length()) {
+			if (curRepl > k) { // shrink from lower end
+				char lower = s.charAt(lo);
+				chars[lower-'A']--;
+				lo++;
+			} else { // increase upper end
+				max = Math.max(max, hi-lo); // window is valid, so check size
+				char upper = s.charAt(hi);
+				chars[upper-'A']++;
+				hi++;
+			}
+			curRepl = getReplaceCount(chars);
+		}
+		if (curRepl <= k) max = Math.max(max, hi-lo); // window may also be valid
+		return max;
+	}
+	// probably a better way of tracking this, but it works for now and is technically constant time
+	private static int getReplaceCount(int[] a) {
+		int sum = a[0];
+		int max = a[0];
+		for (int i = 1; i < a.length; i++) {
+			sum += a[i];
+			max = Math.max(max, a[i]);
+		}
+		return sum - max;
+	}
+	// O(n) time and O(1) space
+	public static int characterReplacementOG(String s, int k) {
 		int n = s.length();
 		if (k-1 >= n) return n;
 		int result = k+1;
@@ -706,7 +894,7 @@ public class StringQuestions {
 	public static int lengthOfLongestSubstring(String s) {
 		Set<Character> set = new HashSet<>(); // technically might be better to use bitset since only 256 possible chars
 		int low = 0, high = 0, max = 0;
-		while (high < s.length()) { // inv: set contains the chars from s[low] to s[high-1]
+		while (high < s.length()) { // inv: set contains the chars from s[low] to s[high-1] inclusive
 			char c = s.charAt(high);
 			if (set.contains(c)) { // pause high, remove from the chars from the low end until no more duplicates 
 				set.remove(s.charAt(low));
@@ -716,6 +904,22 @@ public class StringQuestions {
 				high++;		// set contains the chars from s[low] to s[high-1]
 				if (set.size() > max) max = set.size();
 			}
+		}
+		return max;
+	}
+	public int lengthOfLongestSubstring2(String s) {
+		Set<Character> set = new HashSet<>();
+		int lo = 0, hi = 0, max = 0;
+		while (hi < s.length()) {
+			// move lo pointer up until sliding window doesn't contain current (hi) char
+			while (set.contains(s.charAt(hi)) && lo < hi) {
+				set.remove(s.charAt(lo));
+				lo++;
+			}
+			// add current char
+			set.add(s.charAt(hi));
+			hi++;
+			max = Math.max(max, hi-lo);
 		}
 		return max;
 	}
@@ -729,10 +933,37 @@ public class StringQuestions {
 		}
 	}
 
+	// https://leetcode.com/problems/longest-palindrome
+	// longest palindrome can be built with chars that occur in even counts, if it's odd then make it even
+	public static int longestPalindrome(String s) {
+		int[] counts = new int[26*2];
+		for (int i = 0; i < s.length(); i++) {
+			int index = getIndex(s.charAt(i));
+			counts[index]++;
+		}
+		int result = 0;
+		for (int i = 0; i < counts.length; i++) {
+			if (counts[i] % 2 == 0) {
+				result += counts[i];
+			} else {
+				result += counts[i] - 1;
+			}
+		}
+		return result < s.length() ? result+1 : result; // can put odd char in middle of palindrome if there is a spare char for it
+	}
+	// squish upper and lowercase array into single array of counts, returns the index
+	private static int getIndex(char c) {
+		if (Character.isUpperCase(c)) {
+			return c - 'A' + 26;
+		} else {
+			return c - 'a';
+		}
+	}
+
 	// https://leetcode.com/problems/longest-palindromic-substring
 	// runtime = O(n^2) where n = s.length. Check n possible centers, checking for palindrome at
 	// each location could be O(n) worst case
-	public String longestPalindrome(String s) {
+	public String longestPalindromeSubstring(String s) {
 		int n = s.length();
 		if (n == 0) return "";
 		String longest = s.substring(0, 1);  // a single char itself is a palindrome
@@ -755,6 +986,28 @@ public class StringQuestions {
 			r++;
 		}
 		return s.substring(l+1, r);
+	}
+	// better solution that would be O(n) if call to substring didn't always create a new string
+	public String longestPalindromeSubstringBest(String s) {
+		String res = "";
+		int curLen = 0;
+		for (int i = 0; i < s.length(); i++) {
+			if (isPalindrome(s, i-curLen-1, i)) {
+				res = s.substring(i-curLen-1, i+1);
+				curLen += 2;
+			} else if (isPalindrome(s, i-curLen, i)) {
+				res = s.substring(i-curLen, i+1);
+				curLen++;
+			}
+		}
+		return res;
+	}
+	private boolean isPalindrome(String s, int begin, int end) {
+		if (begin < 0) return false;
+		while (begin < end) {
+			if (s.charAt(begin++) != s.charAt(end--)) return false;
+		}
+		return true;
 	}
 
 	// reverses the string preserving positions of spaces; i.e. " a if" -> " f ia"

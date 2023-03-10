@@ -12,6 +12,13 @@ import static org.junit.Assert.*;
 public class GraphQuestionsTest {
 
     @Test
+    public void testMinimumFuelCost() {
+        assertEquals(0, GraphQuestions.minimumFuelCost(new int[][]{}, 1));
+        assertEquals(3, GraphQuestions.minimumFuelCost(new int[][]{{0,1},{0,2},{0,3}}, 5));
+        assertEquals(7, GraphQuestions.minimumFuelCost(new int[][]{{3,1},{3,2},{1,0},{0,4},{0,5},{4,6}}, 2));
+    }
+
+    @Test
     public void testCloneGraph() {
         Node one = new Node(1);
         Node two = new Node(2);

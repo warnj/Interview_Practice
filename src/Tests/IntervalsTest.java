@@ -9,6 +9,17 @@ import static org.junit.Assert.assertEquals;
 
 public class IntervalsTest {
 
+
+    @Test
+    public void testMeetingRooms() {
+        assertEquals(3, Intervals.meetingRooms(new int[][]{{0,30},{5,10},{5,15},{15,20}}));
+        assertEquals(3, Intervals.meetingRooms(new int[][]{{5,15},{40,70},{0,30},{5,10},{60,72},{15,20},{39,61}}));
+        assertEquals(3, Intervals.meetingRooms(new int[][]{{5,15},{40,70},{5,10},{60,72},{15,20},{0,30},{39,59}}));
+        assertEquals(4, Intervals.meetingRooms(new int[][]{{0,30},{5,10},{5,15},{9,20}}));
+        assertEquals(4, Intervals.meetingRooms(new int[][]{{0,30},{5,10},{5,15},{9,20}}));
+        assertEquals(0, Intervals.meetingRooms(new int[][]{}));
+    }
+
     @Test
     public void testEraseOverlapIntervals() {
         assertEquals(1, Intervals.eraseOverlapIntervals(new int[][]{{1,2},{2,3},{3,4},{1,3}}));

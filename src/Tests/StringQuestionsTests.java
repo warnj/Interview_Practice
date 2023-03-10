@@ -8,6 +8,33 @@ import static org.junit.Assert.*;
 public class StringQuestionsTests {
 
 	@Test
+	public void testPermutationInString() {
+		assertTrue(StringQuestions.checkInclusion("ab", "eidbaooo"));
+		assertTrue(StringQuestions.checkInclusion("abc", "eidbbbacooo"));
+		assertFalse(StringQuestions.checkInclusion("abc", "eidcbbbaooo"));
+		assertFalse(StringQuestions.checkInclusion("ab", "eidboaoo"));
+	}
+
+	@Test
+	public void testZigZagString() {
+		assertEquals("PYAIHRNAPLSIIG", StringQuestions.convert("PAYPALISHIRING", 2));
+		assertEquals("PAHNAPLSIIGYIR", StringQuestions.convert("PAYPALISHIRING", 3));
+		assertEquals("PINALSIGYAHRPI", StringQuestions.convert("PAYPALISHIRING", 4));
+		assertEquals("PHASIYIRPLIGAN", StringQuestions.convert("PAYPALISHIRING", 5));
+		assertEquals("A", StringQuestions.convert("A", 1));
+	}
+
+	@Test
+	public void testAlienDict() {
+		assertTrue(StringQuestions.isAlienSorted(new String[]{"hello", "land"}, "hlabcdefgijkmnopqrstuvwxyz"));
+	}
+
+	@Test
+	public void testGCD() {
+		assertEquals("AB", StringQuestions.gcdOfStrings("ABABAB", "ABAB"));
+	}
+
+	@Test
 	public void testFrequencySort() {
 		assertEquals("BBBAA", StringQuestions.frequencySort("ABABB"));
 		assertEquals("aaaabbbAA", StringQuestions.frequencySort("AAaaaabbb"));
@@ -152,5 +179,13 @@ public class StringQuestionsTests {
 		assertEquals(StringQuestions.longestCommonPrefix(new String[] {"there", "the", "them"}), "the");
 		assertEquals(StringQuestions.longestCommonPrefix(new String[] {"the", "there", "them"}), "the");
 	}
-	
+
+	@Test
+	public void testLongestPalindrome() {
+		assertEquals(7, StringQuestions.longestPalindrome("abccccdd"));
+		assertEquals(12, StringQuestions.longestPalindrome("aabbccddeeff"));
+		assertEquals(1, StringQuestions.longestPalindrome("a"));
+		String in = "civilwartestingwhetherthatnaptionoranynartionsoconceivedandsodedicatedcanlongendureWeareqmetonagreatbattlefiemldoftzhatwarWehavecometodedicpateaportionofthatfieldasafinalrestingplaceforthosewhoheregavetheirlivesthatthatnationmightliveItisaltogetherfangandproperthatweshoulddothisButinalargersensewecannotdedicatewecannotconsecratewecannothallowthisgroundThebravelmenlivinganddeadwhostruggledherehaveconsecrateditfaraboveourpoorponwertoaddordetractTgheworldadswfilllittlenotlenorlongrememberwhatwesayherebutitcanneverforgetwhattheydidhereItisforusthelivingrathertobededicatedheretotheulnfinishedworkwhichtheywhofoughtherehavethusfarsonoblyadvancedItisratherforustobeherededicatedtothegreattdafskremainingbeforeusthatfromthesehonoreddeadwetakeincreaseddevotiontothatcauseforwhichtheygavethelastpfullmeasureofdevotionthatweherehighlyresolvethatthesedeadshallnothavediedinvainthatthisnationunsderGodshallhaveanewbirthoffreedomandthatgovernmentofthepeoplebythepeopleforthepeopleshallnotperishfromtheearth";
+		assertEquals(983, StringQuestions.longestPalindrome(in));
+	}
 }

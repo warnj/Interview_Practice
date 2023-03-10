@@ -14,6 +14,12 @@ import static org.junit.Assert.*;
 public class ArrayQuestionsTests {
 
 	@Test
+	public void testFruit() {
+		assertEquals(3, ArrayQuestions.totalFruit(new int[]{1,2,1}));
+		assertEquals(3, ArrayQuestions.totalFruit(new int[]{0,1,2,2}));
+		assertEquals(4, ArrayQuestions.totalFruit(new int[]{1,2,3,2,2}));
+	}
+	@Test
 	public void testMaxSubarraySumCircular() {
 		assertEquals(3, ArrayQuestions.maxSubarraySumCircular(new int[]{1,-2,3,-2}));
 		assertEquals(10, ArrayQuestions.maxSubarraySumCircular(new int[]{5,-3,5}));
@@ -40,7 +46,9 @@ public class ArrayQuestionsTests {
 		assertEquals(4, ArrayQuestions.lengthOfLIS(new int[]{10,9,2,5,3,7,101,18}));
 		assertEquals(5, ArrayQuestions.lengthOfLIS(new int[]{10,9,2,5,3,4,5,6}));
 		assertEquals(4, ArrayQuestions.lengthOfLIS(new int[]{0,1,0,3,2,3}));
+		assertEquals(3, ArrayQuestions.lengthOfLIS(new int[]{4,10,4,3,8,9}));
 		assertEquals(1, ArrayQuestions.lengthOfLIS(new int[]{7,7,7,7,7,7,7}));
+		assertEquals(6, ArrayQuestions.lengthOfLIS(new int[]{1,3,6,7,9,4,10,5,6}));
 	}
 
 	@Test

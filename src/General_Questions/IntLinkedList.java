@@ -411,23 +411,44 @@ public class IntLinkedList {
 		return head;
 	}
 
-	// https://leetcode.com/problems/reorder-list/
-	public void reorderList() {
-		while (head != null && head.next != null) {
-			ListNode temp = head.next;
-			head.next = getAndRemoveLast(head);
-			head.next.next = temp;
-			head = temp;
-			System.out.println(this);
+	// https://leetcode.com/problems/linked-list-cycle
+	public boolean hasCycle(ListNode head) {
+		ListNode cur = head;
+		ListNode fast = head;
+		while (fast != null && fast.next != null) {
+			cur = cur.next;
+			fast = fast.next.next;
+			if (cur == fast) return true;
 		}
+		return false;
 	}
-	private ListNode getAndRemoveLast(ListNode n) {
-		while (n.next.next != null) {
-			n = n.next;
+
+	// https://leetcode.com/problems/reorder-list/
+	// use a stack to get the correct reverse ordering O(n) time and space
+	// for O(1) extra space, can find middle, reverse last half, then interweave the halves
+	public void reorderList() {
+		Stack<ListNode> s = new Stack<>(); // used to get backwards node ordering
+		ListNode cur = head;
+		while (cur != null) {
+			s.push(cur);
+			cur = cur.next;
 		}
-		ListNode last = n.next;
-		n.next = null;
-		return last;
+		ListNode h = head; // points to current section in original list we're building from
+		cur = head; // use to construct new list
+		int size = s.size();
+		int added = 0;
+		while (added < size) {
+			h = cur.next;
+			cur.next = s.pop();
+			added++;
+			cur = cur.next;
+			if (added < size) {
+				cur.next = h;
+				cur = cur.next;
+				added++;
+			}
+			if (added == size) cur.next = null; // terminate the list
+		}
 	}
 
 	// returns null if there is no loop, otherwise returns the int at the point where the loop begins
