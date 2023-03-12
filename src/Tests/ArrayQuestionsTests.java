@@ -19,11 +19,18 @@ public class ArrayQuestionsTests {
 		assertEquals(3, ArrayQuestions.totalFruit(new int[]{0,1,2,2}));
 		assertEquals(4, ArrayQuestions.totalFruit(new int[]{1,2,3,2,2}));
 	}
+
 	@Test
 	public void testMaxSubarraySumCircular() {
-		assertEquals(3, ArrayQuestions.maxSubarraySumCircular(new int[]{1,-2,3,-2}));
-		assertEquals(10, ArrayQuestions.maxSubarraySumCircular(new int[]{5,-3,5}));
-		assertEquals(-2, ArrayQuestions.maxSubarraySumCircular(new int[]{-3,-2,-3}));
+		assertEquals(3, ArrayQuestions.maxSubarraySumCircular(new int[]{1, -2, 3, -2}));
+		assertEquals(10, ArrayQuestions.maxSubarraySumCircular(new int[]{5, -3, 5}));
+		assertEquals(-2, ArrayQuestions.maxSubarraySumCircular(new int[]{-3, -2, -3}));
+	}
+
+	public void testMaxIceCream() {
+		assertEquals(4, ArrayQuestions.maxIceCream(new int[]{1,3,2,4,1}, 7));
+		assertEquals(0, ArrayQuestions.maxIceCream(new int[]{10,6,8,7,7,8}, 5));
+		assertEquals(6, ArrayQuestions.maxIceCream(new int[]{1,6,3,1,2,5}, 20));
 	}
 
 	@Test
@@ -433,5 +440,15 @@ public class ArrayQuestionsTests {
 		assertArrayEquals(new int[]{1,0}, ArrayQuestions.plusOne(new int[]{9}));
 		assertArrayEquals(new int[]{1,0,0,0}, ArrayQuestions.plusOne(new int[]{9,9,9}));
 		assertArrayEquals(new int[]{3,0,0}, ArrayQuestions.plusOne(new int[]{2,9,9}));
+	}
+
+	@Test
+	public void testIndexOf() {
+		assertEquals(3, ArrayQuestions.indexOfBinarySearchRecursive(new int[]{1,2,3,4,5,6}, 4));
+		assertEquals(0, ArrayQuestions.indexOfBinarySearchRecursive(new int[]{1,2,3,4,5,6}, 1));
+//		assertEquals(-1, ArrayQuestions.indexOfBinarySearchRecursive(new int[]{1,2,3,4,5,6}, 7));
+		assertEquals(3, ArrayQuestions.indexOfBinarySearchRecursive(new int[]{1,2,3,4,5}, 4));
+		assertEquals(0, ArrayQuestions.indexOfBinarySearchRecursive(new int[]{1,2,3,4,5}, 1));
+		assertEquals(-1, ArrayQuestions.indexOfBinarySearchRecursive(new int[]{1,2,3,4,5}, 7));
 	}
 }

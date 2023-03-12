@@ -43,11 +43,23 @@ public class ArrayQuestions {
             int sum = nums[i];
             max = Math.max(max, sum);
             for (int j = 1; j < n; j++) { // length of possible subarray
-                sum += nums[(i+j)%n];
+                sum += nums[(i + j) % n];
                 max = Math.max(max, sum);
             }
         }
         return max;
+    }
+
+    // https://leetcode.com/problems/maximum-ice-cream-bars
+    public static int maxIceCream(int[] costs, int coins) {
+        Arrays.sort(costs);
+        int count = 0;
+        int i = 0;
+        while (i < costs.length && coins > 0) {
+            coins -= costs[i++];
+            if (coins >= 0) count++;
+        }
+        return count;
     }
 
     // https://leetcode.com/problems/first-missing-positive/
@@ -1562,6 +1574,20 @@ public class ArrayQuestions {
             } else { // arr[mid] > key
                 high = mid - 1;
             }
+        }
+        return -1;
+    }
+    public static int indexOfBinarySearchRecursive(int[] arr, int target) {
+        return indexOfBinarySearchRecursive(arr, 0, arr.length-1, target);
+    }
+    private static int indexOfBinarySearchRecursive(int[] arr, int l, int r, int x) {
+        if (r >= l) {
+            int mid = l + (r-l) / 2;
+            if (arr[mid] == x)
+                return mid;
+            if (arr[mid] > x)
+                return indexOfBinarySearchRecursive(arr, l, mid-1, x);
+            return indexOfBinarySearchRecursive(arr, mid+1, r, x);
         }
         return -1;
     }
